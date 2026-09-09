@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { account } from "@/lib/appwrite";
 import { LogOut, WalletCards } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import {
   InputOTP,
@@ -51,6 +53,7 @@ export default function Home() {
   const [user, setUser] = useState(null);
   const [checkingSession, setCheckingSession] = useState(true);
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [isEditingPhone, setIsEditingPhone] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
 
@@ -115,6 +118,10 @@ export default function Home() {
                 displayName={displayName}
                 email={user?.email}
                 phoneNumber={phoneNumber}
+                onEditPhone={() => {
+                  setIsEditingPhone(true);
+                  setIsProfileOpen(false);
+                }}
                 avatarSeed={avatarSeed}
                 onSignOut={signOut}
                 isSigningOut={isSigningOut}
@@ -128,13 +135,20 @@ export default function Home() {
         id="overview"
         aria-label="Nexora overview"
         className="relative z-10 min-h-[calc(100svh-4rem)]"
-      />
+      >
+        {phoneNumber && !isEditingPhone && <FundPanel />}
+      </section>
 
       <div className="pointer-events-none fixed inset-x-0 bottom-20 top-16 z-20 flex items-center justify-center px-5 md:bottom-0">
         <div className="pointer-events-auto w-full max-w-lg">
-          {!phoneNumber && (
+          {(!phoneNumber || isEditingPhone) && (
             <PhoneNumberPrompt
-              onSaved={(savedNumber) => setPhoneNumber(savedNumber)}
+              initialValue={isEditingPhone ? phoneNumber : ""}
+              isEditing={isEditingPhone}
+              onSaved={(savedNumber) => {
+                setPhoneNumber(savedNumber);
+                setIsEditingPhone(false);
+              }}
             />
           )}
         </div>
@@ -173,6 +187,10 @@ export default function Home() {
               displayName={displayName}
               email={user?.email}
               phoneNumber={phoneNumber}
+              onEditPhone={() => {
+                setIsEditingPhone(true);
+                setIsProfileOpen(false);
+              }}
               avatarSeed={avatarSeed}
               onSignOut={signOut}
               isSigningOut={isSigningOut}
@@ -188,8 +206,129 @@ function maskPhoneNumber(phoneNumber) {
   return phoneNumber;
 }
 
-function PhoneNumberPrompt({ onSaved }) {
-  const [phoneNumber, setPhoneNumber] = useState("");
+function FundPanel() {
+  const [amount, setAmount] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [paymentKey, setPaymentKey] = useState("");
+  const [ledgerRowId, setLedgerRowId] = useState("");
+  const [paymentStatus, setPaymentStatus] = useState("");
+
+  useEffect(() => {
+    if (!paymentKey) return undefined;
+
+    const interval = setInterval(async () => {
+      try {
+        const jwtResponse = await account.createJWT();
+        const response = await fetch(`/api/payment/status?paymentKey=${encodeURIComponent(paymentKey)}&ledgerRowId=${encodeURIComponent(ledgerRowId)}`, {
+          headers: { Authorization: `Bearer ${jwtResponse.jwt}` },
+        });
+        const result = await response.json();
+        const status = result.data?.status;
+        if (status === "success") {
+          setPaymentStatus("Payment confirmed.");
+          toast.success("Payment confirmed");
+          clearInterval(interval);
+        } else if (["failed", "cancelled"].includes(status)) {
+          setPaymentStatus("Payment was not completed.");
+          setError("The M-Pesa payment was not completed. You can try again.");
+          clearInterval(interval);
+        }
+      } catch {
+        // Keep polling while ZetuPay processes the STK request.
+      }
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [paymentKey, ledgerRowId]);
+
+  async function startPayment(event) {
+    event.preventDefault();
+    const numericAmount = Number(amount);
+    if (!Number.isSafeInteger(numericAmount) || numericAmount < 1) {
+      setError("Enter a valid amount in KES.");
+      return;
+    }
+
+    setIsLoading(true);
+    setError("");
+    try {
+      const jwtResponse = await account.createJWT();
+      const response = await fetch("/api/payment/initiate", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${jwtResponse.jwt}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ amount: numericAmount }),
+      });
+      const result = await response.json();
+      if (!response.ok || !result.data) {
+        throw new Error(result.message || result.error || "Payment could not be started.");
+      }
+      if (result.data.directStk) {
+        setPaymentKey(result.data.paymentKey);
+        setLedgerRowId(result.data.ledgerRowId);
+        setPaymentStatus("STK prompt sent. Enter your M-Pesa PIN.");
+        setIsLoading(false);
+      } else if (result.data.checkoutUrl) {
+        toast.info("Opening secure M-Pesa checkout", {
+          description: result.data.directStkError || "Continue there to start the STK prompt.",
+        });
+        window.location.assign(result.data.checkoutUrl);
+      } else {
+        throw new Error("Payment could not be started.");
+      }
+    } catch (paymentError) {
+      setError(
+        paymentError instanceof Error
+          ? paymentError.message
+          : "Payment could not be started.",
+      );
+      setIsLoading(false);
+    }
+  }
+
+  return (
+    <div id="fund-account" className="mx-auto max-w-lg px-5 py-24">
+      <p className="text-sm font-medium text-muted-foreground">Fund account</p>
+      <h2 className="mt-3 text-3xl font-semibold tracking-tight text-foreground">
+        Add funds in KES
+      </h2>
+      <p className="mt-4 max-w-md text-sm leading-6 text-muted-foreground">
+        Start a secure M-Pesa payment using your saved number.
+      </p>
+      <form onSubmit={startPayment} className="mt-8 max-w-sm space-y-4">
+        <label className="block text-sm font-medium text-foreground" htmlFor="fund-amount">
+          Amount in KES
+        </label>
+        <Input
+          id="fund-amount"
+          type="number"
+          min="1"
+          step="1"
+          inputMode="numeric"
+          value={amount}
+          onChange={(event) => setAmount(event.target.value)}
+          placeholder="Enter amount"
+          required
+        />
+        {paymentStatus && (
+          <p className="text-sm text-muted-foreground" role="status">
+            {paymentStatus}
+          </p>
+        )}
+        {error && <p className="text-sm text-destructive" role="alert">{error}</p>}
+        <Button type="submit" disabled={isLoading}>
+          {isLoading ? "Starting payment..." : "Continue with M-Pesa"}
+        </Button>
+      </form>
+    </div>
+  );
+}
+
+function PhoneNumberPrompt({ initialValue, isEditing, onSaved }) {
+  const [phoneNumber, setPhoneNumber] = useState(initialValue);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
 
@@ -201,7 +340,7 @@ function PhoneNumberPrompt({ onSaved }) {
   async function savePhoneNumber(event) {
     event.preventDefault();
     if (!/^(01|07)\d{8}$/.test(phoneNumber)) {
-      setError("Enter a valid Safaricom number beginning with 01 or 07.");
+      setError("Enter a valid M-Pesa number beginning with 01 or 07.");
       return;
     }
 
@@ -209,7 +348,7 @@ function PhoneNumberPrompt({ onSaved }) {
     setError("");
     try {
       await account.updatePrefs({ safaricomPhoneNumber: phoneNumber });
-      toast.success("M-Pesa number saved", {
+      toast.success(isEditing ? "M-Pesa number updated" : "M-Pesa number saved", {
         description: `${maskPhoneNumber(phoneNumber)} is ready for funding.`,
       });
       onSaved(phoneNumber);
@@ -225,7 +364,7 @@ function PhoneNumberPrompt({ onSaved }) {
         Before you fund your account
       </p>
       <h1 className="mt-3 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-        Add your M-Pesa number
+        {isEditing ? "Edit your M-Pesa number" : "Add your M-Pesa number"}
       </h1>
       <p className="mt-4 max-w-md text-sm leading-6 text-muted-foreground">
         We will use this number for your M-Pesa payment prompt.
@@ -263,7 +402,13 @@ function PhoneNumberPrompt({ onSaved }) {
           disabled={isSaving}
           className="mt-8 inline-flex min-h-11 min-w-32 items-center justify-center rounded-md bg-primary px-6 text-sm font-medium text-primary-foreground shadow-xs transition-colors hover:bg-primary/90 disabled:pointer-events-none disabled:opacity-50"
         >
-          {isSaving ? "Saving number..." : "Save number"}
+          {isSaving
+            ? isEditing
+              ? "Updating number..."
+              : "Saving number..."
+            : isEditing
+              ? "Update number"
+              : "Save number"}
         </button>
       </form>
     </div>
@@ -274,6 +419,7 @@ function ProfileSheet({
   displayName,
   email,
   phoneNumber,
+  onEditPhone,
   avatarSeed,
   onSignOut,
   isSigningOut,
@@ -294,9 +440,19 @@ function ProfileSheet({
           <p className="truncate font-medium text-foreground">{displayName}</p>
           <p className="truncate text-sm text-muted-foreground">{email}</p>
           {phoneNumber && (
-            <p className="truncate text-sm text-muted-foreground">
-              {maskPhoneNumber(phoneNumber)}
-            </p>
+            <div className="mt-1 flex items-center gap-2">
+              <p className="truncate text-sm text-muted-foreground">
+                {maskPhoneNumber(phoneNumber)}
+              </p>
+              <Button
+                type="button"
+                variant="outline"
+                size="xs"
+                onClick={onEditPhone}
+              >
+                Edit
+              </Button>
+            </div>
           )}
         </div>
       </div>
