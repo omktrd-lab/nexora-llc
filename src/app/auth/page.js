@@ -35,25 +35,25 @@ export default function AuthPage() {
 
   if (checkingSession) {
     return (
-      <main className="flex min-h-screen items-center justify-center px-6">
-        <p className="text-sm text-[#8995A8]">Checking your session...</p>
+      <main className="flex min-h-screen items-center justify-center bg-background px-6">
+        <p className="text-sm text-muted-foreground">Checking your session...</p>
       </main>
     );
   }
 
   return (
-    <main className="flex min-h-[100svh] items-start justify-center px-6 py-14 sm:px-10 sm:py-16 md:items-center md:py-12">
-      <section className="w-full max-w-md md:rounded-2xl md:border md:border-[#283140] md:bg-[#12161F] md:p-10 md:shadow-[0_24px_80px_rgba(0,0,0,0.35)]">
+    <main className="flex min-h-[100svh] items-start justify-center bg-background px-6 py-14 sm:px-10 sm:py-16 md:items-center md:py-12">
+      <section className="w-full max-w-md md:rounded-2xl md:border md:border-border md:bg-card md:p-10 md:shadow-xl">
         <div className="mb-10">
-          <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-[#57E6C1]">
+          <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
             Nexora
           </p>
-          <h1 className="font-[Poppins] text-3xl font-light tracking-tight text-[#E7EDF5]">
+          <h1 className="text-3xl font-light tracking-tight text-foreground">
             Enter the pool
           </h1>
-          <p className="mt-3 leading-6 text-[#8995A8]">
-            Access Nexora&apos;s quantitative asset pool and track your share of
-            the $NXR ecosystem.
+          <p className="mt-3 leading-6 text-muted-foreground">
+            Access Nexora&apos;s HFT bot trading pool and track your share of the
+            $NXR ecosystem.
           </p>
         </div>
 
@@ -70,7 +70,7 @@ export default function AuthPage() {
           type="button"
           onClick={signInWithGoogle}
           disabled={isSigningIn}
-          className="flex w-full items-center justify-center gap-3 rounded-lg border border-[#283140] bg-[#181E29] px-4 py-3 font-medium text-[#E7EDF5] transition-colors hover:border-[#57E6C1] hover:bg-[#202937] disabled:cursor-wait disabled:opacity-60"
+          className="flex w-full items-center justify-center gap-3 rounded-lg border border-border bg-muted px-4 py-3 font-medium text-foreground transition-colors hover:bg-accent disabled:cursor-wait disabled:opacity-60"
         >
           <span aria-hidden="true" className="text-lg font-semibold">
             G
@@ -78,7 +78,7 @@ export default function AuthPage() {
           {isSigningIn ? "Redirecting to Google..." : "Continue with Google"}
         </button>
 
-        <p className="mt-8 text-center text-xs leading-5 text-[#8995A8]">
+        <p className="mt-8 text-center text-xs leading-5 text-muted-foreground">
           HFT bots, cross-exchange arbitrage, pooled liquidity, and a first-loss
           reserve built into the Nexora model.
         </p>

@@ -5,10 +5,10 @@ export const metadata = {
 
 export default function PrivacyPolicyPage() {
   return (
-    <main className="mx-auto min-h-screen max-w-3xl px-6 py-16 text-[#E7EDF5] sm:px-10">
+    <main className="mx-auto min-h-screen max-w-3xl bg-background px-6 py-16 text-foreground sm:px-10">
       <article className="prose prose-neutral max-w-none">
         <h1 className="text-4xl font-semibold tracking-tight">Privacy Policy</h1>
-        <p className="mt-3 text-sm text-[#8995A8]">Last updated: September 2026</p>
+        <p className="mt-3 text-sm text-muted-foreground">Last updated: September 2026</p>
 
         <p className="mt-10 leading-7">
           Nexora ("we", "us", or "our") operates the Nexora application. This
@@ -53,7 +53,7 @@ export default function PrivacyPolicyPage() {
           If you have any questions about this privacy policy, please contact
           us at{" "}
           <a
-            className="text-[#57E6C1] underline underline-offset-4"
+            className="text-foreground underline underline-offset-4"
             href="mailto:brianitira@gmail.com"
           >
             brianitira@gmail.com
