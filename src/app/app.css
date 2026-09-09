@@ -1,5 +1,22 @@
 @import "tailwindcss";
 
+:root {
+  --obsidian: #090b0e;
+  --slate: #12161f;
+  --slate-raised: #181e29;
+  --slate-border: #283140;
+  --slate-text: #e7edf5;
+  --slate-muted: #8995a8;
+  --neon: #57e6c1;
+  --neon-soft: #57e6c126;
+}
+
+html,
+body {
+  background: var(--obsidian);
+  color: var(--slate-text);
+}
+
 summary::-webkit-details-marker {
   display: none
 }
@@ -11,8 +28,8 @@ summary::-webkit-details-marker {
   right: 0;
   bottom: 0;
   left: 0;
-  background-image: linear-gradient(#e6e6e690 1px, transparent 1px),
-    linear-gradient(90deg, #e6e6e690 1px, transparent 1px);
+  background-image: linear-gradient(#28314080 1px, transparent 1px),
+    linear-gradient(90deg, #28314080 1px, transparent 1px);
   background-size: 3.7em 3.7em;
   mask-image: radial-gradient(ellipse at 50% 40%, black 0%, transparent 55%);
   z-index: -1;
