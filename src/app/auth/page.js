@@ -26,11 +26,11 @@ export default function AuthPage() {
     setError("");
     setIsSigningIn(true);
 
-    account.createOAuth2Session({
-      provider: OAuthProvider.Google,
-      success: `${window.location.origin}/`,
-      failure: `${window.location.origin}/auth?error=oauth`,
-    });
+    account.createOAuth2Session(
+      OAuthProvider.Google,
+      `${window.location.origin}/`,
+      `${window.location.origin}/auth?error=oauth`,
+    );
   }
 
   if (checkingSession) {
