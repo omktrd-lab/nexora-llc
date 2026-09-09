@@ -42,8 +42,8 @@ export default function AuthPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center px-6 py-12 sm:px-10">
-      <section className="w-full max-w-md rounded-2xl border border-[#283140] bg-[#12161F] p-7 shadow-[0_24px_80px_rgba(0,0,0,0.35)] sm:p-10">
+    <main className="flex min-h-[100svh] items-start justify-center px-6 py-14 sm:px-10 sm:py-16 md:items-center md:py-12">
+      <section className="w-full max-w-md md:rounded-2xl md:border md:border-[#283140] md:bg-[#12161F] md:p-10 md:shadow-[0_24px_80px_rgba(0,0,0,0.35)]">
         <div className="mb-10">
           <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-[#57E6C1]">
             Nexora
