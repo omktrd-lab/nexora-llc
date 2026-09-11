@@ -20,7 +20,7 @@ export async function GET() {
 
       const response = await fetch(url, {
         cache: "no-store",
-        signal: AbortSignal.timeout(8000),
+        signal: AbortSignal.timeout(15000),
       });
       if (!response.ok) {
         throw new Error(`Binance 24hr ticker failed with status ${response.status}`);

@@ -25,7 +25,7 @@ export async function GET(request) {
 
       const response = await fetch(url, {
         cache: "no-store",
-        signal: AbortSignal.timeout(8000),
+        signal: AbortSignal.timeout(15000),
       });
       if (!response.ok) {
         throw new Error(`Binance depth failed with status ${response.status}`);

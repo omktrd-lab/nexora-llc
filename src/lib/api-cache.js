@@ -7,7 +7,7 @@
 const memoryCache = new Map();
 const inFlightRequests = new Map();
 
-export async function fetchWithCache(cacheKey, fetcher, ttlMs = 2000) {
+export async function fetchWithCache(cacheKey, fetcher, ttlMs = 5000) {
   const now = Date.now();
   const cached = memoryCache.get(cacheKey);
 
@@ -27,10 +27,12 @@ export async function fetchWithCache(cacheKey, fetcher, ttlMs = 2000) {
       memoryCache.set(cacheKey, { data, timestamp: Date.now() });
       return data;
     } catch (err) {
-      // If live fetch fails, fall back to last known good cached data if available
+      // If live fetch fails, fall back to the last known good cached data if available.
       if (cached) {
+        console.warn(`Using stale cache for ${cacheKey}:`, err instanceof Error ? err.message : err);
         return cached.data;
       }
+      console.error(`Market fetch failed for ${cacheKey}:`, err instanceof Error ? err.message : err);
       throw err;
     } finally {
       inFlightRequests.delete(cacheKey);

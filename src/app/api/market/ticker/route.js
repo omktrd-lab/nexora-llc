@@ -43,7 +43,7 @@ async function fetchBinanceKlines(
 
       const response = await fetch(url, {
         cache: "no-store",
-        signal: AbortSignal.timeout(8000),
+        signal: AbortSignal.timeout(15000),
       });
       if (!response.ok) {
         throw new Error(`Binance klines failed with status ${response.status}`);
@@ -180,9 +180,13 @@ export async function GET(request) {
       source: "binance-proxy",
       ...stats,
     });
-  } catch {
+  } catch (error) {
+    console.error("Binance market proxy failed:", error instanceof Error ? error.message : error);
     return NextResponse.json(
-      { message: "Could not read the Binance market proxy feed." },
+      {
+        message: "Could not read the Binance market proxy feed.",
+        error: error instanceof Error ? error.message : String(error),
+      },
       { status: 502 },
     );
   }
