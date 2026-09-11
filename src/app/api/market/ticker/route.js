@@ -43,7 +43,7 @@ async function fetchBinanceKlines(
 
       const response = await fetch(url, {
         cache: "no-store",
-        signal: AbortSignal.timeout(15000),
+        signal: AbortSignal.timeout(8000),
       });
       if (!response.ok) {
         throw new Error(`Binance klines failed with status ${response.status}`);

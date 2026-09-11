@@ -455,7 +455,7 @@ export function NxrMarketChart({
     });
     resizeObserver.observe(container);
 
-    // Polling: candle update + orderbook + trades every 8s to reduce rate-limit pressure on Vercel/Binance.
+    // Polling: candle update + orderbook + trades every 3s
     const poll = async () => {
       if (pollInFlightRef.current) return;
       pollInFlightRef.current = true;
@@ -516,7 +516,7 @@ export function NxrMarketChart({
       }
     };
 
-    const intervalId = window.setInterval(poll, POLL_INTERVAL_MS);
+    const intervalId = window.setInterval(poll, 3000);
 
     return () => {
       window.clearInterval(intervalId);

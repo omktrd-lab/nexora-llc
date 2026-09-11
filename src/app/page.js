@@ -484,7 +484,7 @@ function HomeContent() {
     };
 
     fetchTicker();
-    const interval = setInterval(fetchTicker, 5000);
+    const interval = setInterval(fetchTicker, 2000);
     return () => clearInterval(interval);
   }, [activeSymbol]);
 
