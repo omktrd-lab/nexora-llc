@@ -18,7 +18,10 @@ export default function AuthPage() {
 
     account
       .get()
-      .then(() => router.replace("/"))
+      .then(() => {
+        // User is already authenticated, redirect to home
+        router.replace("/");
+      })
       .catch(() => setCheckingSession(false));
   }, [router]);
 
@@ -26,9 +29,21 @@ export default function AuthPage() {
     setError("");
     setIsSigningIn(true);
 
+    // Get ref from URL params (server-driven, no localStorage)
+    const urlParams = new URLSearchParams(window.location.search);
+    const refCode = urlParams.get("ref");
+    const successUrl = refCode 
+      ? `${window.location.origin}/auth/callback?ref=${refCode}`
+      : `${window.location.origin}/auth/callback`;
+
+    console.log("=== OAUTH INITIATION ===");
+    console.log("Current URL:", window.location.href);
+    console.log("Ref code from URL:", refCode);
+    console.log("OAuth success URL:", successUrl);
+
     account.createOAuth2Session(
       OAuthProvider.Google,
-      `${window.location.origin}/`,
+      successUrl,
       `${window.location.origin}/auth?error=oauth`,
     );
   }

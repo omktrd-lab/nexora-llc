@@ -1,0 +1,26 @@
+{
+  "name": "Nexora",
+  "short_name": "Nexora",
+  "description": "Nexora quantitative asset pool trading terminal.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#090a0c",
+  "theme_color": "#090a0c",
+  "categories": ["finance", "business"],
+  "icons": [
+    {
+      "src": "/nexora-icon.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/nexora-icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
