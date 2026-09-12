@@ -1,9 +1,17 @@
-import { Account, Client } from "appwrite";
 import { NextResponse } from "next/server";
 import { getExecutableNxrPrice, NXR_PRICING } from "@/lib/nxr-pricing";
 
-const appwriteEndpoint = process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT;
-const stateEndpoint = `${appwriteEndpoint}/tablesdb/${process.env.APPWRITE_DATABASE_ID}/tables/${process.env.APPWRITE_NXR_STATE_TABLE_ID}`;
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
+function getAppwriteEndpoint() {
+  return process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT;
+}
+
+function getStateEndpoint() {
+  const appwriteEndpoint = getAppwriteEndpoint();
+  return `${appwriteEndpoint}/tablesdb/${process.env.APPWRITE_DATABASE_ID}/tables/${process.env.APPWRITE_NXR_STATE_TABLE_ID}`;
+}
 
 function error(message, status) {
   return NextResponse.json({ message }, { status });
@@ -36,16 +44,24 @@ export async function POST(request) {
   }
 
   try {
+    const endpoint = getAppwriteEndpoint();
+    const projectId = process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID;
+
+    if (!endpoint || !projectId) {
+      return error("Appwrite is not configured on the server.", 503);
+    }
+
+    const { Account, Client } = await import("appwrite");
     const client = new Client()
-      .setEndpoint(appwriteEndpoint)
-      .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID)
+      .setEndpoint(endpoint)
+      .setProject(projectId)
       .setJWT(jwt);
     const user = await new Account(client).get();
     const nxrBalance = Number(user.prefs?.nxrBalance || 0);
     if (nxrAmount > nxrBalance)
       return error("The sell amount exceeds your NXR balance.", 400);
 
-    const stateResponse = await fetch(`${stateEndpoint}/rows/global`, {
+    const stateResponse = await fetch(`${getStateEndpoint()}/rows/global`, {
       headers: headers(),
       cache: "no-store",
     });
@@ -82,7 +98,7 @@ export async function POST(request) {
       lastNxrSellAt: new Date().toISOString(),
     };
     const update = await fetch(
-      `${appwriteEndpoint}/users/${encodeURIComponent(user.$id)}/prefs`,
+      `${getAppwriteEndpoint()}/users/${encodeURIComponent(user.$id)}/prefs`,
       {
         method: "PATCH",
         headers: headers(),

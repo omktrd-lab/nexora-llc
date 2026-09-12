@@ -1,4 +1,3 @@
-import { Account, Client } from "appwrite";
 import { NextResponse } from "next/server";
 import {
   calculateSwapQuote,
@@ -6,7 +5,12 @@ import {
   getExecutableNxrPrice,
 } from "@/lib/nxr-pricing";
 
-const stateEndpoint = `${process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT}/tablesdb/${process.env.APPWRITE_DATABASE_ID}/tables/${process.env.APPWRITE_NXR_STATE_TABLE_ID}`;
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
+function getStateEndpoint() {
+  return `${process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT}/tablesdb/${process.env.APPWRITE_DATABASE_ID}/tables/${process.env.APPWRITE_NXR_STATE_TABLE_ID}`;
+}
 
 function jsonError(message, status) {
   return NextResponse.json({ message }, { status });
@@ -21,7 +25,7 @@ function serverHeaders() {
 }
 
 async function getGlobalState() {
-  const response = await fetch(`${stateEndpoint}/rows/global`, {
+  const response = await fetch(`${getStateEndpoint()}/rows/global`, {
     headers: serverHeaders(),
     cache: "no-store",
   });
@@ -53,9 +57,17 @@ export async function GET(request) {
   }
 
   try {
+    const endpoint = process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT;
+    const projectId = process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID;
+
+    if (!endpoint || !projectId) {
+      return jsonError("Appwrite is not configured on the server.", 503);
+    }
+
+    const { Account, Client } = await import("appwrite");
     const appwriteClient = new Client()
-      .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT)
-      .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID)
+      .setEndpoint(endpoint)
+      .setProject(projectId)
       .setJWT(jwt);
     const currentUser = await new Account(appwriteClient).get();
     const availableKes = Number(currentUser.prefs?.balanceKes || 0);

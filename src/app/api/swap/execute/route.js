@@ -1,11 +1,28 @@
-import { Account, Client } from "appwrite";
 import { NextResponse } from "next/server";
 import { calculateSwapQuote } from "@/lib/nxr-pricing";
 
-const appwriteEndpoint = process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT;
-const databaseId = process.env.APPWRITE_DATABASE_ID;
-const stateEndpoint = `${appwriteEndpoint}/tablesdb/${databaseId}/tables/${process.env.APPWRITE_NXR_STATE_TABLE_ID}`;
-const swapLedgerEndpoint = `${appwriteEndpoint}/tablesdb/${databaseId}/tables/${process.env.APPWRITE_SWAP_LEDGER_ID}`;
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
+function getAppwriteEndpoint() {
+  return process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT;
+}
+
+function getDatabaseId() {
+  return process.env.APPWRITE_DATABASE_ID;
+}
+
+function getStateEndpoint() {
+  const appwriteEndpoint = getAppwriteEndpoint();
+  const databaseId = getDatabaseId();
+  return `${appwriteEndpoint}/tablesdb/${databaseId}/tables/${process.env.APPWRITE_NXR_STATE_TABLE_ID}`;
+}
+
+function getSwapLedgerEndpoint() {
+  const appwriteEndpoint = getAppwriteEndpoint();
+  const databaseId = getDatabaseId();
+  return `${appwriteEndpoint}/tablesdb/${databaseId}/tables/${process.env.APPWRITE_SWAP_LEDGER_ID}`;
+}
 
 function jsonError(message, status) {
   return NextResponse.json({ message }, { status });
@@ -35,13 +52,13 @@ async function appwriteRequest(endpoint, path, options = {}) {
 }
 
 async function getGlobalState() {
-  return appwriteRequest(stateEndpoint, "/rows/global");
+  return appwriteRequest(getStateEndpoint(), "/rows/global");
 }
 
 async function findSwap(requestId) {
   try {
     return await appwriteRequest(
-      swapLedgerEndpoint,
+      getSwapLedgerEndpoint(),
       `/rows/${encodeURIComponent(requestId)}`,
     );
   } catch (error) {
@@ -87,9 +104,17 @@ export async function POST(request) {
   }
 
   try {
+    const endpoint = getAppwriteEndpoint();
+    const projectId = process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID;
+
+    if (!endpoint || !projectId) {
+      return jsonError("Appwrite is not configured on the server.", 503);
+    }
+
+    const { Account, Client } = await import("appwrite");
     const appwriteClient = new Client()
-      .setEndpoint(appwriteEndpoint)
-      .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID)
+      .setEndpoint(endpoint)
+      .setProject(projectId)
       .setJWT(jwt);
     const currentUser = await new Account(appwriteClient).get();
     executingUserId = currentUser.$id;
@@ -136,7 +161,7 @@ export async function POST(request) {
       lastSwapReference: reference,
     };
 
-    ledgerRow = await appwriteRequest(swapLedgerEndpoint, "/rows", {
+    ledgerRow = await appwriteRequest(getSwapLedgerEndpoint(), "/rows", {
       method: "POST",
       body: JSON.stringify({
         rowId: requestId,
@@ -161,7 +186,7 @@ export async function POST(request) {
     });
 
     const prefsResponse = await fetch(
-      `${appwriteEndpoint}/users/${encodeURIComponent(currentUser.$id)}/prefs`,
+      `${getAppwriteEndpoint()}/users/${encodeURIComponent(currentUser.$id)}/prefs`,
       {
         method: "PATCH",
         headers: serverHeaders(),
@@ -175,7 +200,7 @@ export async function POST(request) {
     }
     prefsUpdated = true;
 
-    await appwriteRequest(stateEndpoint, "/rows/global", {
+    await appwriteRequest(getStateEndpoint(), "/rows/global", {
       method: "PATCH",
       body: JSON.stringify({
         data: {
@@ -188,7 +213,7 @@ export async function POST(request) {
     });
     stateUpdated = true;
 
-    await appwriteRequest(swapLedgerEndpoint, `/rows/${ledgerRow.$id}`, {
+    await appwriteRequest(getSwapLedgerEndpoint(), `/rows/${ledgerRow.$id}`, {
       method: "PATCH",
       body: JSON.stringify({ data: { status: "success" } }),
     });
@@ -207,7 +232,7 @@ export async function POST(request) {
     console.error("NXR swap execution failed:", error);
     try {
       if (stateUpdated && previousState) {
-        await appwriteRequest(stateEndpoint, "/rows/global", {
+        await appwriteRequest(getStateEndpoint(), "/rows/global", {
           method: "PATCH",
           body: JSON.stringify({ data: previousState }),
         });
@@ -215,7 +240,7 @@ export async function POST(request) {
       if (prefsUpdated && previousPrefs) {
         if (executingUserId) {
           await fetch(
-            `${appwriteEndpoint}/users/${encodeURIComponent(executingUserId)}/prefs`,
+            `${getAppwriteEndpoint()}/users/${encodeURIComponent(executingUserId)}/prefs`,
             {
               method: "PATCH",
               headers: serverHeaders(),
@@ -225,7 +250,7 @@ export async function POST(request) {
         }
       }
       if (ledgerRow?.$id) {
-        await appwriteRequest(swapLedgerEndpoint, `/rows/${ledgerRow.$id}`, {
+        await appwriteRequest(getSwapLedgerEndpoint(), `/rows/${ledgerRow.$id}`, {
           method: "PATCH",
           body: JSON.stringify({ data: { status: "failed" } }),
         });
