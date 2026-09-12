@@ -1109,7 +1109,11 @@ function SwapPanel({ balanceKes, nxrBalance, usdtBalance, onBalancesUpdated }) {
     try {
       const jwtResponse = await account.createJWT();
       const response = await fetch(
-        side === "buy" ? "/api/swap/execute" : "/api/swap/sell",
+        side === "buy"
+          ? buyCurrency === "kes"
+            ? "/api/swap/execute"
+            : "/api/swap/buy-usdt"
+          : "/api/swap/sell",
         {
           method: "POST",
           headers: {
@@ -1120,7 +1124,7 @@ function SwapPanel({ balanceKes, nxrBalance, usdtBalance, onBalancesUpdated }) {
             side === "buy"
               ? buyCurrency === "kes"
                 ? { amountKes: Number(amount), requestId: crypto.randomUUID() }
-                : { amountUsdt: Number(amount), requestId: crypto.randomUUID() }
+                : { usdtAmount: Number(amount), requestId: crypto.randomUUID() }
               : { nxrAmount: Number(amount) },
           ),
         },
