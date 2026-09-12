@@ -49,13 +49,16 @@ export async function POST(request) {
   }
 
   try {
-    if (!process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT || !process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID) {
+    const endpoint = process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT;
+    const projectId = process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID;
+
+    if (!endpoint || !projectId) {
       return jsonError("Appwrite is not configured on the server.", 503);
     }
 
     const appwriteClient = new Client()
-      .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT)
-      .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID)
+      .setEndpoint(endpoint)
+      .setProject(projectId)
       .setJWT(jwt);
     const currentUser = await new Account(appwriteClient).get();
     const phoneNumber = currentUser.prefs?.safaricomPhoneNumber;

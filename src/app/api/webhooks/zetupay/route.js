@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { findPaymentLedgerRow, updatePaymentLedgerRow } from "@/lib/payment-ledger";
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(request) {
   const receivedSecret = request.headers.get("x-zetupay-secret");
   const expectedSecret = process.env.ZETUPAY_SECRET_KEY;
