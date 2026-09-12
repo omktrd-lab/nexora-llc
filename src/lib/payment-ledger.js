@@ -2,7 +2,7 @@ function getLedgerEndpoint() {
   return `${process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT}/tablesdb/${process.env.APPWRITE_DATABASE_ID}/tables/${process.env.APPWRITE_PAYMENT_LEDGER_ID}`;
 }
 
-function headers() {
+function getHeaders() {
   return {
     "X-Appwrite-Project": process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID,
     "X-Appwrite-Key": process.env.APPWRITE_API_KEY,
@@ -11,13 +11,14 @@ function headers() {
 }
 
 async function appwriteRequest(path, options = {}) {
-  if (!process.env.APPWRITE_API_KEY) {
+  const apiKey = process.env.APPWRITE_API_KEY;
+  if (!apiKey) {
     throw new Error("Appwrite server API key is not configured.");
   }
 
   const response = await fetch(`${getLedgerEndpoint()}${path}`, {
     ...options,
-    headers: { ...headers(), ...options.headers },
+    headers: { ...getHeaders(), ...options.headers },
   });
   const result = await response.json().catch(() => ({}));
   if (!response.ok) {

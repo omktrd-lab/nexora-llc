@@ -7,14 +7,14 @@ import {
 import { validateReferral } from "@/lib/referrals";
 
 export const dynamic = 'force-dynamic';
-
-const statusEndpoint = "https://pay.zetupay.co.ke/api/v1/payment";
+export const fetchCache = 'force-no-store';
 
 function jsonError(message, status) {
   return NextResponse.json({ message }, { status });
 }
 
 export async function GET(request) {
+  const statusEndpoint = "https://pay.zetupay.co.ke/api/v1/payment";
   const authorization = request.headers.get("authorization");
   const jwt = authorization?.startsWith("Bearer ")
     ? authorization.slice("Bearer ".length)
