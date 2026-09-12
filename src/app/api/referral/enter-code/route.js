@@ -6,10 +6,19 @@ const REFERRALS_COLLECTION_ID = "referrals";
 
 export async function POST(request) {
   try {
+    console.error("[REFERRAL ENTER CODE] Starting referral code processing");
+
     const endpoint = process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT;
     const projectId = process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID;
     const apiKey = process.env.APPWRITE_API_KEY;
     const databaseId = process.env.APPWRITE_DATABASE_ID;
+
+    console.error("[REFERRAL ENTER CODE] Appwrite config", {
+      hasEndpoint: !!endpoint,
+      hasProjectId: !!projectId,
+      hasApiKey: !!apiKey,
+      hasDatabaseId: !!databaseId,
+    });
 
     if (!endpoint || !projectId || !apiKey || !databaseId) {
       return Response.json({ error: "Appwrite is not configured" }, { status: 503 });
@@ -25,22 +34,39 @@ export async function POST(request) {
 
     const { code, userId } = await request.json();
 
+    console.error("[REFERRAL ENTER CODE] Request body", {
+      hasCode: !!code,
+      hasUserId: !!userId,
+      code: code ? code.substring(0, 3) + "..." : null,
+      userId: userId ? userId.substring(0, 8) + "..." : null,
+    });
+
     if (!code || !userId) {
       return Response.json({ error: "Code and user ID are required" }, { status: 400 });
     }
 
     // Find the referral code
+    console.error("[REFERRAL ENTER CODE] Finding referral code");
     const codeDocs = await databases.listDocuments(
       databaseId,
       REFERRAL_CODES_COLLECTION_ID,
       [Query.equal("code", code)]
     );
 
+    console.error("[REFERRAL ENTER CODE] Code search result", {
+      found: codeDocs.documents.length,
+    });
+
     if (codeDocs.documents.length === 0) {
       return Response.json({ error: "Invalid referral code" }, { status: 400 });
     }
 
     const codeDoc = codeDocs.documents[0];
+
+    console.error("[REFERRAL ENTER CODE] Code details", {
+      isAssigned: codeDoc.isAssigned,
+      assignedTo: codeDoc.assignedTo ? codeDoc.assignedTo.substring(0, 8) + "..." : null,
+    });
 
     // Check if code is assigned to someone
     if (!codeDoc.isAssigned) {
@@ -53,6 +79,7 @@ export async function POST(request) {
     }
 
     // Check if user already used this code
+    console.error("[REFERRAL ENTER CODE] Checking existing referrals");
     const existingReferrals = await databases.listDocuments(
       databaseId,
       REFERRALS_COLLECTION_ID,
@@ -62,11 +89,16 @@ export async function POST(request) {
       ]
     );
 
+    console.error("[REFERRAL ENTER CODE] Existing referrals check", {
+      count: existingReferrals.documents.length,
+    });
+
     if (existingReferrals.documents.length > 0) {
       return Response.json({ error: "You already used this referral code" }, { status: 400 });
     }
 
     // Create referral record
+    console.error("[REFERRAL ENTER CODE] Creating referral record");
     const referral = await databases.createDocument(
       databaseId,
       REFERRALS_COLLECTION_ID,
@@ -83,13 +115,20 @@ export async function POST(request) {
       }
     );
 
-    return Response.json({ 
+    console.error("[REFERRAL ENTER CODE] Referral created successfully", {
+      referralId: referral.$id,
+    });
+
+    return Response.json({
       message: "Referral code applied successfully",
       referralId: referral.$id
     });
 
   } catch (error) {
-    console.error("Error processing referral code:", error);
+    console.error("[REFERRAL ENTER CODE] ERROR", {
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    });
     return Response.json({ error: "Failed to process referral code" }, { status: 500 });
   }
 }
