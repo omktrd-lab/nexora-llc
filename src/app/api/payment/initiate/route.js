@@ -82,53 +82,50 @@ export async function POST(request) {
     }
 
     const payment = responseBody.data;
-    const checkoutUrl = payment?.checkoutUrl || null;
     let directStk = false;
     let directStkError = null;
     let directResponse = {};
 
-    if (!checkoutUrl) {
-      let appId = payment?.appId;
-      if (!appId && payment?.paymentKey) {
-        const statusResponse = await fetch(
-          `https://pay.zetupay.co.ke/api/v1/payment/${payment.paymentKey}`,
-        );
-        const statusBody = await statusResponse.json();
-        appId = statusBody.data?.application?.appId;
-      }
+    let appId = payment?.appId;
+    if (!appId && payment?.paymentKey) {
+      const statusResponse = await fetch(
+        `https://pay.zetupay.co.ke/api/v1/payment/${payment.paymentKey}`,
+      );
+      const statusBody = await statusResponse.json();
+      appId = statusBody.data?.application?.appId;
+    }
 
-      if (appId && payment?.waveTransactionId) {
-        const fallbackCheckoutUrl = payment.checkoutUrl || "https://www.zetupay.co.ke/checkout/v1";
-        const stkResponse = await fetch("https://www.zetupay.co.ke/api/mpesa-stk", {
-          method: "POST",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            Origin: "https://www.zetupay.co.ke",
-            Referer: fallbackCheckoutUrl,
-          },
-          body: JSON.stringify({
-            amount,
-            phoneNumber: toInternationalPhone(phoneNumber),
-            reference,
-            appId,
-            waveTransactionId: payment.waveTransactionId,
-            identifier: currentUser.$id,
-          }),
-        });
-        const directResponseText = await stkResponse.text();
-        try {
-          directResponse = JSON.parse(directResponseText);
-        } catch {
-          directResponse = {};
-        }
-        directStk = stkResponse.ok && Boolean(directResponse.CheckoutRequestID);
-        if (!directStk) {
-          directStkError = directResponse.message || directResponse.error || `ZetuPay STK request failed (${stkResponse.status}).`;
-        }
-      } else {
-        directStkError = "ZetuPay did not return the identifiers required for direct STK.";
+    if (appId && payment?.waveTransactionId) {
+      const checkoutUrl = payment.checkoutUrl || "https://www.zetupay.co.ke/checkout/v1";
+      const stkResponse = await fetch("https://www.zetupay.co.ke/api/mpesa-stk", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          Origin: "https://www.zetupay.co.ke",
+          Referer: checkoutUrl,
+        },
+        body: JSON.stringify({
+          amount,
+          phoneNumber: toInternationalPhone(phoneNumber),
+          reference,
+          appId,
+          waveTransactionId: payment.waveTransactionId,
+          identifier: currentUser.$id,
+        }),
+      });
+      const directResponseText = await stkResponse.text();
+      try {
+        directResponse = JSON.parse(directResponseText);
+      } catch {
+        directResponse = {};
       }
+      directStk = stkResponse.ok && Boolean(directResponse.CheckoutRequestID);
+      if (!directStk) {
+        directStkError = directResponse.message || directResponse.error || `ZetuPay STK request failed (${stkResponse.status}).`;
+      }
+    } else {
+      directStkError = "ZetuPay did not return the identifiers required for direct STK.";
     }
 
     const ledgerRow = await createPaymentLedgerRow({
@@ -155,13 +152,7 @@ export async function POST(request) {
     return NextResponse.json({
       ...responseBody,
       reference,
-      data: {
-        ...payment,
-        checkoutUrl,
-        directStk,
-        directStkError,
-        ledgerRowId: ledgerRow.$id,
-      },
+      data: { ...payment, directStk, directStkError, ledgerRowId: ledgerRow.$id },
     });
   } catch {
     return jsonError("Could not start the ZetuPay payment.", 502);

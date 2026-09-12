@@ -1399,16 +1399,8 @@ function FundPanel({ onBalanceUpdated, onPaymentComplete, onCollapse }) {
         if (!response.ok) {
           throw new Error(result.message || "Could not verify the payment.");
         }
-        const status = String(result.data?.status || "").toLowerCase();
-        const successStatuses = new Set([
-          "success",
-          "successful",
-          "completed",
-          "complete",
-          "paid",
-          "succeeded",
-        ]);
-        if (successStatuses.has(status)) {
+        const status = result.data?.status;
+        if (status === "success") {
           const refreshedUser = await account.get();
           const confirmedBalance = Number(refreshedUser.prefs?.balanceKes || 0);
           const amountToAdd = Number(result.data?.amount || 0);
@@ -1422,7 +1414,7 @@ function FundPanel({ onBalanceUpdated, onPaymentComplete, onCollapse }) {
           setLedgerRowId("");
           clearInterval(interval);
         } else if (
-          ["failed", "cancelled", "canceled"].includes(status)
+          ["failed", "cancelled", "canceled"].includes(status?.toLowerCase())
         ) {
           setPaymentStatus("Payment was not completed.");
           setError("The M-Pesa payment was not completed. You can try again.");
@@ -1464,23 +1456,20 @@ function FundPanel({ onBalanceUpdated, onPaymentComplete, onCollapse }) {
           result.message || result.error || "Payment could not be started.",
         );
       }
-      if (result.data.checkoutUrl) {
-        setPaymentKey(result.data.paymentKey);
-        setLedgerRowId(result.data.ledgerRowId);
-        setPaymentStatus(
-          "Redirecting to secure M-Pesa checkout. Keep this tab open while the payment is processed.",
-        );
-        toast.info("Redirecting to secure M-Pesa checkout", {
-          description: "Complete the payment there and we will confirm your balance automatically.",
-        });
-        window.location.assign(result.data.checkoutUrl);
-      } else if (result.data.directStk) {
+      if (result.data.directStk) {
         setPaymentKey(result.data.paymentKey);
         setLedgerRowId(result.data.ledgerRowId);
         setPaymentStatus(
           "Payment processing. Enter your M-Pesa PIN on your phone and keep this page open while we confirm it.",
         );
         setIsLoading(false);
+      } else if (result.data.checkoutUrl) {
+        toast.info("Opening secure M-Pesa checkout", {
+          description:
+            result.data.directStkError ||
+            "Continue there to start the STK prompt.",
+        });
+        window.location.assign(result.data.checkoutUrl);
       } else {
         throw new Error("Payment could not be started.");
       }
