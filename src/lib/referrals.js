@@ -120,14 +120,26 @@ export async function validateReferral(referredUserId, depositAmount) {
  */
 export async function getReferrals(referrerId) {
   try {
+    console.error("[GET REFERRALS] Fetching referrals", {
+      referrerId: referrerId ? referrerId.substring(0, 8) + "..." : null,
+      collectionId: REFERRALS_COLLECTION_ID,
+      databaseId: DATABASE_ID,
+    });
+
     const response = await databases.listDocuments(
       DATABASE_ID,
       REFERRALS_COLLECTION_ID,
       [Query.equal('referrerId', referrerId)]
     );
+
+    console.error("[GET REFERRALS] Response", {
+      total: response.total,
+      documents: response.documents.length,
+    });
+
     return response.documents;
   } catch (error) {
-    console.error('Error fetching referrals:', error);
+    console.error('[GET REFERRALS] ERROR:', error);
     return [];
   }
 }
