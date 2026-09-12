@@ -144,13 +144,13 @@ export async function GET(request) {
       const latestBar = bars.at(-1);
       if (!latestBar) {
         return NextResponse.json(
-          { message: "No latest Binance candle available." },
+          { message: "No latest MEXC candle available." },
           { status: 204 },
         );
       }
 
       const stats = buildTickerStats(
-        await fetchBinanceKlines(
+        await fetchMexcKlines(
           binanceSymbol,
           historyLimit,
           interval,
