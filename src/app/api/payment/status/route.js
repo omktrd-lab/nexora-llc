@@ -6,6 +6,8 @@ import {
 } from "@/lib/payment-ledger";
 import { validateReferral } from "@/lib/referrals";
 
+export const dynamic = 'force-dynamic';
+
 const statusEndpoint = "https://pay.zetupay.co.ke/api/v1/payment";
 
 function jsonError(message, status) {

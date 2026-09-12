@@ -2,6 +2,8 @@ import { Account, Client } from "appwrite";
 import { NextResponse } from "next/server";
 import { createPaymentLedgerRow } from "@/lib/payment-ledger";
 
+export const dynamic = 'force-dynamic';
+
 const zetupayEndpoint = "https://pay.zetupay.co.ke/api/v1/payment/initiate";
 
 function jsonError(message, status) {
