@@ -90,8 +90,17 @@ export async function validateReferral(referredUserId, depositAmount) {
       databaseId: DATABASE_ID,
     });
 
+    // Use server-side client with API key for authorization
+    const { Client, Databases, Query } = await import("node-appwrite");
+    const client = new Client()
+      .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT)
+      .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID)
+      .setKey(process.env.APPWRITE_API_KEY);
+
+    const serverDatabases = new Databases(client);
+
     // Find pending referral for this user
-    const response = await databases.listDocuments(
+    const response = await serverDatabases.listDocuments(
       DATABASE_ID,
       REFERRALS_COLLECTION_ID,
       [
@@ -115,7 +124,7 @@ export async function validateReferral(referredUserId, depositAmount) {
       referrerId: referral.referrerId ? referral.referrerId.substring(0, 8) + "..." : null,
     });
 
-    const updated = await databases.updateDocument(
+    const updated = await serverDatabases.updateDocument(
       DATABASE_ID,
       REFERRALS_COLLECTION_ID,
       referral.$id,
