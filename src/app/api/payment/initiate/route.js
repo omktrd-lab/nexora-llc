@@ -47,6 +47,10 @@ export async function POST(request) {
   }
 
   try {
+    if (!process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT || !process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID) {
+      return jsonError("Appwrite is not configured on the server.", 503);
+    }
+
     const appwriteClient = new Client()
       .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT)
       .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID)
