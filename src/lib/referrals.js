@@ -90,12 +90,23 @@ export async function validateReferral(referredUserId, depositAmount) {
       databaseId: DATABASE_ID,
     });
 
+    const endpoint = process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT;
+    const projectId = process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID;
+    const apiKey = process.env.APPWRITE_API_KEY;
+
+    console.error("[VALIDATE REFERRAL] Appwrite config", {
+      hasEndpoint: !!endpoint,
+      hasProjectId: !!projectId,
+      hasApiKey: !!apiKey,
+      apiKeyPrefix: apiKey ? apiKey.substring(0, 8) + "..." : null,
+    });
+
     // Use server-side client with API key for authorization
     const { Client, Databases, Query } = await import("node-appwrite");
     const client = new Client()
-      .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT)
-      .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID)
-      .setKey(process.env.APPWRITE_API_KEY);
+      .setEndpoint(endpoint)
+      .setProject(projectId)
+      .setKey(apiKey);
 
     const serverDatabases = new Databases(client);
 
