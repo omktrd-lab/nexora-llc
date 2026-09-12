@@ -1,4 +1,6 @@
-const ledgerEndpoint = `${process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT}/tablesdb/${process.env.APPWRITE_DATABASE_ID}/tables/${process.env.APPWRITE_PAYMENT_LEDGER_ID}`;
+function getLedgerEndpoint() {
+  return `${process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT}/tablesdb/${process.env.APPWRITE_DATABASE_ID}/tables/${process.env.APPWRITE_PAYMENT_LEDGER_ID}`;
+}
 
 function headers() {
   return {
@@ -13,7 +15,7 @@ async function appwriteRequest(path, options = {}) {
     throw new Error("Appwrite server API key is not configured.");
   }
 
-  const response = await fetch(`${ledgerEndpoint}${path}`, {
+  const response = await fetch(`${getLedgerEndpoint()}${path}`, {
     ...options,
     headers: { ...headers(), ...options.headers },
   });
