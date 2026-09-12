@@ -48,6 +48,14 @@ export async function GET(request) {
   const amountParameter = isUsdSwap ? usdParameter : kesParameter;
   const amount = Number(amountParameter);
 
+  console.error("[SWAP QUOTE] Starting quote calculation", {
+    hasJwt: !!jwt,
+    isUsdSwap,
+    amount,
+    kesParameter,
+    usdParameter,
+  });
+
   if (!jwt) return jsonError("You must be signed in.", 401);
   if (!amountParameter || !Number.isFinite(amount) || amount <= 0) {
     return jsonError(
@@ -59,6 +67,11 @@ export async function GET(request) {
   try {
     const endpoint = process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT;
     const projectId = process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID;
+
+    console.error("[SWAP QUOTE] Appwrite config", {
+      hasEndpoint: !!endpoint,
+      hasProjectId: !!projectId,
+    });
 
     if (!endpoint || !projectId) {
       return jsonError("Appwrite is not configured on the server.", 503);
@@ -74,6 +87,12 @@ export async function GET(request) {
     const availableUsdt = Number(currentUser.prefs?.usdtBalance || 0);
     const available = isUsdSwap ? availableUsdt : availableKes;
 
+    console.error("[SWAP QUOTE] User authenticated", {
+      userId: currentUser.$id,
+      availableKes,
+      availableUsdt,
+    });
+
     if (!Number.isFinite(available) || amount > available) {
       return jsonError(
         `The swap amount exceeds your available ${isUsdSwap ? "USDT" : "KES"} balance.`,
@@ -81,6 +100,7 @@ export async function GET(request) {
       );
     }
 
+    console.error("[SWAP QUOTE] Fetching global state");
     const state = await getGlobalState();
     const circulatingSupply = Number(state.circulatingSupply);
     const configuredBtcTrend = Number(
@@ -89,10 +109,22 @@ export async function GET(request) {
     const btc24hChangePercent = Number.isFinite(configuredBtcTrend)
       ? configuredBtcTrend
       : 0;
+
+    console.error("[SWAP QUOTE] Calculating price", {
+      circulatingSupply,
+      btc24hChangePercent,
+    });
+
     const executablePrice = await getExecutableNxrPrice({
       circulatingSupply,
       btc24hChangePercent,
     });
+
+    console.error("[SWAP QUOTE] Executable price", {
+      priceUsd: executablePrice.priceUsd,
+      source: executablePrice.source,
+    });
+
     const quote = isUsdSwap
       ? calculateUsdSwapQuote({
           usdAmount: amount,
@@ -107,6 +139,11 @@ export async function GET(request) {
           currentPriceUsd: executablePrice.priceUsd,
         });
 
+    console.error("[SWAP QUOTE] Quote calculated", {
+      nxrReceived: quote.nxrReceived,
+      feeKes: quote.feeKes,
+    });
+
     return NextResponse.json({
       quote,
       availableKes,
@@ -117,7 +154,11 @@ export async function GET(request) {
         : "mocked",
       stateVersion: Number(state.version || 0),
     });
-  } catch {
+  } catch (error) {
+    console.error("[SWAP QUOTE] ERROR", {
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    });
     return jsonError("Could not calculate the NXR quote.", 502);
   }
 }
