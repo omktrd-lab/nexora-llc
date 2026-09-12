@@ -2,10 +2,10 @@ import { NextResponse } from "next/server";
 import { resolveMarket } from "@/lib/market-symbols";
 import { fetchWithCache } from "@/lib/api-cache";
 
-const BINANCE_KLINE_URL = "https://api.binance.com/api/v3/klines";
+const MEXC_KLINE_URL = "https://api.mexc.com/api/v3/klines";
 const SUPPORTED_INTERVALS = new Set(["1m", "5m", "15m", "1h", "4h", "1d"]);
 
-function transformBinanceKline(klinesEntry, priceScalar, volumeScalar) {
+function transformMexcKline(klinesEntry, priceScalar, volumeScalar) {
   const [openTime, open, high, low, close, volume] = klinesEntry;
   const time = Math.floor(openTime / 1000);
   const toPrice = (v) => Number((Number(v) * priceScalar).toFixed(8));
@@ -20,7 +20,7 @@ function transformBinanceKline(klinesEntry, priceScalar, volumeScalar) {
   };
 }
 
-async function fetchBinanceKlines(
+async function fetchMexcKlines(
   binanceSymbol,
   limit = 50,
   interval = "15m",
@@ -35,7 +35,7 @@ async function fetchBinanceKlines(
 
     while (remaining > 0) {
       const pageLimit = Math.min(1000, remaining);
-      const url = new URL(BINANCE_KLINE_URL);
+      const url = new URL(MEXC_KLINE_URL);
       url.searchParams.set("symbol", binanceSymbol);
       url.searchParams.set("interval", interval);
       url.searchParams.set("limit", String(pageLimit));
@@ -46,7 +46,7 @@ async function fetchBinanceKlines(
         signal: AbortSignal.timeout(8000),
       });
       if (!response.ok) {
-        throw new Error(`Binance klines failed with status ${response.status}`);
+        throw new Error(`MEXC klines failed with status ${response.status}`);
       }
 
       const payload = await response.json();
@@ -62,7 +62,7 @@ async function fetchBinanceKlines(
   }, 2000);
 
   return rawData.map((entry) =>
-    transformBinanceKline(entry, priceScalar, volumeScalar),
+    transformMexcKline(entry, priceScalar, volumeScalar),
   );
 }
 
@@ -119,7 +119,7 @@ export async function GET(request) {
     const { market, binanceSymbol, priceScalar, volumeScalar } =
       resolveMarket(platformSymbol);
 
-    const bars = await fetchBinanceKlines(
+    const bars = await fetchMexcKlines(
       binanceSymbol,
       type === "history" ? historyLimit : 180,
       interval,
@@ -134,7 +134,7 @@ export async function GET(request) {
       return NextResponse.json({
         pair: pairLabel,
         symbol: platformSymbol,
-        source: "binance-proxy",
+        source: "mexc-proxy",
         bars,
         ...stats,
       });
@@ -161,7 +161,7 @@ export async function GET(request) {
       return NextResponse.json({
         pair: pairLabel,
         symbol: platformSymbol,
-        source: "binance-proxy",
+        source: "mexc-proxy",
         bar: latestBar,
         price: latestBar.close,
         change24h: stats.change24h,
@@ -177,14 +177,14 @@ export async function GET(request) {
     return NextResponse.json({
       pair: pairLabel,
       symbol: platformSymbol,
-      source: "binance-proxy",
+      source: "mexc-proxy",
       ...stats,
     });
   } catch (error) {
-    console.error("Binance market proxy failed:", error instanceof Error ? error.message : error);
+    console.error("MEXC market proxy failed:", error instanceof Error ? error.message : error);
     return NextResponse.json(
       {
-        message: "Could not read the Binance market proxy feed.",
+        message: "Could not read the MEXC market proxy feed.",
         error: error instanceof Error ? error.message : String(error),
       },
       { status: 502 },

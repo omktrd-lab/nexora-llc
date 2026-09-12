@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { fetchWithCache } from "@/lib/api-cache";
 import { BINANCE_PRICE_SCALAR } from "@/lib/market-symbols";
 
-const BINANCE_URL = "https://api.binance.com/api/v3/ticker/24hr";
+const MEXC_URL = "https://api.mexc.com/api/v3/ticker/24hr";
 const STOCKS = [
   ["TSLA", "Tesla"],
   ["AAPL", "Apple"],
@@ -37,27 +37,38 @@ export async function GET() {
       "market:tape",
       async () => {
         const symbols = ["BTCUSDT", "SOLUSDT", "ETHUSDT", "UNIUSDT"];
-        const url = new URL(BINANCE_URL);
-        url.searchParams.set("symbols", JSON.stringify(symbols));
 
         let crypto = [];
         try {
-          const cryptoResponse = await fetch(url, {
-            cache: "no-store",
-            signal: AbortSignal.timeout(6_000),
-          });
-          if (!cryptoResponse.ok) throw new Error("Crypto ticker unavailable.");
-          const cryptoData = await cryptoResponse.json();
-          crypto = cryptoData.map((quote) => {
-            const isNxr = quote.symbol === "UNIUSDT";
-            return {
-              symbol: isNxr ? "NXR" : quote.symbol.replace("USDT", ""),
-              label: isNxr ? "Nexora" : quote.symbol.replace("USDT", ""),
-              price: Number(quote.lastPrice) * (isNxr ? BINANCE_PRICE_SCALAR : 1),
-              change24h: Number(quote.priceChangePercent),
-              market: "crypto",
-            };
-          });
+          const cryptoData = await Promise.all(
+            symbols.map(async (symbol) => {
+              const url = new URL(MEXC_URL);
+              url.searchParams.set("symbol", symbol);
+
+              const cryptoResponse = await fetch(url, {
+                cache: "no-store",
+                signal: AbortSignal.timeout(6_000),
+              });
+
+              if (!cryptoResponse.ok) {
+                throw new Error(`MEXC tape fetch failed for ${symbol}: ${cryptoResponse.status}`);
+              }
+
+              const quote = await cryptoResponse.json();
+              if (!quote || typeof quote !== "object") return null;
+
+              const isNxr = quote.symbol === "UNIUSDT";
+              return {
+                symbol: isNxr ? "NXR" : quote.symbol.replace("USDT", ""),
+                label: isNxr ? "Nexora" : quote.symbol.replace("USDT", ""),
+                price: Number(quote.lastPrice) * (isNxr ? BINANCE_PRICE_SCALAR : 1),
+                change24h: Number(quote.priceChangePercent),
+                market: "crypto",
+              };
+            }),
+          );
+
+          crypto = cryptoData.filter(Boolean);
         } catch (cryptoError) {
           console.warn("Market tape crypto feed failed; serving partial market data.", cryptoError);
         }

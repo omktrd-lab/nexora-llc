@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { resolveMarket } from "@/lib/market-symbols";
 import { fetchWithCache } from "@/lib/api-cache";
 
-const BINANCE_TRADES_URL = "https://api.binance.com/api/v3/trades";
+const MEXC_TRADES_URL = "https://api.mexc.com/api/v3/trades";
 
 export async function GET(request) {
   try {
@@ -19,7 +19,7 @@ export async function GET(request) {
 
     const cacheKey = `trades:${binanceSymbol}:${limit}`;
     const data = await fetchWithCache(cacheKey, async () => {
-      const url = new URL(BINANCE_TRADES_URL);
+      const url = new URL(MEXC_TRADES_URL);
       url.searchParams.set("symbol", binanceSymbol);
       url.searchParams.set("limit", String(limit));
 
@@ -28,7 +28,7 @@ export async function GET(request) {
         signal: AbortSignal.timeout(8000),
       });
       if (!response.ok) {
-        throw new Error(`Binance trades failed with status ${response.status}`);
+        throw new Error(`MEXC trades failed with status ${response.status}`);
       }
 
       return await response.json();
@@ -62,7 +62,7 @@ export async function GET(request) {
       symbol: platformSymbol,
       pair: `${market.base}/USDT`,
       trades,
-      source: "binance-trades",
+      source: "mexc-trades",
     });
   } catch {
     return NextResponse.json(

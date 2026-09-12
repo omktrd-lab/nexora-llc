@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { resolveMarket } from "@/lib/market-symbols";
 import { fetchWithCache } from "@/lib/api-cache";
 
-const BINANCE_DEPTH_URL = "https://api.binance.com/api/v3/depth";
+const MEXC_DEPTH_URL = "https://api.mexc.com/api/v3/depth";
 
 export async function GET(request) {
   try {
@@ -19,7 +19,7 @@ export async function GET(request) {
 
     const cacheKey = `depth:${binanceSymbol}:${limit}`;
     const data = await fetchWithCache(cacheKey, async () => {
-      const url = new URL(BINANCE_DEPTH_URL);
+      const url = new URL(MEXC_DEPTH_URL);
       url.searchParams.set("symbol", binanceSymbol);
       url.searchParams.set("limit", String(limit));
 
@@ -28,7 +28,7 @@ export async function GET(request) {
         signal: AbortSignal.timeout(8000),
       });
       if (!response.ok) {
-        throw new Error(`Binance depth failed with status ${response.status}`);
+        throw new Error(`MEXC depth failed with status ${response.status}`);
       }
       return await response.json();
     }, 2000);
@@ -52,7 +52,7 @@ export async function GET(request) {
       bids,
       asks,
       spread,
-      source: "binance-depth",
+      source: "mexc-depth",
     });
   } catch {
     return NextResponse.json(

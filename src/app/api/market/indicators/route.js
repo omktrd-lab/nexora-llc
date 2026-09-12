@@ -10,9 +10,9 @@ import {
   calculateATR,
 } from "@/lib/indicators";
 
-const BINANCE_KLINE_URL = "https://api.binance.com/api/v3/klines";
+const MEXC_KLINE_URL = "https://api.mexc.com/api/v3/klines";
 
-function transformBinanceKline(klinesEntry, priceScalar, volumeScalar) {
+function transformMexcKline(klinesEntry, priceScalar, volumeScalar) {
   const [openTime, open, high, low, close, volume] = klinesEntry;
   const time = Math.floor(openTime / 1000);
   const toPrice = (v) => Number((Number(v) * priceScalar).toFixed(8));
@@ -27,27 +27,27 @@ function transformBinanceKline(klinesEntry, priceScalar, volumeScalar) {
   };
 }
 
-async function fetchBinanceKlines(
+async function fetchMexcKlines(
   binanceSymbol,
   limit = 200,
   interval = "15m",
   priceScalar = 1,
   volumeScalar = 1,
 ) {
-  const url = new URL(BINANCE_KLINE_URL);
+  const url = new URL(MEXC_KLINE_URL);
   url.searchParams.set("symbol", binanceSymbol);
   url.searchParams.set("interval", interval);
   url.searchParams.set("limit", String(limit));
 
   const response = await fetch(url, { cache: "no-store" });
   if (!response.ok) {
-    throw new Error(`Binance klines failed with status ${response.status}`);
+    throw new Error(`MEXC klines failed with status ${response.status}`);
   }
 
   const payload = await response.json();
   return Array.isArray(payload)
     ? payload.map((entry) =>
-        transformBinanceKline(entry, priceScalar, volumeScalar),
+        transformMexcKline(entry, priceScalar, volumeScalar),
       )
     : [];
 }
@@ -73,7 +73,7 @@ export async function GET(request) {
     const { market, binanceSymbol, priceScalar, volumeScalar } =
       resolveMarket(platformSymbol);
 
-    const bars = await fetchBinanceKlines(
+    const bars = await fetchMexcKlines(
       binanceSymbol,
       limit,
       interval,
