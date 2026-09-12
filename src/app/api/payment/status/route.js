@@ -3,7 +3,6 @@ import {
   getPaymentLedgerRow,
   updatePaymentLedgerRow,
 } from "@/lib/payment-ledger";
-import { validateReferral } from "@/lib/referrals";
 
 export const dynamic = 'force-dynamic';
 export const fetchCache = 'force-no-store';
@@ -184,9 +183,55 @@ export async function GET(request) {
 
         if (amountKes >= 1) {
           try {
-            await validateReferral(currentUser.$id, amountKes);
+            console.error("[PAYMENT STATUS] Validating referral", {
+              userId: currentUser.$id ? currentUser.$id.substring(0, 8) + "..." : null,
+              amountKes,
+            });
+
+            const databaseId = process.env.APPWRITE_DATABASE_ID;
+            const referralsCollectionId = process.env.NEXT_PUBLIC_REFERRALS_COLLECTION_ID || "referrals";
+
+            const { Client, Databases, Query } = await import("node-appwrite");
+            const client = new Client()
+              .setEndpoint(endpoint)
+              .setProject(projectId)
+              .setKey(process.env.APPWRITE_API_KEY);
+
+            const databases = new Databases(client);
+
+            const response = await databases.listDocuments(
+              databaseId,
+              referralsCollectionId,
+              [
+                Query.equal('referredUserId', currentUser.$id),
+                Query.equal('status', 'PENDING')
+              ]
+            );
+
+            console.error("[PAYMENT STATUS] Pending referrals found", {
+              count: response.documents.length,
+            });
+
+            if (response.documents.length > 0) {
+              const referral = response.documents[0];
+              const updated = await databases.updateDocument(
+                databaseId,
+                referralsCollectionId,
+                referral.$id,
+                {
+                  status: 'VALID',
+                  hasDeposited: true,
+                  depositAmount: amountKes,
+                }
+              );
+
+              console.error("[PAYMENT STATUS] Referral updated successfully", {
+                referralId: updated.$id,
+                status: updated.status,
+              });
+            }
           } catch (error) {
-            console.error("Failed to validate referral:", error);
+            console.error("[PAYMENT STATUS] Failed to validate referral:", error);
           }
         }
       } else if (!isSuccessfulPayment) {
