@@ -21,7 +21,7 @@ import {
 import { MARKET_MAP, formatMarketPrice } from "@/lib/market-symbols";
 import { cachedFetch } from "@/lib/client-fetch-cache";
 
-const POLL_INTERVAL_MS = 800;
+const POLL_INTERVAL_MS = 300;
 const DESKTOP_CHART_HEIGHT = 500;
 const MOBILE_CHART_HEIGHT = 330;
 const UP_CANDLE_COLOR = "#22c55e";
