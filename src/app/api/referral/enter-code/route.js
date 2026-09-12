@@ -1,6 +1,7 @@
 import { Client, Databases, Query, ID } from "node-appwrite";
 
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 const REFERRAL_CODES_COLLECTION_ID = "referral_codes";
 const REFERRALS_COLLECTION_ID = "referrals";

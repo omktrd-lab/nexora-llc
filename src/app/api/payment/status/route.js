@@ -8,6 +8,7 @@ import { validateReferral } from "@/lib/referrals";
 
 export const dynamic = 'force-dynamic';
 export const fetchCache = 'force-no-store';
+export const runtime = 'nodejs';
 
 function jsonError(message, status) {
   return NextResponse.json({ message }, { status });

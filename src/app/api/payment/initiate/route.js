@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { createPaymentLedgerRow } from "@/lib/payment-ledger";
 
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 const zetupayEndpoint = "https://pay.zetupay.co.ke/api/v1/payment/initiate";
 
