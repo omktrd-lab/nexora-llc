@@ -675,7 +675,7 @@ function PhoneNumberPrompt({ initialValue, isEditing, onSaved }) {
       </p>
 
       <form onSubmit={savePhoneNumber} className="mt-9">
-        <div className="w-full overflow-hidden rounded-lg border border-[#1e1e22] bg-[#111214] p-3 sm:p-4">
+        <div className="w-full rounded-lg border border-[#1e1e22] bg-[#111214] p-3 sm:p-4">
           <InputOTP
             maxLength={10}
             pattern="[0-9]*"
@@ -683,14 +683,14 @@ function PhoneNumberPrompt({ initialValue, isEditing, onSaved }) {
             value={phoneNumber}
             onChange={handlePhoneNumberChange}
             aria-label="M-Pesa phone number"
-            className="justify-start overflow-hidden"
+            className="w-full"
           >
-            <InputOTPGroup className="gap-1 sm:gap-1.5">
+            <InputOTPGroup className="w-full gap-1 sm:gap-1.5">
               {Array.from({ length: 10 }, (_, index) => (
                 <InputOTPSlot
                   key={index}
                   index={index}
-                  className="size-6 rounded-md border border-[#2a2a2d] bg-[#0b0b0d] text-base text-white sm:size-8 sm:text-lg"
+                  className="h-9 flex-1 rounded-md border border-[#2a2a2d] bg-[#0b0b0d] text-base text-white sm:h-10 sm:text-lg"
                 />
               ))}
             </InputOTPGroup>
