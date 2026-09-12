@@ -109,9 +109,7 @@ export async function POST(request) {
         status: "PENDING",
         phoneNumber: "",
         hasDeposited: false,
-        depositAmount: 0,
-        createdAt: new Date().toISOString(),
-        completedAt: null
+        depositAmount: 0
       }
     );
 
