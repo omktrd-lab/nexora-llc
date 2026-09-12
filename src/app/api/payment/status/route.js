@@ -20,6 +20,15 @@ export async function GET(request) {
   const paymentKey = new URL(request.url).searchParams.get("paymentKey");
   const ledgerRowId = new URL(request.url).searchParams.get("ledgerRowId");
 
+  console.error("[PAYMENT STATUS] Starting status check", {
+    timestamp: new Date().toISOString(),
+    hasPaymentKey: !!paymentKey,
+    hasLedgerRowId: !!ledgerRowId,
+    hasJwt: !!jwt,
+    zetupayKeyPresent: !!process.env.ZETUPAY_SECRET_KEY,
+    appwriteKeyPresent: !!process.env.APPWRITE_API_KEY,
+  });
+
   if (!jwt) return jsonError("You must be signed in.", 401);
   if (!paymentKey) return jsonError("A payment key is required.", 400);
 
@@ -30,6 +39,13 @@ export async function GET(request) {
       .setJWT(jwt);
     const account = new Account(appwriteClient);
     const currentUser = await account.get();
+
+    console.error("[PAYMENT STATUS] User authenticated", {
+      userId: currentUser.$id,
+      paymentKey,
+      ledgerRowId,
+    });
+
     const response = await fetch(
       `${statusEndpoint}/${encodeURIComponent(paymentKey)}`,
       {
@@ -39,6 +55,11 @@ export async function GET(request) {
         },
       },
     );
+
+    console.error("[PAYMENT STATUS] ZetuPay API response", {
+      status: response.status,
+      ok: response.ok,
+    });
 
     const result = await response.json().catch(() => ({}));
     if (!response.ok) {
@@ -97,10 +118,26 @@ export async function GET(request) {
       });
 
       if (isSuccessfulPayment && currentUser.prefs?.lastTopUpReference !== reference) {
+        console.error("[PAYMENT STATUS POLLING] Crediting balance via polling endpoint", {
+          timestamp: new Date().toISOString(),
+          userId: currentUser.$id,
+          amountKes,
+          reference,
+          paymentKey,
+          ledgerRowId,
+          path: "POLLING"
+        });
         const existingPrefs = currentUser.prefs || {};
         const currentBalance = Number(existingPrefs.balanceKes || 0);
         const nextBalance = currentBalance + amountKes;
         const creditedAt = new Date().toISOString();
+        console.error("[PAYMENT STATUS] Attempting to credit balance", {
+          currentBalance,
+          nextBalance,
+          amountKes,
+          reference,
+        });
+
         const prefsResponse = await fetch(
           `${process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT}/users/${encodeURIComponent(currentUser.$id)}/prefs`,
           {
@@ -123,9 +160,17 @@ export async function GET(request) {
           },
         );
 
+        console.error("[PAYMENT STATUS] Appwrite balance update response", {
+          status: prefsResponse.status,
+          ok: prefsResponse.ok,
+        });
+
         if (!prefsResponse.ok) {
+          console.error("[PAYMENT STATUS] Appwrite balance update FAILED");
           throw new Error("Appwrite balance update failed.");
         }
+
+        console.error("[PAYMENT STATUS] Balance credited successfully");
 
         if (amountKes >= 1) {
           try {
