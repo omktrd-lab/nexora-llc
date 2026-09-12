@@ -80,85 +80,11 @@ export async function createReferral(referrerId, referredUserId, phoneNumber = n
 
 /**
  * Update referral status to VALID on deposit
+ * NOTE: This function is deprecated - referral validation is now handled in the payment status route
  */
 export async function validateReferral(referredUserId, depositAmount) {
-  try {
-    console.error("[VALIDATE REFERRAL] Starting referral validation", {
-      referredUserId: referredUserId ? referredUserId.substring(0, 8) + "..." : null,
-      depositAmount,
-      collectionId: REFERRALS_COLLECTION_ID,
-      databaseId: DATABASE_ID,
-    });
-
-    const endpoint = process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT;
-    const projectId = process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID;
-    const apiKey = process.env.APPWRITE_API_KEY;
-
-    console.error("[VALIDATE REFERRAL] Appwrite config", {
-      hasEndpoint: !!endpoint,
-      hasProjectId: !!projectId,
-      hasApiKey: !!apiKey,
-      apiKeyPrefix: apiKey ? apiKey.substring(0, 8) + "..." : null,
-    });
-
-    // Use server-side client with API key for authorization
-    const { Client, Databases, Query } = await import("node-appwrite");
-    const client = new Client()
-      .setEndpoint(endpoint)
-      .setProject(projectId)
-      .setKey(apiKey);
-
-    const serverDatabases = new Databases(client);
-
-    // Find pending referral for this user
-    const response = await serverDatabases.listDocuments(
-      DATABASE_ID,
-      REFERRALS_COLLECTION_ID,
-      [
-        Query.equal('referredUserId', referredUserId),
-        Query.equal('status', 'PENDING')
-      ]
-    );
-
-    console.error("[VALIDATE REFERRAL] Pending referrals found", {
-      count: response.documents.length,
-    });
-
-    if (response.documents.length === 0) {
-      console.error("[VALIDATE REFERRAL] No pending referrals found for user");
-      return null;
-    }
-
-    const referral = response.documents[0];
-    console.error("[VALIDATE REFERRAL] Updating referral", {
-      referralId: referral.$id,
-      referrerId: referral.referrerId ? referral.referrerId.substring(0, 8) + "..." : null,
-    });
-
-    const updated = await serverDatabases.updateDocument(
-      DATABASE_ID,
-      REFERRALS_COLLECTION_ID,
-      referral.$id,
-      {
-        status: 'VALID',
-        hasDeposited: true,
-        depositAmount: depositAmount,
-      }
-    );
-
-    console.error("[VALIDATE REFERRAL] Referral updated successfully", {
-      referralId: updated.$id,
-      status: updated.status,
-    });
-
-    return updated;
-  } catch (error) {
-    console.error('[VALIDATE REFERRAL] ERROR:', {
-      error: error instanceof Error ? error.message : String(error),
-      stack: error instanceof Error ? error.stack : undefined,
-    });
-    throw error;
-  }
+  console.error("[VALIDATE REFERRAL] This function is deprecated - validation is handled in payment status route");
+  return null;
 }
 
 /**
