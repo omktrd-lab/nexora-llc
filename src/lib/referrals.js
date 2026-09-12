@@ -83,6 +83,13 @@ export async function createReferral(referrerId, referredUserId, phoneNumber = n
  */
 export async function validateReferral(referredUserId, depositAmount) {
   try {
+    console.error("[VALIDATE REFERRAL] Starting referral validation", {
+      referredUserId: referredUserId ? referredUserId.substring(0, 8) + "..." : null,
+      depositAmount,
+      collectionId: REFERRALS_COLLECTION_ID,
+      databaseId: DATABASE_ID,
+    });
+
     // Find pending referral for this user
     const response = await databases.listDocuments(
       DATABASE_ID,
@@ -92,10 +99,22 @@ export async function validateReferral(referredUserId, depositAmount) {
         Query.equal('status', 'PENDING')
       ]
     );
-    
-    if (response.documents.length === 0) return null;
-    
+
+    console.error("[VALIDATE REFERRAL] Pending referrals found", {
+      count: response.documents.length,
+    });
+
+    if (response.documents.length === 0) {
+      console.error("[VALIDATE REFERRAL] No pending referrals found for user");
+      return null;
+    }
+
     const referral = response.documents[0];
+    console.error("[VALIDATE REFERRAL] Updating referral", {
+      referralId: referral.$id,
+      referrerId: referral.referrerId ? referral.referrerId.substring(0, 8) + "..." : null,
+    });
+
     const updated = await databases.updateDocument(
       DATABASE_ID,
       REFERRALS_COLLECTION_ID,
@@ -104,13 +123,20 @@ export async function validateReferral(referredUserId, depositAmount) {
         status: 'VALID',
         hasDeposited: true,
         depositAmount: depositAmount,
-        completedAt: new Date().toISOString(),
       }
     );
-    
+
+    console.error("[VALIDATE REFERRAL] Referral updated successfully", {
+      referralId: updated.$id,
+      status: updated.status,
+    });
+
     return updated;
   } catch (error) {
-    console.error('Error validating referral:', error);
+    console.error('[VALIDATE REFERRAL] ERROR:', {
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    });
     throw error;
   }
 }
