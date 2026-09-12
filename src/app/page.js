@@ -645,13 +645,11 @@ function HomeContent() {
               phoneNumber={phoneNumber}
               onEditPhone={() => {
                 setIsEditingPhone(true);
-                setIsProfileOpen(false);
               }}
               avatarSeed={avatarSeed}
               onSignOut={signOut}
               isSigningOut={isSigningOut}
-              open={isProfileOpen}
-              onOpenChange={setIsProfileOpen}
+              onClose={() => setIsProfileOpen(false)}
               balanceKes={balanceKes}
               nxrBalance={nxrBalance}
               isBalanceVisible={isBalanceVisible}
@@ -962,8 +960,7 @@ function HomeContent() {
             setIsBalanceVisible={setIsBalanceVisible}
             onEditPhone={() => setIsEditingPhone(true)}
             onSignOut={signOut}
-            open={isProfileOpen}
-            onOpenChange={setIsProfileOpen}
+            onClose={() => setIsProfileOpen(false)}
           />
         </Sheet>
       </nav>
@@ -1671,15 +1668,14 @@ function ProfileSheet({
   avatarSeed,
   onSignOut,
   isSigningOut,
-  open,
-  onOpenChange,
+  onClose,
   balanceKes,
   nxrBalance,
   isBalanceVisible,
   setIsBalanceVisible,
 }) {
   return (
-    <SheetContent side="right" className="w-[min(22rem,85vw)]" open={open} onOpenChange={onOpenChange}>
+    <SheetContent side="right" className="w-[min(22rem,85vw)]">
       <SheetHeader>
         <SheetTitle>Profile</SheetTitle>
         <SheetDescription>Manage your Nexora account.</SheetDescription>
@@ -1702,7 +1698,10 @@ function ProfileSheet({
                 type="button"
                 variant="outline"
                 size="xs"
-                onClick={onEditPhone}
+                onClick={() => {
+                  onEditPhone();
+                  onClose?.();
+                }}
               >
                 Edit
               </Button>
