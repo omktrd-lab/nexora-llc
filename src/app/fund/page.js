@@ -710,12 +710,12 @@ function WithdrawPanel({ availableUsdt, isEligible, onOpenReferrals }) {
       setError("Enter a valid USDT amount.");
       return;
     }
-    if (!walletAddress || !/^0x[a-fA-F0-9]{40}$/.test(walletAddress)) {
-      setError("Enter a valid BNB Chain wallet address.");
-      return;
-    }
     if (numericAmount > Number(availableUsdt || 0)) {
       setError("Insufficient USDT balance.");
+      return;
+    }
+    if (!walletAddress || !/^0x[a-fA-F0-9]{40}$/.test(walletAddress)) {
+      setError("Enter a valid BNB Chain wallet address.");
       return;
     }
 
