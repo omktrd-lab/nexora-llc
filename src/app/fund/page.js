@@ -850,11 +850,11 @@ function WithdrawPanel({ availableUsdt, isEligible, onOpenReferrals }) {
             Withdrawals typically take 20 minutes to hit your Binance wallet.
           </p>
 
-          <div className="mt-4 rounded-md bg-green-500/10 border border-green-500/20 p-4">
-            <p className="text-sm font-medium text-green-400 mb-1">
+          <div className="mt-4 rounded-md bg-muted border border-border p-4">
+            <p className="text-sm font-medium text-foreground mb-1">
               🎉 Limited Time Offer
             </p>
-            <p className="text-xs text-green-300">
+            <p className="text-xs text-muted-foreground">
               Refer a friend now and get 30% bonus on your NXR holdings! While your withdrawal processes, start earning more.
             </p>
             <Button
@@ -862,7 +862,7 @@ function WithdrawPanel({ availableUsdt, isEligible, onOpenReferrals }) {
               onClick={onOpenReferrals}
               variant="outline"
               size="sm"
-              className="mt-2 w-full border-green-500/50 text-green-400 hover:bg-green-500/10"
+              className="mt-2 w-full"
             >
               Refer a Friend
             </Button>
