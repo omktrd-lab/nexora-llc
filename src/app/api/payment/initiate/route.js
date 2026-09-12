@@ -1,4 +1,3 @@
-import { Account, Client } from "appwrite";
 import { NextResponse } from "next/server";
 import { createPaymentLedgerRow } from "@/lib/payment-ledger";
 
@@ -57,6 +56,7 @@ export async function POST(request) {
       return jsonError("Appwrite is not configured on the server.", 503);
     }
 
+    const { Account, Client } = await import("appwrite");
     const appwriteClient = new Client()
       .setEndpoint(endpoint)
       .setProject(projectId)

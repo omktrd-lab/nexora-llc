@@ -1,5 +1,3 @@
-import { Client, Databases, Query, ID } from "node-appwrite";
-
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
@@ -17,6 +15,7 @@ export async function POST(request) {
       return Response.json({ error: "Appwrite is not configured" }, { status: 503 });
     }
 
+    const { Client, Databases, Query, ID } = await import("node-appwrite");
     const client = new Client()
       .setEndpoint(endpoint)
       .setProject(projectId)
