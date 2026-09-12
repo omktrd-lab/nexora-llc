@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { cn } from "cn";
+import { Loader2 } from "lucide-react";
 
 function NavigationFeedback() {
   const pathname = usePathname();
@@ -46,7 +47,7 @@ function NavigationFeedback() {
         "animate-in fade-in slide-in-from-top-1",
       )}
     >
-      <span className="font-mono text-primary">:)</span>{" "}
+      <Loader2 className="inline size-3 animate-spin text-primary" />{" "}
       Opening <span className="font-medium">{label}</span>...
     </div>
   );
