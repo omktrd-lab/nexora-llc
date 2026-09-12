@@ -21,6 +21,11 @@ export async function POST(request) {
     ? authorization.slice("Bearer ".length)
     : "";
 
+  console.error("[PAYMENT INITIATE] Starting payment initiation", {
+    hasJwt: !!jwt,
+    zetupayKeyPresent: !!process.env.ZETUPAY_SECRET_KEY,
+  });
+
   if (!jwt) {
     return jsonError("You must be signed in to start a payment.", 401);
   }
@@ -49,11 +54,19 @@ export async function POST(request) {
     const currentUser = await new Account(appwriteClient).get();
     const phoneNumber = currentUser.prefs?.safaricomPhoneNumber;
 
+    console.error("[PAYMENT INITIATE] User authenticated", {
+      userId: currentUser.$id,
+      phoneNumber,
+      amount,
+    });
+
     if (!/^(01|07)\d{8}$/.test(phoneNumber || "")) {
       return jsonError("Add a valid M-Pesa number before funding.", 400);
     }
 
     const reference = `NXR-${currentUser.$id}-${Date.now()}`;
+    console.error("[PAYMENT INITIATE] Calling ZetuPay initiate API", { reference });
+
     const upstream = await fetch(zetupayEndpoint, {
       method: "POST",
       headers: {
@@ -76,6 +89,12 @@ export async function POST(request) {
     } catch {
       responseBody = { message: "ZetuPay returned an invalid response." };
     }
+
+    console.error("[PAYMENT INITIATE] ZetuPay initiate response", {
+      status: upstream.status,
+      ok: upstream.ok,
+      hasData: !!responseBody.data,
+    });
 
     if (!upstream.ok) {
       return NextResponse.json(responseBody, { status: upstream.status });
@@ -154,7 +173,11 @@ export async function POST(request) {
       reference,
       data: { ...payment, directStk, directStkError, ledgerRowId: ledgerRow.$id },
     });
-  } catch {
+  } catch (error) {
+    console.error("[PAYMENT INITIATE] ERROR", {
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    });
     return jsonError("Could not start the ZetuPay payment.", 502);
   }
 }
