@@ -8,6 +8,11 @@ export default function LandingPage() {
   return (
     <main className="flex h-screen w-full flex-col items-center justify-center bg-[#090a0c] px-6">
       <div className="max-w-2xl">
+        {/* App Name */}
+        <p className="mb-4 text-xs font-semibold tracking-widest text-zinc-500 uppercase">
+          Nexora
+        </p>
+
         {/* Headline */}
         <h1 className="mb-4 text-3xl font-light tracking-tight text-white sm:text-4xl sm:font-semibold">
           Trade Smarter with HFT
