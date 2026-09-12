@@ -62,7 +62,7 @@ function AuthCallbackContent() {
 
         // Redirect to home
         console.log("=== AUTH CALLBACK END - Redirecting to home ===");
-        router.replace("/");
+        router.replace("/trade");
       } catch (error) {
         console.error("Auth callback error:", error);
         console.error("Error details:", JSON.stringify(error, null, 2));

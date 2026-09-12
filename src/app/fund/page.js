@@ -123,7 +123,7 @@ function FundPageContent() {
         <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-5 sm:px-8">
           <button
             type="button"
-            onClick={() => router.push("/")}
+            onClick={() => router.push("/trade")}
             className="flex items-center gap-3 transition-opacity hover:opacity-80"
           >
             <div className="flex size-8 shrink-0 items-center justify-center rounded-md bg-foreground text-sm font-bold text-background">
@@ -137,7 +137,7 @@ function FundPageContent() {
           <div className="flex items-center gap-4">
             <button
               type="button"
-              onClick={() => router.push("/")}
+              onClick={() => router.push("/trade")}
               className="text-xs font-medium text-muted-foreground hover:text-foreground hidden sm:block transition-colors"
             >
               Trading Terminal →
@@ -244,7 +244,7 @@ function FundPageContent() {
             {activeFlow === "fund" ? (
               <FundPanel
                 onBalanceUpdated={setBalanceKes}
-                onCollapse={() => router.push("/")}
+                onCollapse={() => router.push("/trade")}
               />
             ) : (
               <WithdrawPanel
@@ -314,7 +314,7 @@ function FundPageContent() {
 
         <button
           type="button"
-          onClick={() => router.push("/")}
+          onClick={() => router.push("/trade")}
           className="flex flex-col items-center justify-center text-[10px] text-zinc-400 hover:text-white transition-colors"
         >
           <ArrowLeftRight className="mb-0.5 size-4" />

@@ -129,7 +129,7 @@ export default function ReferralsPage() {
         <div className="flex min-w-0 items-center gap-8">
           <button
             type="button"
-            onClick={() => router.push("/")}
+            onClick={() => router.push("/trade")}
             className="flex items-center gap-2.5"
           >
             <div className="terminal-logo flex size-7 items-center justify-center rounded text-xs font-black">
@@ -140,7 +140,7 @@ export default function ReferralsPage() {
           <nav className="text-muted-foreground flex items-center gap-4 overflow-x-auto text-xs whitespace-nowrap">
             <button
               type="button"
-              onClick={() => router.push("/?focus=buy")}
+              onClick={() => router.push("/trade?focus=buy")}
               className="transition-colors hover:text-white"
             >
               Buy Crypto
@@ -158,7 +158,7 @@ export default function ReferralsPage() {
               Deposit KES
             </button>
             <button
-              onClick={() => router.push("/")}
+              onClick={() => router.push("/trade")}
               className="terminal-nav-active"
             >
               Trade <ChevronDown className="ml-0.5 inline size-3" />
@@ -181,7 +181,7 @@ export default function ReferralsPage() {
           </button>
           <button
             type="button"
-            onClick={() => router.push("/")}
+            onClick={() => router.push("/trade")}
             aria-label="Open profile"
             className="border-foreground flex size-7 items-center justify-center rounded-full border text-[10px] font-semibold"
           >

@@ -99,7 +99,7 @@ export default function BotsPage() {
       <header className="terminal-header hidden h-14 shrink-0 items-center border-b border-[#27272a] px-4 lg:flex">
         <div className="flex items-center gap-8">
           <button
-            onClick={() => router.push("/")}
+            onClick={() => router.push("/trade")}
             className="flex items-center gap-2.5"
           >
             <span className="grid size-7 place-items-center rounded bg-white text-xs font-black text-black">
@@ -110,7 +110,7 @@ export default function BotsPage() {
           <nav className="flex items-center gap-4 overflow-x-auto text-xs whitespace-nowrap text-zinc-500">
             <button
               type="button"
-              onClick={() => router.push("/?focus=buy")}
+              onClick={() => router.push("/trade?focus=buy")}
               className="transition-colors hover:text-white"
             >
               Buy Crypto
@@ -128,7 +128,7 @@ export default function BotsPage() {
               Deposit KES
             </button>
             <button
-              onClick={() => router.push("/")}
+              onClick={() => router.push("/trade")}
               className="transition-colors hover:text-white"
             >
               Trade <ChevronDown className="inline size-3" />
@@ -190,7 +190,7 @@ export default function BotsPage() {
 
       <header className="flex h-12 items-center justify-between px-4 lg:hidden">
         <button
-          onClick={() => router.push("/")}
+          onClick={() => router.push("/trade")}
           className="text-xs font-bold tracking-wide"
         >
           NEXORA

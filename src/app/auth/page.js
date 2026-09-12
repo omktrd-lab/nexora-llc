@@ -20,7 +20,7 @@ export default function AuthPage() {
       .get()
       .then(() => {
         // User is already authenticated, redirect to home
-        router.replace("/");
+        router.replace("/trade");
       })
       .catch(() => setCheckingSession(false));
   }, [router]);

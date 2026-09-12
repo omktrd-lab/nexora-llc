@@ -319,14 +319,14 @@ export default function MarketsPage() {
 
         <nav className="flex items-center gap-4 overflow-x-auto text-xs whitespace-nowrap text-zinc-500">
           <button
-            onClick={() => router.push("/?focus=buy")}
+            onClick={() => router.push("/trade?focus=buy")}
             className="text-zinc-400 transition-colors hover:text-white"
           >
             Buy Crypto
           </button>
           <button className="font-medium text-white">Markets</button>
           <button
-            onClick={() => router.push("/")}
+            onClick={() => router.push("/trade")}
             className="text-zinc-400 transition-colors hover:text-white"
           >
             Trade
@@ -393,7 +393,7 @@ export default function MarketsPage() {
         {/* Back + Title */}
         <div className="markets-page-title mb-0 flex items-center gap-3 px-4 py-4 md:mb-6 md:px-0 md:py-0">
           <button
-            onClick={() => router.push("/")}
+            onClick={() => router.push("/trade")}
             className="flex items-center gap-1.5 text-xs text-zinc-500 transition-colors hover:text-white"
           >
             <ArrowLeft className="size-3.5" />
@@ -554,7 +554,7 @@ export default function MarketsPage() {
         {/* 1. Trade */}
         <button
           type="button"
-          onClick={() => router.push("/")}
+          onClick={() => router.push("/trade")}
           className="flex w-full flex-col items-center justify-center py-1 text-[9px] text-zinc-400 transition-colors hover:text-white"
         >
           <ArrowLeftRight className="mb-0.5 size-4" />
@@ -651,7 +651,7 @@ export default function MarketsPage() {
         <MobileFeatureView
           feature={activeFeature}
           onClose={() => setActiveFeature(null)}
-          onGoToMarkets={() => router.push("/")}
+          onGoToMarkets={() => router.push("/trade")}
         />
       )}
     </main>

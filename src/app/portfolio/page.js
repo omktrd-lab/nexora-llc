@@ -266,7 +266,7 @@ export default function PortfolioPage() {
     <main className="min-h-screen bg-[#090a0c] pb-20 text-white">
       <header className="flex h-14 items-center px-4">
         <button
-          onClick={() => router.push("/")}
+          onClick={() => router.push("/trade")}
           className="text-xs text-zinc-500 hover:text-white"
         >
           ← Trade
