@@ -1,19 +1,28 @@
 import { Client, Databases, Query, ID } from "node-appwrite";
 
-const client = new Client();
+export const dynamic = 'force-dynamic';
 
-client
-  .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT)
-  .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID)
-  .setKey(process.env.APPWRITE_API_KEY);
-
-const databases = new Databases(client);
 const REFERRAL_CODES_COLLECTION_ID = "referral_codes";
 const REFERRALS_COLLECTION_ID = "referrals";
-const DATABASE_ID = process.env.APPWRITE_DATABASE_ID;
 
 export async function POST(request) {
   try {
+    const endpoint = process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT;
+    const projectId = process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID;
+    const apiKey = process.env.APPWRITE_API_KEY;
+    const databaseId = process.env.APPWRITE_DATABASE_ID;
+
+    if (!endpoint || !projectId || !apiKey || !databaseId) {
+      return Response.json({ error: "Appwrite is not configured" }, { status: 503 });
+    }
+
+    const client = new Client()
+      .setEndpoint(endpoint)
+      .setProject(projectId)
+      .setKey(apiKey);
+
+    const databases = new Databases(client);
+
     const { code, userId } = await request.json();
 
     if (!code || !userId) {
@@ -22,7 +31,7 @@ export async function POST(request) {
 
     // Find the referral code
     const codeDocs = await databases.listDocuments(
-      DATABASE_ID,
+      databaseId,
       REFERRAL_CODES_COLLECTION_ID,
       [Query.equal("code", code)]
     );
@@ -45,7 +54,7 @@ export async function POST(request) {
 
     // Check if user already used this code
     const existingReferrals = await databases.listDocuments(
-      DATABASE_ID,
+      databaseId,
       REFERRALS_COLLECTION_ID,
       [
         Query.equal("referrerId", codeDoc.assignedTo),
@@ -59,7 +68,7 @@ export async function POST(request) {
 
     // Create referral record
     const referral = await databases.createDocument(
-      DATABASE_ID,
+      databaseId,
       REFERRALS_COLLECTION_ID,
       ID.unique(),
       {

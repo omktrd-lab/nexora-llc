@@ -1,18 +1,27 @@
 import { Client, Databases, Query, ID } from "node-appwrite";
 
-const client = new Client();
+export const dynamic = 'force-dynamic';
 
-client
-  .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT)
-  .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID)
-  .setKey(process.env.APPWRITE_API_KEY);
-
-const databases = new Databases(client);
 const REFERRAL_CODES_COLLECTION_ID = "referral_codes";
-const DATABASE_ID = process.env.APPWRITE_DATABASE_ID;
 
 export async function POST(request) {
   try {
+    const endpoint = process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT;
+    const projectId = process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID;
+    const apiKey = process.env.APPWRITE_API_KEY;
+    const databaseId = process.env.APPWRITE_DATABASE_ID;
+
+    if (!endpoint || !projectId || !apiKey || !databaseId) {
+      return Response.json({ error: "Appwrite is not configured" }, { status: 503 });
+    }
+
+    const client = new Client()
+      .setEndpoint(endpoint)
+      .setProject(projectId)
+      .setKey(apiKey);
+
+    const databases = new Databases(client);
+
     const { userId } = await request.json();
 
     if (!userId) {
@@ -21,13 +30,13 @@ export async function POST(request) {
 
     // Check if user already has a code assigned
     const existingCode = await databases.listDocuments(
-      DATABASE_ID,
+      databaseId,
       REFERRAL_CODES_COLLECTION_ID,
       [Query.equal("assignedTo", userId)]
     );
 
     if (existingCode.documents.length > 0) {
-      return Response.json({ 
+      return Response.json({
         code: existingCode.documents[0].code,
         message: "User already has a referral code"
       });
@@ -35,7 +44,7 @@ export async function POST(request) {
 
     // Find an unassigned code
     const unassignedCodes = await databases.listDocuments(
-      DATABASE_ID,
+      databaseId,
       REFERRAL_CODES_COLLECTION_ID,
       [Query.equal("isAssigned", false)]
     );
@@ -47,7 +56,7 @@ export async function POST(request) {
     // Assign the first available code
     const codeDoc = unassignedCodes.documents[0];
     const updated = await databases.updateDocument(
-      DATABASE_ID,
+      databaseId,
       REFERRAL_CODES_COLLECTION_ID,
       codeDoc.$id,
       {

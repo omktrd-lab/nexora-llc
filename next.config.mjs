@@ -1,8 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    serverComponentsExternalPackages: ['appwrite'],
-  },
+  serverExternalPackages: ['appwrite'],
 };
 
 export default nextConfig;
