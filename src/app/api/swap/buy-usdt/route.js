@@ -227,6 +227,7 @@ export async function POST(request) {
       reference,
       swap: quote,
       balances: {
+        balanceKes: Number(currentUser.prefs?.balanceKes || 0),
         usdtBalance: nextPrefs.usdtBalance,
         nxrBalance: nextPrefs.nxrBalance,
       },
