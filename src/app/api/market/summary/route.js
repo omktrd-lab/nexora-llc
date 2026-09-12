@@ -2,44 +2,48 @@ import { NextResponse } from "next/server";
 import { MARKETS, BINANCE_PRICE_SCALAR, BINANCE_VOLUME_SCALAR } from "@/lib/market-symbols";
 import { fetchWithCache } from "@/lib/api-cache";
 
-const BINANCE_TICKER_URL = "https://api.binance.com/api/v3/ticker/24hr";
+const MEXC_TICKER_URL = "https://api.mexc.com/api/v3/ticker/24hr";
+
+async function fetchMexcTicker(symbol) {
+  const url = new URL(MEXC_TICKER_URL);
+  url.searchParams.set("symbol", symbol);
+
+  const response = await fetch(url, {
+    cache: "no-store",
+    signal: AbortSignal.timeout(8000),
+  });
+
+  if (!response.ok) {
+    throw new Error(`MEXC 24hr ticker failed with status ${response.status}`);
+  }
+
+  const data = await response.json();
+  if (!data || typeof data !== "object" || Array.isArray(data)) {
+    throw new Error("Unexpected MEXC response format");
+  }
+
+  return data;
+}
 
 export async function GET() {
   try {
-    // Fetch all 24h ticker data for all unique Binance symbols we need
-    const uniqueBinanceSymbols = [
-      ...new Set(MARKETS.map((m) => m.binanceSymbol)),
-    ];
+    const rawMap = await fetchWithCache("summary:mexc:24hr", async () => {
+      const entries = await Promise.all(
+        [...new Set(MARKETS.map((m) => m.binanceSymbol))].map(async (symbol) => {
+          try {
+            const data = await fetchMexcTicker(symbol);
+            return [symbol, data];
+          } catch {
+            return [symbol, null];
+          }
+        }),
+      );
 
-    // Binance supports fetching multiple tickers with ?symbols=[...] param
-    const symbolsParam = JSON.stringify(uniqueBinanceSymbols);
-
-    const rawData = await fetchWithCache("summary:24hr", async () => {
-      const url = new URL(BINANCE_TICKER_URL);
-      url.searchParams.set("symbols", symbolsParam);
-
-      const response = await fetch(url, {
-        cache: "no-store",
-        signal: AbortSignal.timeout(8000),
-      });
-      if (!response.ok) {
-        throw new Error(`Binance 24hr ticker failed with status ${response.status}`);
-      }
-
-      const data = await response.json();
-      if (!Array.isArray(data)) {
-        throw new Error("Unexpected Binance response format");
-      }
-      return data;
+      return Object.fromEntries(entries.filter(([, value]) => value));
     }, 2000);
 
-    // Map Binance symbol → raw ticker
-    const binanceMap = Object.fromEntries(
-      rawData.map((ticker) => [ticker.symbol, ticker]),
-    );
-
     const markets = MARKETS.map((market) => {
-      const raw = binanceMap[market.binanceSymbol];
+      const raw = rawMap[market.binanceSymbol];
       const priceScalar = market.useScalar ? BINANCE_PRICE_SCALAR : 1;
       const volumeScalar = market.useScalar ? BINANCE_VOLUME_SCALAR : 1;
 
@@ -83,12 +87,12 @@ export async function GET() {
 
     return NextResponse.json({
       markets,
-      source: "binance-24hr",
+      source: "mexc-24hr",
       timestamp: Math.floor(Date.now() / 1000),
     });
   } catch (error) {
     return NextResponse.json(
-      { message: "Could not fetch market summary.", error: error.message },
+      { message: "Could not fetch market summary.", error: error instanceof Error ? error.message : String(error) },
       { status: 502 },
     );
   }
