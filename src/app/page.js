@@ -1586,7 +1586,7 @@ function PhoneNumberPrompt({ initialValue, isEditing, onSaved, onCancel }) {
   }
 
   return (
-    <div className="w-full max-w-lg text-left md:border md:border-[#1e1e22] md:bg-[#0d0d0f] md:px-8 md:py-7">
+    <div className="w-full max-w-lg rounded-xl border border-[#1e1e22] bg-[#0d0d0f] px-4 py-5 text-left md:px-8 md:py-7">
       <p className="text-muted-foreground text-sm font-medium">
         Before you fund your account
       </p>
