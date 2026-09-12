@@ -699,13 +699,60 @@ function CryptoDepositPanel() {
 function WithdrawPanel({ availableUsdt, isEligible, onOpenReferrals }) {
   const [amount, setAmount] = useState("");
   const [walletAddress, setWalletAddress] = useState("");
-  const [confirmAddress, setConfirmAddress] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [status, setStatus] = useState("");
 
   async function handleSubmit(event) {
     event.preventDefault();
-    toast.info("Withdrawal requests are preview-only for now.", {
-      description: "The payout middleware is not live yet.",
-    });
+    const numericAmount = Number(amount);
+    if (!Number.isFinite(numericAmount) || numericAmount <= 0) {
+      setError("Enter a valid USDT amount.");
+      return;
+    }
+    if (!walletAddress || !/^0x[a-fA-F0-9]{40}$/.test(walletAddress)) {
+      setError("Enter a valid BNB Chain wallet address.");
+      return;
+    }
+    if (numericAmount > Number(availableUsdt || 0)) {
+      setError("Insufficient USDT balance.");
+      return;
+    }
+
+    setIsLoading(true);
+    setError("");
+    setStatus("");
+
+    try {
+      const jwtResponse = await account.createJWT();
+      const response = await fetch("/api/crypto-withdrawal/submit", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${jwtResponse.jwt}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          amount: numericAmount,
+          walletAddress,
+        }),
+      });
+
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(result.message || "Could not submit withdrawal request.");
+      }
+
+      setStatus("Withdrawal request submitted. Your USDT will be sent within 20 minutes.");
+      setAmount("");
+      setWalletAddress("");
+      toast.success("Withdrawal request submitted", {
+        description: "We'll send your USDT within 20 minutes.",
+      });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not submit withdrawal request.");
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -733,73 +780,94 @@ function WithdrawPanel({ availableUsdt, isEligible, onOpenReferrals }) {
             <span>You do not have any USDT available to withdraw yet.</span>
           </p>
         </div>
-      ) : !isEligible ? (
-        <div className="space-y-4">
-          <p className="flex items-start gap-2 text-sm leading-6 text-amber-200">
-            <ShieldAlert className="mt-0.5 size-4 shrink-0 text-amber-400" />
-            <span>Withdrawals are locked until you have at least one valid referral.</span>
-          </p>
-          <Button type="button" onClick={onOpenReferrals} className="w-full sm:w-auto">
-            View referrals
-          </Button>
-        </div>
       ) : (
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
-            <label className="mb-2 block text-sm font-medium text-foreground">
-              Amount in USDT
-            </label>
-            <Input
-              type="number"
-              min="0"
-              step="0.01"
-              value={amount}
-              onChange={(event) => setAmount(event.target.value)}
-              placeholder="0.00"
-            />
+        <>
+          <div className="mb-4 rounded-md bg-muted p-4 text-sm">
+            <p className="font-medium mb-2">Instructions:</p>
+            <ol className="list-decimal list-inside space-y-1 text-muted-foreground">
+              <li>Go to Binance</li>
+              <li>Select Deposit Crypto</li>
+              <li>Choose USDT</li>
+              <li>Select BNB Chain (BSC)</li>
+              <li>Copy your wallet address</li>
+              <li>Paste it below to withdraw</li>
+            </ol>
           </div>
 
-          <div>
-            <label className="mb-2 block text-sm font-medium text-foreground">
-              Network
-            </label>
-            <div className="border border-border bg-transparent px-3 py-2 text-sm text-foreground">
-              BNB Smart Chain (BEP20)
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="mb-2 block text-sm font-medium text-foreground">
+                Amount in USDT
+              </label>
+              <Input
+                type="number"
+                min="0.01"
+                step="0.01"
+                inputMode="decimal"
+                value={amount}
+                onChange={(event) => setAmount(event.target.value)}
+                placeholder="Enter amount"
+                required
+              />
             </div>
-          </div>
 
-          <div>
-            <label className="mb-2 block text-sm font-medium text-foreground">
-              USDT address
-            </label>
-            <Input
-              type="text"
-              value={walletAddress}
-              onChange={(event) => setWalletAddress(event.target.value)}
-              placeholder="0x... or Binance chain wallet address"
-            />
-          </div>
+            <div>
+              <label className="mb-2 block text-sm font-medium text-foreground">
+                Your BNB Chain Wallet Address
+              </label>
+              <Input
+                type="text"
+                value={walletAddress}
+                onChange={(event) => setWalletAddress(event.target.value)}
+                placeholder="0x..."
+                className="font-mono text-xs"
+                required
+              />
+            </div>
 
-          <div>
-            <label className="mb-2 block text-sm font-medium text-foreground">
-              Confirm USDT address
-            </label>
-            <Input
-              type="text"
-              value={confirmAddress}
-              onChange={(event) => setConfirmAddress(event.target.value)}
-              placeholder="Repeat the wallet address"
-            />
-          </div>
+            {status && (
+              <p className="text-muted-foreground text-sm" role="status">
+                {status}
+              </p>
+            )}
 
-          <p className="text-sm leading-6 text-amber-200">
-            Double-check the address before submitting. Wrong BNB Smart Chain USDT addresses cannot be recovered.
+            {error && (
+              <p className="text-destructive text-sm" role="alert">
+                {error}
+              </p>
+            )}
+
+            <Button
+              type="submit"
+              disabled={isLoading}
+              className="w-full"
+            >
+              {isLoading ? "Submitting..." : "Withdraw USDT"}
+            </Button>
+          </form>
+
+          <p className="text-muted-foreground text-xs mt-4">
+            Withdrawals typically take 20 minutes to hit your Binance wallet.
           </p>
 
-          <Button type="submit" className="w-full sm:w-auto" disabled>
-            Withdrawals coming soon
-          </Button>
-        </form>
+          <div className="mt-4 rounded-md bg-green-500/10 border border-green-500/20 p-4">
+            <p className="text-sm font-medium text-green-400 mb-1">
+              🎉 Limited Time Offer
+            </p>
+            <p className="text-xs text-green-300">
+              Refer a friend now and get 30% bonus on your NXR holdings! While your withdrawal processes, start earning more.
+            </p>
+            <Button
+              type="button"
+              onClick={onOpenReferrals}
+              variant="outline"
+              size="sm"
+              className="mt-2 w-full border-green-500/50 text-green-400 hover:bg-green-500/10"
+            >
+              Refer a Friend
+            </Button>
+          </div>
+        </>
       )}
     </div>
   );
