@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import {
   ArrowLeftRight,
   Coins,
+  Copy,
   Eye,
   EyeOff,
   LineChart,
@@ -344,6 +345,7 @@ function FundPageContent() {
 }
 
 function FundPanel({ onBalanceUpdated, onCollapse }) {
+  const [depositMethod, setDepositMethod] = useState("mpesa");
   const [amount, setAmount] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -458,7 +460,7 @@ function FundPanel({ onBalanceUpdated, onCollapse }) {
             Fund account
           </p>
           <h2 className="text-foreground mt-3 text-3xl font-semibold tracking-tight">
-            Add funds in KES
+            Add funds
           </h2>
         </div>
         {onCollapse && (
@@ -473,48 +475,223 @@ function FundPanel({ onBalanceUpdated, onCollapse }) {
           </button>
         )}
       </div>
-      <p className="text-muted-foreground mt-4 max-w-md text-sm leading-6">
-        Start a secure M-Pesa payment using your saved number.
+
+      {/* Toggle between MPESA and Crypto */}
+      <div className="mt-6 flex gap-2">
+        <button
+          type="button"
+          onClick={() => setDepositMethod("mpesa")}
+          className={`flex-1 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+            depositMethod === "mpesa"
+              ? "bg-foreground text-background"
+              : "bg-muted text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          M-Pesa
+        </button>
+        <button
+          type="button"
+          onClick={() => setDepositMethod("crypto")}
+          className={`flex-1 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+            depositMethod === "crypto"
+              ? "bg-foreground text-background"
+              : "bg-muted text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          Crypto
+        </button>
+      </div>
+
+      {depositMethod === "mpesa" ? (
+        <>
+          <p className="text-muted-foreground mt-4 max-w-md text-sm leading-6">
+            Start a secure M-Pesa payment using your saved number.
+          </p>
+
+          <form onSubmit={startPayment} className="mt-8 max-w-sm space-y-4">
+            <label
+              className="text-foreground block text-sm font-medium"
+              htmlFor="fund-amount"
+            >
+              Amount in KES
+            </label>
+            <Input
+              id="fund-amount"
+              type="number"
+              min="1"
+              step="1"
+              inputMode="numeric"
+              value={amount}
+              onChange={(event) => setAmount(event.target.value)}
+              placeholder="Enter amount"
+              required
+            />
+            {paymentStatus && (
+              <p className="text-muted-foreground text-sm" role="status">
+                {paymentStatus}
+              </p>
+            )}
+            {error && (
+              <p className="text-destructive text-sm" role="alert">
+                {error}
+              </p>
+            )}
+            <Button
+              type="submit"
+              disabled={isLoading || Boolean(paymentKey)}
+              className="w-full sm:w-auto"
+            >
+              {isLoading || paymentKey
+                ? "Payment processing..."
+                : "Pay with M-Pesa"}
+            </Button>
+          </form>
+        </>
+      ) : (
+        <CryptoDepositPanel />
+      )}
+    </div>
+  );
+}
+
+function CryptoDepositPanel() {
+  const [amount, setAmount] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [status, setStatus] = useState("");
+  const walletAddress = "0xd75dd51493ca387cfddacb727bfeef5d5dd50eb2";
+
+  async function handlePaymentSubmitted(event) {
+    event.preventDefault();
+    const numericAmount = Number(amount);
+    if (!Number.isFinite(numericAmount) || numericAmount <= 0) {
+      setError("Enter a valid USDT amount.");
+      return;
+    }
+
+    setIsLoading(true);
+    setError("");
+    setStatus("");
+
+    try {
+      const jwtResponse = await account.createJWT();
+      const response = await fetch("/api/crypto-deposit/submit", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${jwtResponse.jwt}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          amount: numericAmount,
+          walletAddress,
+        }),
+      });
+
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(result.message || "Could not submit deposit request.");
+      }
+
+      setStatus("Deposit request submitted. Your funds will be credited after block confirmations (typically 10 minutes).");
+      setAmount("");
+      toast.success("Deposit request submitted", {
+        description: "We'll verify and credit your USDT within 10 minutes.",
+      });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not submit deposit request.");
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  function copyAddress() {
+    navigator.clipboard.writeText(walletAddress);
+    toast.success("Address copied", {
+      description: "Wallet address copied to clipboard.",
+    });
+  }
+
+  return (
+    <div className="mt-4">
+      <p className="text-muted-foreground max-w-md text-sm leading-6">
+        Deposit USDT using the BNB Chain. Funds will be credited after block confirmations.
       </p>
 
-      <form onSubmit={startPayment} className="mt-8 max-w-sm space-y-4">
-        <label
-          className="text-foreground block text-sm font-medium"
-          htmlFor="fund-amount"
-        >
-          Amount in KES
-        </label>
-        <Input
-          id="fund-amount"
-          type="number"
-          min="1"
-          step="1"
-          inputMode="numeric"
-          value={amount}
-          onChange={(event) => setAmount(event.target.value)}
-          placeholder="Enter amount"
-          required
-        />
-        {paymentStatus && (
-          <p className="text-muted-foreground text-sm" role="status">
-            {paymentStatus}
-          </p>
-        )}
-        {error && (
-          <p className="text-destructive text-sm" role="alert">
-            {error}
-          </p>
-        )}
-        <Button
-          type="submit"
-          disabled={isLoading || Boolean(paymentKey)}
-          className="w-full sm:w-auto"
-        >
-          {isLoading || paymentKey
-            ? "Payment processing..."
-            : "Pay with M-Pesa"}
-        </Button>
-      </form>
+      <div className="mt-6 space-y-4">
+        <div>
+          <label className="text-foreground block text-sm font-medium mb-2">
+            Wallet Address (BNB Chain - USDT)
+          </label>
+          <div className="flex gap-2">
+            <Input
+              value={walletAddress}
+              readOnly
+              className="font-mono text-xs"
+            />
+            <Button
+              type="button"
+              onClick={copyAddress}
+              variant="outline"
+              size="icon"
+            >
+              <Copy className="size-4" />
+            </Button>
+          </div>
+        </div>
+
+        <div className="rounded-md bg-muted p-4 text-sm">
+          <p className="font-medium mb-2">Instructions:</p>
+          <ol className="list-decimal list-inside space-y-1 text-muted-foreground">
+            <li>Go to Binance</li>
+            <li>Select Withdraw/Send to other networks</li>
+            <li>Choose USDT</li>
+            <li>Select BNB Chain (BSC)</li>
+            <li>Send USDT to the address above</li>
+          </ol>
+        </div>
+
+        <form onSubmit={handlePaymentSubmitted} className="space-y-4">
+          <div>
+            <label className="text-foreground block text-sm font-medium mb-2">
+              Amount in USDT
+            </label>
+            <Input
+              type="number"
+              min="0.01"
+              step="0.01"
+              inputMode="decimal"
+              value={amount}
+              onChange={(event) => setAmount(event.target.value)}
+              placeholder="Enter amount"
+              required
+            />
+          </div>
+
+          {status && (
+            <p className="text-muted-foreground text-sm" role="status">
+              {status}
+            </p>
+          )}
+
+          {error && (
+            <p className="text-destructive text-sm" role="alert">
+              {error}
+            </p>
+          )}
+
+          <Button
+            type="submit"
+            disabled={isLoading}
+            className="w-full"
+          >
+            {isLoading ? "Submitting..." : "I have paid in USDT"}
+          </Button>
+        </form>
+
+        <p className="text-muted-foreground text-xs">
+          Block confirmations typically take 10 minutes. For instant deposits, use M-Pesa instead.
+        </p>
+      </div>
     </div>
   );
 }
