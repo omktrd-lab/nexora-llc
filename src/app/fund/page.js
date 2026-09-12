@@ -368,7 +368,15 @@ function FundPanel({ onBalanceUpdated, onCollapse }) {
           throw new Error(result.message || "Could not verify the payment.");
         }
         const status = String(result.data?.status || "").toLowerCase();
-        if (status === "success") {
+        const successStatuses = new Set([
+          "success",
+          "successful",
+          "completed",
+          "complete",
+          "paid",
+          "succeeded",
+        ]);
+        if (successStatuses.has(status)) {
           const refreshedUser = await account.get();
           const confirmedBalance = Number(refreshedUser.prefs?.balanceKes || 0);
           const amountToAdd = Number(result.data?.amount || 0);
@@ -423,20 +431,23 @@ function FundPanel({ onBalanceUpdated, onCollapse }) {
           result.message || result.error || "Payment could not be started.",
         );
       }
-      if (result.data.directStk) {
+      if (result.data.checkoutUrl) {
+        setPaymentKey(result.data.paymentKey);
+        setLedgerRowId(result.data.ledgerRowId);
+        setPaymentStatus(
+          "Redirecting to secure M-Pesa checkout. Keep this tab open while the payment is processed.",
+        );
+        toast.info("Redirecting to secure M-Pesa checkout", {
+          description: "Complete the payment there and we will confirm your balance automatically.",
+        });
+        window.location.assign(result.data.checkoutUrl);
+      } else if (result.data.directStk) {
         setPaymentKey(result.data.paymentKey);
         setLedgerRowId(result.data.ledgerRowId);
         setPaymentStatus(
           "Payment processing. Enter your M-Pesa PIN on your phone and keep this page open while we confirm it.",
         );
         setIsLoading(false);
-      } else if (result.data.checkoutUrl) {
-        toast.info("Opening secure M-Pesa checkout", {
-          description:
-            result.data.directStkError ||
-            "Continue there to start the STK prompt.",
-        });
-        window.location.assign(result.data.checkoutUrl);
       } else {
         throw new Error("Payment could not be started.");
       }
