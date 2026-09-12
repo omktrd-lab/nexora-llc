@@ -176,9 +176,9 @@ export default function PrivacyPolicyPage() {
           <li><strong>Email:</strong>{" "}
             <a
               className="text-foreground underline underline-offset-4"
-              href="mailto:brianitira@gmail.com"
+              href="mailto:brianitira@programmer.net"
             >
-              brianitira@gmail.com
+              brianitira@programmer.net
             </a>
           </li>
           <li><strong>Website:</strong> https://nexoraquant.com</li>
