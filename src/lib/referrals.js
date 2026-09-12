@@ -1,7 +1,7 @@
 import { databases, ID, Query } from "@/lib/appwrite";
 
 const REFERRALS_COLLECTION_ID = process.env.NEXT_PUBLIC_REFERRALS_COLLECTION_ID || "referrals";
-const DATABASE_ID = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID;
+const DATABASE_ID = process.env.APPWRITE_DATABASE_ID;
 
 // Local storage and cookie keys
 const REFERRAL_STORAGE_KEY = "nexora_ref_id";
