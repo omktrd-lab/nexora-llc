@@ -286,16 +286,13 @@ export default function ReferralsPage() {
             <thead>
               <tr className="border-b border-[#16181d] bg-[#0d0e12]">
                 <th className="px-4 py-3 text-left text-xs font-medium tracking-wide text-zinc-500 uppercase">
-                  User ID
+                  User
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium tracking-wide text-zinc-500 uppercase">
                   Phone
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium tracking-wide text-zinc-500 uppercase">
                   Status
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium tracking-wide text-zinc-500 uppercase">
-                  Deposit Amount
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium tracking-wide text-zinc-500 uppercase">
                   Date
@@ -305,7 +302,7 @@ export default function ReferralsPage() {
             <tbody>
               {referrals.length === 0 ? (
                 <tr>
-                  <td colSpan="5" className="px-4 py-12 text-center">
+                  <td colSpan="4" className="px-4 py-12 text-center">
                     <Users className="mx-auto mb-3 size-8 text-zinc-600" />
                     <p className="text-sm text-zinc-500">No referrals yet</p>
                     <p className="mt-1 text-xs text-zinc-600">
@@ -316,8 +313,8 @@ export default function ReferralsPage() {
               ) : (
                 referrals.map((referral) => (
                   <tr key={referral.$id} className="border-b border-[#16181d]">
-                    <td className="px-4 py-3 font-mono text-xs text-zinc-300">
-                      {referral.referredUserId.slice(0, 8)}...
+                    <td className="px-4 py-3 text-xs text-zinc-300">
+                      {referral.referredUserName || "Unknown"}
                     </td>
                     <td className="px-4 py-3 text-xs text-zinc-400">
                       {referral.phoneNumber || "Not set"}
@@ -332,11 +329,6 @@ export default function ReferralsPage() {
                       >
                         {referral.status}
                       </span>
-                    </td>
-                    <td className="px-4 py-3 text-xs text-zinc-300">
-                      {referral.hasDeposited
-                        ? `KES ${referral.depositAmount?.toLocaleString() || "0"}`
-                        : "—"}
                     </td>
                     <td className="px-4 py-3 text-xs text-zinc-500">
                       {new Date(referral.createdAt).toLocaleDateString()}
@@ -442,16 +434,13 @@ export default function ReferralsPage() {
               <thead>
                 <tr className="border-b border-[#16181d] bg-[#0d0e12]">
                   <th className="px-5 py-3 text-left text-xs font-medium tracking-wide text-zinc-500 uppercase">
-                    User ID
+                    User
                   </th>
                   <th className="px-5 py-3 text-left text-xs font-medium tracking-wide text-zinc-500 uppercase">
                     Phone
                   </th>
                   <th className="px-5 py-3 text-left text-xs font-medium tracking-wide text-zinc-500 uppercase">
                     Status
-                  </th>
-                  <th className="px-5 py-3 text-left text-xs font-medium tracking-wide text-zinc-500 uppercase">
-                    Deposit Amount
                   </th>
                   <th className="px-5 py-3 text-left text-xs font-medium tracking-wide text-zinc-500 uppercase">
                     Date
@@ -461,7 +450,7 @@ export default function ReferralsPage() {
               <tbody>
                 {referrals.length === 0 ? (
                   <tr>
-                    <td colSpan="5" className="px-5 py-12 text-center">
+                    <td colSpan="4" className="px-5 py-12 text-center">
                       <Users className="mx-auto mb-3 size-8 text-zinc-600" />
                       <p className="text-sm text-zinc-500">No referrals yet</p>
                       <p className="mt-1 text-xs text-zinc-600">
@@ -475,8 +464,8 @@ export default function ReferralsPage() {
                       key={referral.$id}
                       className="border-b border-[#16181d]"
                     >
-                      <td className="px-5 py-3 font-mono text-xs text-zinc-300">
-                        {referral.referredUserId.slice(0, 8)}...
+                      <td className="px-5 py-3 text-xs text-zinc-300">
+                        {referral.referredUserName || "Unknown"}
                       </td>
                       <td className="px-5 py-3 text-xs text-zinc-400">
                         {referral.phoneNumber || "Not set"}
@@ -491,11 +480,6 @@ export default function ReferralsPage() {
                         >
                           {referral.status}
                         </span>
-                      </td>
-                      <td className="px-5 py-3 text-xs text-zinc-300">
-                        {referral.hasDeposited
-                          ? `KES ${referral.depositAmount?.toLocaleString() || "0"}`
-                          : "—"}
                       </td>
                       <td className="px-5 py-3 text-xs text-zinc-500">
                         {new Date(referral.createdAt).toLocaleDateString()}

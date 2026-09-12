@@ -55,7 +55,33 @@ export async function GET(request) {
       documents: response.documents.length,
     });
 
-    const referrals = response.documents;
+    const { Users } = await import("node-appwrite");
+    const users = new Users(client);
+
+    // Fetch user details for each referral to get names
+    const referralsWithNames = await Promise.all(
+      response.documents.map(async (referral) => {
+        try {
+          const user = await users.get(referral.referredUserId);
+          const name = user.name || user.prefs?.name || user.prefs?.username || "Unknown";
+          return {
+            ...referral,
+            referredUserName: name,
+          };
+        } catch (error) {
+          console.error("[REFERRAL STATS API] Error fetching user", {
+            referredUserId: referral.referredUserId.substring(0, 8) + "...",
+            error: error.message,
+          });
+          return {
+            ...referral,
+            referredUserName: "Unknown",
+          };
+        }
+      })
+    );
+
+    const referrals = referralsWithNames;
     const stats = {
       total: referrals.length,
       valid: referrals.filter(r => r.status === 'VALID').length,
