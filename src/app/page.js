@@ -650,6 +650,12 @@ function HomeContent() {
               avatarSeed={avatarSeed}
               onSignOut={signOut}
               isSigningOut={isSigningOut}
+              open={isProfileOpen}
+              onOpenChange={setIsProfileOpen}
+              balanceKes={balanceKes}
+              nxrBalance={nxrBalance}
+              isBalanceVisible={isBalanceVisible}
+              setIsBalanceVisible={setIsBalanceVisible}
             />
           </Sheet>
         </div>
@@ -956,6 +962,8 @@ function HomeContent() {
             setIsBalanceVisible={setIsBalanceVisible}
             onEditPhone={() => setIsEditingPhone(true)}
             onSignOut={signOut}
+            open={isProfileOpen}
+            onOpenChange={setIsProfileOpen}
           />
         </Sheet>
       </nav>
@@ -1663,9 +1671,15 @@ function ProfileSheet({
   avatarSeed,
   onSignOut,
   isSigningOut,
+  open,
+  onOpenChange,
+  balanceKes,
+  nxrBalance,
+  isBalanceVisible,
+  setIsBalanceVisible,
 }) {
   return (
-    <SheetContent side="right" className="w-[min(22rem,85vw)]">
+    <SheetContent side="right" className="w-[min(22rem,85vw)]" open={open} onOpenChange={onOpenChange}>
       <SheetHeader>
         <SheetTitle>Profile</SheetTitle>
         <SheetDescription>Manage your Nexora account.</SheetDescription>
