@@ -675,25 +675,27 @@ function PhoneNumberPrompt({ initialValue, isEditing, onSaved }) {
       </p>
 
       <form onSubmit={savePhoneNumber} className="mt-9">
-        <InputOTP
-          maxLength={10}
-          pattern="[0-9]*"
-          inputMode="numeric"
-          value={phoneNumber}
-          onChange={handlePhoneNumberChange}
-          aria-label="M-Pesa phone number"
-          className="justify-start"
-        >
-          <InputOTPGroup className="gap-1">
-            {Array.from({ length: 10 }, (_, index) => (
-              <InputOTPSlot
-                key={index}
-                index={index}
-                className="size-7 rounded-md border text-base sm:size-9 sm:text-lg"
-              />
-            ))}
-          </InputOTPGroup>
-        </InputOTP>
+        <div className="w-full overflow-hidden rounded-lg border border-[#1e1e22] bg-[#111214] p-3 sm:p-4">
+          <InputOTP
+            maxLength={10}
+            pattern="[0-9]*"
+            inputMode="numeric"
+            value={phoneNumber}
+            onChange={handlePhoneNumberChange}
+            aria-label="M-Pesa phone number"
+            className="justify-start overflow-hidden"
+          >
+            <InputOTPGroup className="gap-1 sm:gap-1.5">
+              {Array.from({ length: 10 }, (_, index) => (
+                <InputOTPSlot
+                  key={index}
+                  index={index}
+                  className="size-6 rounded-md border border-[#2a2a2d] bg-[#0b0b0d] text-base text-white sm:size-8 sm:text-lg"
+                />
+              ))}
+            </InputOTPGroup>
+          </InputOTP>
+        </div>
 
         {error && (
           <p className="text-destructive mt-4 text-sm" role="alert">
