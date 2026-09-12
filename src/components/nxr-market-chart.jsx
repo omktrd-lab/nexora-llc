@@ -715,23 +715,23 @@ export function NxrMarketChart({
         </div>
       </header>
 
-      <header className="terminal-chart-head flex items-start justify-between gap-4 px-4 pt-3 pb-2 lg:hidden">
-        <div className="flex items-baseline gap-2">
-          <p className="text-[10px] font-semibold tracking-wider text-zinc-500 uppercase">
+      <header className="terminal-chart-head flex min-h-[72px] items-start justify-between gap-4 overflow-hidden px-4 pt-3 pb-2 lg:hidden">
+        <div className="flex min-w-0 items-baseline gap-2 overflow-hidden">
+          <p className="shrink-0 text-[10px] font-semibold tracking-wider text-zinc-500 uppercase">
             {market.base}/USDT
           </p>
           <p
-            className={`font-mono text-xl font-semibold ${priceDirection === "down" ? "text-purple-500" : "text-green-500"}`}
+            className={`shrink-0 font-mono text-xl font-semibold leading-none ${priceDirection === "down" ? "text-purple-500" : "text-green-500"}`}
           >
             {fmtPrice(ticker?.price)}
           </p>
-          <p className="text-muted-foreground mt-0.5 text-[10px]">
+          <p className="text-muted-foreground mt-0.5 truncate text-[10px] leading-none">
             {ticker
               ? `${ticker.change24h >= 0 ? "+" : ""}${Number(ticker.change24h).toFixed(2)}% · 24h`
               : "Loading market"}
           </p>
         </div>
-        <div className="grid grid-cols-[auto_auto] gap-x-3 gap-y-1 text-[9px] leading-4">
+        <div className="grid min-w-[120px] shrink-0 grid-cols-[auto_auto] gap-x-3 gap-y-1 text-[9px] leading-4">
           <span className="text-muted-foreground">24h High</span>
           <span className="text-right font-mono">
             {ticker ? fmtPrice(ticker.high24h) : "--"}

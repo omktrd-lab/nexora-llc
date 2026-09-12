@@ -117,17 +117,17 @@ function SkeletonRow() {
 function MobileMarketRow({ market, onTrade }) {
   return (
     <div className="border-b border-[#16181d] px-4 py-3.5 last:border-b-0">
-      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4">
-        <div className="flex min-w-0 items-center gap-3">
+      <div className="grid min-h-[52px] grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 overflow-hidden">
+        <div className="flex min-w-0 items-center gap-3 overflow-hidden">
           <AssetBadge symbol={market.base} isNative={market.isNative} />
-          <div className="min-w-0">
-            <div className="flex items-center gap-1.5">
+          <div className="min-w-0 overflow-hidden">
+            <div className="flex min-w-0 items-center gap-1.5 overflow-hidden">
               <span className="truncate text-sm font-semibold text-white">
                 {market.base}
               </span>
-              <span className="text-[10px] text-zinc-500">/USDT</span>
+              <span className="shrink-0 text-[10px] text-zinc-500">/USDT</span>
               {market.isNative && (
-                <span className="rounded bg-[#22c55e]/20 px-1 py-0.5 text-[8px] font-bold text-[#22c55e]">
+                <span className="shrink-0 rounded bg-[#22c55e]/20 px-1 py-0.5 text-[8px] font-bold text-[#22c55e]">
                   NXR
                 </span>
               )}
@@ -137,16 +137,18 @@ function MobileMarketRow({ market, onTrade }) {
             </p>
           </div>
         </div>
-        <p className="font-mono text-sm font-medium text-white tabular-nums">
+        <p className="shrink-0 whitespace-nowrap font-mono text-sm font-medium text-white tabular-nums">
           {formatMarketPrice(market.price, market.decimals)}
         </p>
       </div>
-      <div className="mt-3 flex items-center justify-between pl-11">
-        <ChangeCell change={market.change24h} />
+      <div className="mt-3 flex min-h-[24px] items-center justify-between pl-11">
+        <div className="min-w-0 overflow-hidden">
+          <ChangeCell change={market.change24h} />
+        </div>
         <button
           type="button"
           onClick={onTrade}
-          className="rounded border border-[#2a2a2e] px-3 py-1.5 text-[10px] font-semibold tracking-wide text-zinc-300 uppercase transition-colors hover:border-[#22c55e] hover:bg-[#22c55e] hover:text-black"
+          className="shrink-0 rounded border border-[#2a2a2e] px-3 py-1.5 text-[10px] font-semibold tracking-wide text-zinc-300 uppercase transition-colors hover:border-[#22c55e] hover:bg-[#22c55e] hover:text-black"
         >
           Trade
         </button>
