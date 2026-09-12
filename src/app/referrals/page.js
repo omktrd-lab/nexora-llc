@@ -62,12 +62,15 @@ export default function ReferralsPage() {
 
   const loadReferralData = async (userId) => {
     try {
-      const [referralData, statsData] = await Promise.all([
-        getReferrals(userId),
-        getReferralStats(userId),
-      ]);
-      setReferrals(referralData);
-      setStats(statsData);
+      const response = await fetch(`/api/referral/stats?referrerId=${encodeURIComponent(userId)}`);
+      const data = await response.json();
+
+      if (response.ok) {
+        setReferrals(data.referrals);
+        setStats(data.stats);
+      } else {
+        console.error("Error loading referral data:", data.error);
+      }
     } catch (error) {
       console.error("Error loading referral data:", error);
     } finally {
