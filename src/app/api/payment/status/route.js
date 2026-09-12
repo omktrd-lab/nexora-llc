@@ -76,9 +76,17 @@ export async function GET(request) {
     if (ledgerRowId && ledgerRow) {
       const paymentData = result.data || {};
       const ledgerData = ledgerRow.data || ledgerRow;
-      const paymentStatus = String(
-        paymentData.status || "pending",
-      ).toLowerCase();
+      const rawStatus = String(paymentData.status || "pending");
+      const paymentStatus = rawStatus.toLowerCase();
+      const successStatuses = new Set([
+        "success",
+        "successful",
+        "completed",
+        "complete",
+        "paid",
+        "succeeded",
+      ]);
+      const isSuccessfulPayment = successStatuses.has(paymentStatus);
       const amountKes = Number(ledgerData.amountKes || paymentData.amount || 0);
 
       await updatePaymentLedgerRow(ledgerRowId, {
@@ -88,10 +96,7 @@ export async function GET(request) {
         updatedAt: new Date().toISOString(),
       });
 
-      if (
-        paymentStatus === "success" &&
-        currentUser.prefs?.lastTopUpReference !== reference
-      ) {
+      if (isSuccessfulPayment && currentUser.prefs?.lastTopUpReference !== reference) {
         const existingPrefs = currentUser.prefs || {};
         const currentBalance = Number(existingPrefs.balanceKes || 0);
         const nextBalance = currentBalance + amountKes;
@@ -122,15 +127,20 @@ export async function GET(request) {
           throw new Error("Appwrite balance update failed.");
         }
 
-        // Validate referral if user has a pending referral and deposited >= 1 KES
         if (amountKes >= 1) {
           try {
             await validateReferral(currentUser.$id, amountKes);
           } catch (error) {
             console.error("Failed to validate referral:", error);
-            // Don't fail the payment if referral validation fails
           }
         }
+      } else if (!isSuccessfulPayment) {
+        console.warn("ZetuPay payment status not marked successful yet", {
+          paymentKey,
+          rawStatus,
+          reference,
+          ledgerRowId,
+        });
       }
     }
 
