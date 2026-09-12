@@ -7,7 +7,7 @@ export default function LandingPage() {
 
   return (
     <main className="flex h-screen w-full flex-col items-center justify-center bg-[#090a0c] px-6">
-      <div className="max-w-2xl text-center">
+      <div className="max-w-2xl">
         {/* Headline */}
         <h1 className="mb-4 text-3xl font-light tracking-tight text-white sm:text-4xl sm:font-semibold">
           Trade Smarter with HFT
@@ -18,21 +18,41 @@ export default function LandingPage() {
           High-frequency trading strategies working for you. Access quantitative asset pools and track your share of the NXR ecosystem.
         </p>
 
+        {/* What We Do */}
+        <div className="mb-6">
+          <h2 className="mb-2 text-sm font-semibold text-white sm:text-base">
+            What We Do
+          </h2>
+          <p className="text-xs leading-relaxed text-zinc-400 sm:text-sm">
+            Automated high-frequency trading strategies execute on your behalf. Our bots analyze market data and execute trades with precision, maximizing opportunities in the crypto markets.
+          </p>
+        </div>
+
+        {/* How It Works */}
+        <div className="mb-6">
+          <h2 className="mb-2 text-sm font-semibold text-white sm:text-base">
+            How It Works
+          </h2>
+          <p className="text-xs leading-relaxed text-zinc-400 sm:text-sm">
+            Connect your account, deposit funds, and let our HFT strategies work. Track your portfolio performance in real-time with transparent reporting.
+          </p>
+        </div>
+
         {/* Features */}
         <ul className="mb-6 space-y-2 text-xs text-zinc-400 sm:space-y-3 sm:text-sm">
-          <li className="flex items-center justify-center gap-2">
+          <li className="flex items-center gap-2">
             <span className="size-1.5 rounded-full bg-[#22c55e]" />
             Automated HFT bot trading
           </li>
-          <li className="flex items-center justify-center gap-2">
+          <li className="flex items-center gap-2">
             <span className="size-1.5 rounded-full bg-[#22c55e]" />
             Real-time market execution
           </li>
-          <li className="flex items-center justify-center gap-2">
+          <li className="flex items-center gap-2">
             <span className="size-1.5 rounded-full bg-[#22c55e]" />
             Portfolio performance tracking
           </li>
-          <li className="flex items-center justify-center gap-2">
+          <li className="flex items-center gap-2">
             <span className="size-1.5 rounded-full bg-[#22c55e]" />
             Secure asset management
           </li>
