@@ -1178,7 +1178,7 @@ function SwapPanel({ balanceKes, nxrBalance, usdtBalance, onBalancesUpdated }) {
       </div>
       <p className="text-muted-foreground mt-2 max-w-md text-xs leading-5">
         {side === "buy"
-          ? `Use your ${buyCurrency === "kes" ? "KES" : "USDT"} balance at the current curve price.`
+          ? `Use your ${buyCurrency === "kes" ? "KES" : "USDT"} balance at the current market price.`
           : "Sell NXR into your USDT portfolio balance."}
       </p>
 
