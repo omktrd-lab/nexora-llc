@@ -72,9 +72,9 @@ function getSymbolBasedVariation(symbol, originalChange) {
   const absChange = Math.abs(originalChange);
   const sign = Math.sign(originalChange) || 1;
   
-  // Stablecoins should remain at 0.00%
-  const stablecoins = ['USDC', 'USDT', 'DAI', 'BUSD'];
-  if (stablecoins.some(stable => symbol.includes(stable))) {
+  // Stablecoins should remain at 0.00% (exact match only)
+  const stablecoins = ['USDCUSDT', 'USDTUSDT', 'DAIUSDT', 'BUSDUSDT'];
+  if (stablecoins.includes(symbol)) {
     return 0;
   }
   
