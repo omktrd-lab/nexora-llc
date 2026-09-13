@@ -165,6 +165,11 @@ export async function GET(request) {
         const quoteVolume24h = Number(ticker24h.quoteVolume) * 0.98; // 2% volume lag
         const change24h = Number(ticker24h.priceChangePercent) - 0.1; // Slight change lag
 
+        // Format change24h with appropriate precision
+        const change24hFormatted = Math.abs(change24h) < 0.01 
+          ? change24h.toFixed(4) 
+          : change24h.toFixed(2);
+
         if (type === "latest") {
           if (!latestBar) {
             return NextResponse.json(
@@ -178,7 +183,7 @@ export async function GET(request) {
             source: "mexc-24hr-ticker",
             bar: latestBar,
             price: Number(price.toFixed(8)),
-            change24h: Number(change24h.toFixed(2)),
+            change24h: Number(change24hFormatted),
             high24h: Number(high24h.toFixed(8)),
             low24h: Number(low24h.toFixed(8)),
             volume24h: Number(quoteVolume24h.toFixed(2)),
@@ -192,7 +197,7 @@ export async function GET(request) {
           symbol: platformSymbol,
           source: "mexc-24hr-ticker",
           price: Number(price.toFixed(8)),
-          change24h: Number(change24h.toFixed(2)),
+          change24h: Number(change24hFormatted),
           high24h: Number(high24h.toFixed(8)),
           low24h: Number(low24h.toFixed(8)),
           volume24h: Number(quoteVolume24h.toFixed(2)),
@@ -226,13 +231,18 @@ export async function GET(request) {
 
       // Use MEXC 24h ticker for stable metrics
       const ticker24h = await fetchMexcTicker24h(binanceSymbol);
+      const change24h = Number(ticker24h.priceChangePercent);
+      const change24hFormatted = Math.abs(change24h) < 0.01 
+        ? change24h.toFixed(4) 
+        : change24h.toFixed(2);
+      
       return NextResponse.json({
         pair: pairLabel,
         symbol: platformSymbol,
         source: "mexc-24hr-ticker",
         bar: latestBar,
         price: Number(ticker24h.lastPrice),
-        change24h: Number(ticker24h.priceChangePercent),
+        change24h: Number(change24hFormatted),
         high24h: Number(ticker24h.highPrice),
         low24h: Number(ticker24h.lowPrice),
         volume24h: Number(ticker24h.quoteVolume),
@@ -242,12 +252,17 @@ export async function GET(request) {
 
     // Default: use MEXC 24h ticker for stable metrics
     const ticker24h = await fetchMexcTicker24h(binanceSymbol);
+    const change24h = Number(ticker24h.priceChangePercent);
+    const change24hFormatted = Math.abs(change24h) < 0.01 
+      ? change24h.toFixed(4) 
+      : change24h.toFixed(2);
+    
     return NextResponse.json({
       pair: pairLabel,
       symbol: platformSymbol,
       source: "mexc-24hr-ticker",
       price: Number(ticker24h.lastPrice),
-      change24h: Number(ticker24h.priceChangePercent),
+      change24h: Number(change24hFormatted),
       high24h: Number(ticker24h.highPrice),
       low24h: Number(ticker24h.lowPrice),
       volume24h: Number(ticker24h.quoteVolume),
