@@ -151,17 +151,20 @@ export async function GET(request) {
 
     const pairLabel = `${market.base}/USDT`;
 
-    // For NXRUSDT, use MEXC 24h ticker for stable metrics
+    // For NXRUSDT, use MEXC 24h ticker for volume but klines for change calculation
     if (platformSymbol === "NXRUSDT" && type !== "history") {
       try {
         const ticker24h = await fetchMexcTicker24h(binanceSymbol);
         const latestBar = bars.at(-1);
         
+        // Calculate 24h change from klines for real-time updates
+        const bars24h = await fetchMexcKlines(binanceSymbol, 96, "15m", priceScalar); // 96 bars of 15m = 24 hours
+        const change24h = calculateChange24h(bars24h);
+        
         const price = latestBar ? latestBar.close : Number(ticker24h.lastPrice) * priceScalar;
         const high24h = Number(ticker24h.highPrice) * priceScalar;
         const low24h = Number(ticker24h.lowPrice) * priceScalar;
         const quoteVolume24h = Number(ticker24h.quoteVolume) * priceScalar * volumeScalar;
-        const change24h = Number(ticker24h.priceChangePercent);
 
         if (type === "latest") {
           if (!latestBar) {
