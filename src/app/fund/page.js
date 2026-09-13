@@ -893,7 +893,13 @@ function PhoneNumberPrompt({ initialValue, isEditing, onSaved }) {
     setIsSaving(true);
     setError("");
     try {
-      await account.updatePrefs({ safaricomPhoneNumber: phoneNumber });
+      // Appwrite replaces the complete preferences object. Merge it first so
+      // changing an M-Pesa number never discards balances or trade history.
+      const currentUser = await account.get();
+      await account.updatePrefs({
+        ...(currentUser.prefs || {}),
+        safaricomPhoneNumber: phoneNumber,
+      });
       toast.success(
         isEditing ? "M-Pesa number updated" : "M-Pesa number saved",
         {
