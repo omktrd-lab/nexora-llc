@@ -118,7 +118,7 @@ export async function GET() {
         price = price - 0.05;
         high24h = high24h - 0.05;
         low24h = low24h - 0.05;
-        quoteVolume24h = quoteVolume24h * 0.98;
+        // No volume lag for stability
         change24h = change24h - 0.1;
       }
 

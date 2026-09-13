@@ -162,7 +162,7 @@ export async function GET(request) {
         const price = uniPrice - 0.05; // Small price lag
         const high24h = Number(ticker24h.highPrice) - 0.05;
         const low24h = Number(ticker24h.lowPrice) - 0.05;
-        const quoteVolume24h = Number(ticker24h.quoteVolume) * 0.98; // 2% volume lag
+        const quoteVolume24h = Number(ticker24h.quoteVolume); // No volume lag for stability
         const change24h = Number(ticker24h.priceChangePercent) - 0.1; // Slight change lag
 
         // Format change24h with appropriate precision
