@@ -128,8 +128,10 @@ export async function GET() {
       const low24h = Number(raw.lowPrice) * priceScalar;
       const quoteVolume24h = Number(raw.quoteVolume) * priceScalar * volumeScalar;
       
-      // Calculate change24h from klines for accuracy
-      const change24h = klines.length > 0 ? calculateChange24h(klines) : Number(raw.priceChangePercent || 0);
+      // For NXRUSDT, use MEXC 24h ticker for stable metrics; for others, use kline calculation
+      const change24h = market.symbol === "NXRUSDT" 
+        ? Number(raw.priceChangePercent || 0)
+        : (klines.length > 0 ? calculateChange24h(klines) : Number(raw.priceChangePercent || 0));
 
       return {
         symbol: market.symbol,
