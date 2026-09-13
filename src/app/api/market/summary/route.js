@@ -116,7 +116,6 @@ export async function GET() {
           isNative: market.isNative,
           decimals: market.decimals,
           price: 0,
-          change24h: 0,
           high24h: 0,
           low24h: 0,
           volume24h: 0,
@@ -130,7 +129,6 @@ export async function GET() {
       let high24h = Number(raw.highPrice);
       let low24h = Number(raw.lowPrice);
       let quoteVolume24h = Number(raw.quoteVolume);
-      let change24h = 0; // Temporarily disabled
       let volume24h = Number(raw.volume);
       
       // Apply lag offset only to NXRUSDT
@@ -141,8 +139,6 @@ export async function GET() {
         // No volume lag for stability
       }
 
-      const finalChange24h = 0; // Temporarily disabled
-
       return {
         symbol: market.symbol,
         base: market.base,
@@ -150,7 +146,6 @@ export async function GET() {
         isNative: market.isNative,
         decimals: market.decimals,
         price: Number(price.toFixed(8)),
-        change24h: finalChange24h,
         high24h: Number(high24h.toFixed(8)),
         low24h: Number(low24h.toFixed(8)),
         volume24h: Number(volume24h.toFixed(2)),

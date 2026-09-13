@@ -183,7 +183,6 @@ export async function GET(request) {
         const high24h = Number(ticker24h.highPrice) - 0.05;
         const low24h = Number(ticker24h.lowPrice) - 0.05;
         const quoteVolume24h = Number(ticker24h.quoteVolume); // No volume lag for stability
-        const finalChange24h = 0; // Temporarily disabled
 
         if (type === "latest") {
           if (!latestBar) {
@@ -198,7 +197,6 @@ export async function GET(request) {
             source: "mexc-24hr-ticker",
             bar: latestBar,
             price: Number(price.toFixed(8)),
-            change24h: finalChange24h,
             high24h: Number(high24h.toFixed(8)),
             low24h: Number(low24h.toFixed(8)),
             volume24h: Number(quoteVolume24h.toFixed(2)),
@@ -212,7 +210,6 @@ export async function GET(request) {
           symbol: platformSymbol,
           source: "mexc-24hr-ticker",
           price: Number(price.toFixed(8)),
-          change24h: finalChange24h,
           high24h: Number(high24h.toFixed(8)),
           low24h: Number(low24h.toFixed(8)),
           volume24h: Number(quoteVolume24h.toFixed(2)),
@@ -246,7 +243,6 @@ export async function GET(request) {
 
       // Use MEXC 24h ticker for stable metrics
       const ticker24h = await fetchMexcTicker24h(binanceSymbol);
-      const finalChange24h = 0; // Temporarily disabled
       
       return NextResponse.json({
         pair: pairLabel,
@@ -254,7 +250,6 @@ export async function GET(request) {
         source: "mexc-24hr-ticker",
         bar: latestBar,
         price: Number(ticker24h.lastPrice),
-        change24h: finalChange24h,
         high24h: Number(ticker24h.highPrice),
         low24h: Number(ticker24h.lowPrice),
         volume24h: Number(ticker24h.quoteVolume),
@@ -264,14 +259,12 @@ export async function GET(request) {
 
     // Default: use MEXC 24h ticker for stable metrics
     const ticker24h = await fetchMexcTicker24h(binanceSymbol);
-    const finalChange24h = 0; // Temporarily disabled
     
     return NextResponse.json({
       pair: pairLabel,
       symbol: platformSymbol,
       source: "mexc-24hr-ticker",
       price: Number(ticker24h.lastPrice),
-      change24h: finalChange24h,
       high24h: Number(ticker24h.highPrice),
       low24h: Number(ticker24h.lowPrice),
       volume24h: Number(ticker24h.quoteVolume),
