@@ -206,9 +206,7 @@ export function NxrMarketChart({
   useEffect(() => {
     if (externalTickerData) {
       setTicker(externalTickerData);
-      setPriceDirection(
-        Number(externalTickerData.change24h) >= 0 ? "up" : "down",
-      );
+      setPriceDirection("up");
     }
   }, [externalTickerData]);
 
@@ -492,7 +490,6 @@ export function NxrMarketChart({
             latestCandleRef.current = latestBar;
             setTicker({
               price: latestBar.close,
-              change24h: payload.change24h,
               high24h: payload.high24h,
               low24h: payload.low24h,
               volume24h: payload.volume24h,
@@ -695,12 +692,6 @@ export function NxrMarketChart({
         </div>
         <div className="text-muted-foreground flex gap-2 text-[10px]">
           <span className="bg-muted rounded px-2 py-1">
-            24h{" "}
-            {ticker
-              ? `${ticker.change24h >= 0 ? "+" : ""}${Number(ticker.change24h).toFixed(2)}%`
-              : "--"}
-          </span>
-          <span className="bg-muted rounded px-2 py-1">
             H: {ticker ? fmtPrice(ticker.high24h) : "--"}
           </span>
           <span className="bg-muted rounded px-2 py-1">
@@ -726,9 +717,7 @@ export function NxrMarketChart({
             {fmtPrice(ticker?.price)}
           </p>
           <p className="text-muted-foreground mt-0.5 truncate text-[10px] leading-none">
-            {ticker
-              ? `${ticker.change24h >= 0 ? "+" : ""}${Number(ticker.change24h).toFixed(2)}% · 24h`
-              : "Loading market"}
+            {ticker ? "24h" : "Loading market"}
           </p>
         </div>
         <div className="grid min-w-[120px] shrink-0 grid-cols-[auto_auto] gap-x-3 gap-y-1 text-[9px] leading-4">
@@ -1040,7 +1029,6 @@ function MarketTape({ markets }) {
     >
       <div className="market-tape-track">
         {items.map((market, index) => {
-          const up = Number(market.change24h) >= 0;
           return (
             <span
               className="market-tape-item"
@@ -1048,10 +1036,6 @@ function MarketTape({ markets }) {
             >
               <b>{market.symbol}</b>
               <span>{quote(market)}</span>
-              <span className={up ? "text-[#22c55e]" : "text-[#a855f7]"}>
-                {up ? "+" : ""}
-                {Number(market.change24h).toFixed(2)}%
-              </span>
             </span>
           );
         })}
