@@ -58,37 +58,37 @@ export function getCurrentNxrPrice({
 export async function getExecutableNxrPrice(options = {}) {
   const fallback = getCurrentNxrPrice(options);
   try {
-    // Fetch from MEXC for consistency with order book
-    const mexcUrl = "https://api.mexc.com/api/v3/ticker/price?symbol=NXRUSDT";
+    const url = new URL(NXR_REFERENCE_URL);
+    url.searchParams.set("symbol", NXR_REFERENCE_SYMBOL);
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 1_500);
 
     try {
-      const response = await fetch(mexcUrl, {
+      const response = await fetch(url, {
         cache: "no-store",
         signal: controller.signal,
         headers: { Accept: "application/json" },
       });
       const payload = await response.json().catch(() => ({}));
-      const mexcPrice = Number(payload?.price);
+      const referencePrice = Number(payload?.price);
       if (
         !response.ok ||
-        !Number.isFinite(mexcPrice) ||
-        mexcPrice <= 0
+        !Number.isFinite(referencePrice) ||
+        referencePrice <= 0
       ) {
-        throw new Error("Invalid MEXC NXR price.");
+        throw new Error("Invalid NXR reference price.");
       }
       return {
         ...fallback,
-        priceUsd: mexcPrice,
-        source: "mexc-ticker",
+        priceUsd: referencePrice * NXR_REFERENCE_SCALAR,
+        source: "uni-usdt-reference",
       };
     } finally {
       clearTimeout(timeoutId);
     }
   } catch (error) {
     console.warn(
-      "MEXC NXR price fetch failed; using curve fallback.",
+      "Binance NXR price fetch failed; using curve fallback.",
       error instanceof Error ? error.message : error,
     );
     return { ...fallback, source: "curve-fallback" };
