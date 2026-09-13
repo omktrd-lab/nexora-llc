@@ -72,6 +72,12 @@ function getSymbolBasedVariation(symbol, originalChange) {
   const absChange = Math.abs(originalChange);
   const sign = Math.sign(originalChange) || 1;
   
+  // Stablecoins should remain at 0.00%
+  const stablecoins = ['USDC', 'USDT', 'DAI', 'BUSD'];
+  if (stablecoins.some(stable => symbol.includes(stable))) {
+    return 0;
+  }
+  
   // If already >= 0.05%, use the real value
   if (absChange >= 0.05) return originalChange;
   
