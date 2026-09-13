@@ -195,7 +195,6 @@ function SidebarMarketList({ activeSymbol, onSelectSymbol }) {
     return {
       ...m,
       price: live?.price ?? 0,
-      change24h: live?.change24h ?? 0,
     };
   });
 
@@ -229,23 +228,21 @@ function SidebarMarketList({ activeSymbol, onSelectSymbol }) {
       </div>
 
       {/* Column Labels */}
-      <div className="grid shrink-0 grid-cols-[1fr_auto_auto] items-center gap-2 border-b border-[#16181d] bg-[#090a0c] px-3 py-1 text-[9px] font-semibold tracking-wider text-zinc-500 uppercase">
+      <div className="grid shrink-0 grid-cols-[1fr_auto] items-center gap-2 border-b border-[#16181d] bg-[#090a0c] px-3 py-1 text-[9px] font-semibold tracking-wider text-zinc-500 uppercase">
         <span>Pair</span>
         <span className="text-right">Price</span>
-        <span className="w-12 text-right">24h%</span>
       </div>
 
       {/* Internal scrollable list — strictly locked within sidebar height */}
       <div className="min-h-0 flex-1 divide-y divide-white/[0.02] overflow-y-auto">
         {filtered.map((m) => {
           const isSelected = m.symbol === activeSymbol;
-          const isPositive = m.change24h >= 0;
           return (
             <button
               key={m.symbol}
               type="button"
               onClick={() => onSelectSymbol(m.symbol)}
-              className={`grid w-full grid-cols-[1fr_auto_auto] items-center gap-2 px-3 py-2 text-left text-xs transition-colors hover:bg-[#16181d] ${
+              className={`grid w-full grid-cols-[1fr_auto] items-center gap-2 px-3 py-2 text-left text-xs transition-colors hover:bg-[#16181d] ${
                 isSelected
                   ? "border-l-2 border-[#22c55e] bg-[#16181d]"
                   : "border-l-2 border-transparent"
@@ -264,14 +261,6 @@ function SidebarMarketList({ activeSymbol, onSelectSymbol }) {
               </div>
               <span className="text-right font-mono text-[11px] text-zinc-200 tabular-nums">
                 {m.price > 0 ? formatMarketPrice(m.price, m.decimals) : "--"}
-              </span>
-              <span
-                className={`w-12 text-right font-mono text-[10px] tabular-nums ${
-                  isPositive ? "text-[#22c55e]" : "text-[#a855f7]"
-                }`}
-              >
-                {isPositive ? "+" : ""}
-                {Number(m.change24h).toFixed(2)}%
               </span>
             </button>
           );
@@ -687,16 +676,6 @@ function HomeContent() {
                   : "--"
               }
               accent
-            />
-            <MarketMetric
-              label="24h change"
-              value={
-                tickerData
-                  ? `${tickerData.change24h >= 0 ? "+" : ""}${Number(tickerData.change24h).toFixed(2)}%`
-                  : "--"
-              }
-              accent={tickerData?.change24h >= 0}
-              isNegative={tickerData?.change24h < 0}
             />
             <MarketMetric
               label="24h high"

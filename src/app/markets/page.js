@@ -143,7 +143,6 @@ function MobileMarketRow({ market, onTrade }) {
       </div>
       <div className="mt-3 flex min-h-[24px] items-center justify-between pl-11">
         <div className="min-w-0 overflow-hidden">
-          <ChangeCell change={market.change24h} />
         </div>
         <button
           type="button"
@@ -498,11 +497,6 @@ export default function MarketsPage() {
                   <p className="font-mono text-sm font-medium text-white tabular-nums">
                     {formatMarketPrice(market.price, market.decimals)}
                   </p>
-                </div>
-
-                {/* 24h Change */}
-                <div className="flex justify-end">
-                  <ChangeCell change={market.change24h} />
                 </div>
 
                 {/* High / Low */}
