@@ -87,8 +87,6 @@ export async function GET() {
 
     const markets = MARKETS.map((market) => {
       const raw = rawMap[market.binanceSymbol];
-      const priceScalar = market.useScalar ? BINANCE_PRICE_SCALAR : 1;
-      const volumeScalar = market.useScalar ? BINANCE_VOLUME_SCALAR : 1;
 
       if (!raw) {
         return {
@@ -107,25 +105,21 @@ export async function GET() {
         };
       }
 
-      const price = Number(raw.lastPrice) * priceScalar;
-      const high24h = Number(raw.highPrice) * priceScalar;
-      const low24h = Number(raw.lowPrice) * priceScalar;
-      const quoteVolume24h = Number(raw.quoteVolume) * priceScalar * volumeScalar;
-      
-      // For all markets, use MEXC 24h ticker for stable metrics
-      // Apply lag offset only to NXRUSDT
+      // Use MEXC values directly for all markets
+      let price = Number(raw.lastPrice);
+      let high24h = Number(raw.highPrice);
+      let low24h = Number(raw.lowPrice);
+      let quoteVolume24h = Number(raw.quoteVolume);
       let change24h = Number(raw.priceChangePercent || 0);
-      let finalPrice = price;
-      let finalHigh24h = high24h;
-      let finalLow24h = low24h;
-      let finalQuoteVolume24h = quoteVolume24h;
+      let volume24h = Number(raw.volume);
       
+      // Apply lag offset only to NXRUSDT
       if (market.symbol === "NXRUSDT") {
-        change24h = change24h - 0.1; // Slight change lag
-        finalPrice = Number(raw.lastPrice) - 0.05; // Small price lag
-        finalHigh24h = Number(raw.highPrice) - 0.05;
-        finalLow24h = Number(raw.lowPrice) - 0.05;
-        finalQuoteVolume24h = Number(raw.quoteVolume) * 0.98; // 2% volume lag
+        price = price - 0.05;
+        high24h = high24h - 0.05;
+        low24h = low24h - 0.05;
+        quoteVolume24h = quoteVolume24h * 0.98;
+        change24h = change24h - 0.1;
       }
 
       return {
@@ -134,12 +128,12 @@ export async function GET() {
         name: market.name,
         isNative: market.isNative,
         decimals: market.decimals,
-        price: Number(finalPrice.toFixed(8)),
+        price: Number(price.toFixed(8)),
         change24h: Number(change24h.toFixed(2)),
-        high24h: Number(finalHigh24h.toFixed(8)),
-        low24h: Number(finalLow24h.toFixed(8)),
-        volume24h: Number((Number(raw.volume) * volumeScalar).toFixed(2)),
-        quoteVolume24h: Number(finalQuoteVolume24h.toFixed(2)),
+        high24h: Number(high24h.toFixed(8)),
+        low24h: Number(low24h.toFixed(8)),
+        volume24h: Number(volume24h.toFixed(2)),
+        quoteVolume24h: Number(quoteVolume24h.toFixed(2)),
       };
     });
 
