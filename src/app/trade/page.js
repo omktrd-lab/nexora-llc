@@ -360,6 +360,8 @@ function HomeContent() {
   const [balanceKes, setBalanceKes] = useState(0);
   const [nxrBalance, setNxrBalance] = useState(0);
   const [usdtBalance, setUsdtBalance] = useState(0);
+  const [portfolioSummary, setPortfolioSummary] = useState(null);
+  const [kesPerUsd, setKesPerUsd] = useState(130);
   const [isBalanceVisible, setIsBalanceVisible] = useState(true);
   const [isFundPanelOpen, setIsFundPanelOpen] = useState(true);
   const [isDepositOpen, setIsDepositOpen] = useState(false);
@@ -369,7 +371,6 @@ function HomeContent() {
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [tickerData, setTickerData] = useState(null);
   const [activeFeature, setActiveFeature] = useState(null);
-  const [portfolioSummary, setPortfolioSummary] = useState(null);
   const [isBuyCryptoFocused, setIsBuyCryptoFocused] = useState(false);
 
   // Active trading pair — read from ?market= URL param on load
@@ -424,6 +425,27 @@ function HomeContent() {
         router.replace(authUrl);
       });
   }, [router]);
+
+  useEffect(() => {
+    async function fetchKesRate() {
+      try {
+        const response = await fetch(
+          "https://cdn.jsdelivr.net/gh/irfanokr/currency-api@main/v1/currencies/usd.json",
+          { cache: "no-store" }
+        );
+        const data = await response.json();
+        const kesRate = data?.usd?.kes;
+        if (Number.isFinite(kesRate) && kesRate > 0) {
+          setKesPerUsd(kesRate);
+        }
+      } catch (error) {
+        console.warn("Failed to fetch USD/KES rate:", error);
+      }
+    }
+    fetchKesRate();
+    const interval = setInterval(fetchKesRate, 24 * 60 * 60 * 1000); // Update daily
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     if (!user) return undefined;
@@ -797,14 +819,13 @@ function HomeContent() {
             </p>
             <p className="mt-1 text-sm font-black text-white">
               {(() => {
-                const KES_PER_USD = 130;
                 const nxrPriceUsd = portfolioSummary?.priceUsd || tickerData?.lastPrice || 0;
                 const botProfitUsdt = portfolioSummary?.botProfitUsdt || 0;
                 const totalKes =
                   balanceKes +
-                  (nxrBalance * nxrPriceUsd * KES_PER_USD) +
-                  (usdtBalance * KES_PER_USD) +
-                  (botProfitUsdt * KES_PER_USD);
+                  (nxrBalance * nxrPriceUsd * kesPerUsd) +
+                  (usdtBalance * kesPerUsd) +
+                  (botProfitUsdt * kesPerUsd);
                 return `KES ${totalKes.toFixed(2).toLocaleString()}`;
               })()}
             </p>

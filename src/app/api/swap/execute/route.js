@@ -149,7 +149,7 @@ export async function POST(request) {
       circulatingSupply: supplyBefore,
       btc24hChangePercent,
     });
-    const quote = calculateSwapQuote({
+    const quote = await calculateSwapQuote({
       kesAmount,
       circulatingSupply: supplyBefore,
       btc24hChangePercent,

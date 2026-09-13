@@ -126,13 +126,13 @@ export async function GET(request) {
     });
 
     const quote = isUsdSwap
-      ? calculateUsdSwapQuote({
+      ? await calculateUsdSwapQuote({
           usdAmount: amount,
           circulatingSupply,
           btc24hChangePercent,
           currentPriceUsd: executablePrice.priceUsd,
         })
-      : calculateSwapQuote({
+      : await calculateSwapQuote({
           kesAmount: amount,
           circulatingSupply,
           btc24hChangePercent,

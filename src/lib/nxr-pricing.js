@@ -3,13 +3,49 @@ const VIRTUAL_INITIAL_SUPPLY = 100_000;
 const CURVE_SLOPE = 0.00005;
 const BTC_BETA = 0.35;
 const BTC_TREND_LIMIT_PERCENT = 20;
-const KES_PER_USD = 130;
+const DEFAULT_KES_PER_USD = 130;
 const NETWORK_FEE_RATE = 0.01;
 const NXR_REFERENCE_SYMBOL = "UNIUSDT";
 const NXR_REFERENCE_URL = "https://api.binance.com/api/v3/ticker/price";
 const NXR_REFERENCE_SCALAR = Number(
   process.env.NEXT_PUBLIC_BINANCE_PRICE_SCALAR || 1.02,
 );
+
+let cachedKesPerUsd = DEFAULT_KES_PER_USD;
+let lastKesRateFetch = 0;
+const KES_RATE_CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
+
+export async function getKesPerUsd() {
+  const now = Date.now();
+  if (cachedKesPerUsd && now - lastKesRateFetch < KES_RATE_CACHE_DURATION) {
+    return cachedKesPerUsd;
+  }
+
+  try {
+    const response = await fetch(
+      "https://cdn.jsdelivr.net/gh/irfanokr/currency-api@main/v1/currencies/usd.json",
+      {
+        cache: "no-store",
+        headers: { Accept: "application/json" },
+      },
+    );
+    const data = await response.json();
+    const kesRate = data?.usd?.kes;
+    if (Number.isFinite(kesRate) && kesRate > 0) {
+      cachedKesPerUsd = kesRate;
+      lastKesRateFetch = now;
+      return kesRate;
+    }
+  } catch (error) {
+    console.warn("Failed to fetch USD/KES rate, using fallback:", error);
+  }
+
+  return DEFAULT_KES_PER_USD;
+}
+
+export function getKesPerUsdSync() {
+  return cachedKesPerUsd;
+}
 
 function assertFiniteNonNegative(value, name) {
   if (!Number.isFinite(value) || value < 0) {
@@ -111,17 +147,18 @@ export function calculateNxrReceived({ usdAmount, currentPriceUsd }) {
   );
 }
 
-export function calculateSwapQuote({
+export async function calculateSwapQuote({
   kesAmount,
   circulatingSupply = VIRTUAL_INITIAL_SUPPLY,
   btc24hChangePercent = 0,
   livePriceUsd = null,
 } = {}) {
   assertFiniteNonNegative(kesAmount, "KES amount");
+  const kesPerUsd = await getKesPerUsd();
   const feeKes = Math.max(0.01, kesAmount * NETWORK_FEE_RATE);
   const netKes = kesAmount - feeKes;
-  const usdAmount = kesAmount / KES_PER_USD;
-  const netUsdAmount = netKes / KES_PER_USD;
+  const usdAmount = kesAmount / kesPerUsd;
+  const netUsdAmount = netKes / kesPerUsd;
   
   // Use live market price if provided, otherwise fall back to curve model
   let priceUsd, btcBetaAdjustment, supplyBeyondBaseline;
@@ -156,20 +193,21 @@ export function calculateSwapQuote({
     priceImpact,
     btcBetaAdjustment,
     supplyBeyondBaseline,
-    exchangeRateKesPerUsd: KES_PER_USD,
+    exchangeRateKesPerUsd: kesPerUsd,
     networkFeeRate: NETWORK_FEE_RATE,
     circulatingSupply,
   };
 }
 
-export function calculateUsdSwapQuote({
+export async function calculateUsdSwapQuote({
   usdAmount,
   circulatingSupply = VIRTUAL_INITIAL_SUPPLY,
   btc24hChangePercent = 0,
   currentPriceUsd,
 } = {}) {
   assertFiniteNonNegative(usdAmount, "USDT amount");
-  const feeUsd = Math.max(0.01 / KES_PER_USD, usdAmount * NETWORK_FEE_RATE);
+  const kesPerUsd = await getKesPerUsd();
+  const feeUsd = Math.max(0.01 / kesPerUsd, usdAmount * NETWORK_FEE_RATE);
   const netUsdAmount = usdAmount - feeUsd;
   const {
     priceUsd: curvePriceUsd,
@@ -196,6 +234,7 @@ export function calculateUsdSwapQuote({
     priceImpact: nxrReceived > 0 ? averagePriceUsd / priceUsd - 1 : 0,
     btcBetaAdjustment,
     supplyBeyondBaseline,
+    exchangeRateKesPerUsd: kesPerUsd,
     networkFeeRate: NETWORK_FEE_RATE,
     circulatingSupply,
   };
@@ -207,6 +246,6 @@ export const NXR_PRICING = Object.freeze({
   CURVE_SLOPE,
   BTC_BETA,
   BTC_TREND_LIMIT_PERCENT,
-  KES_PER_USD,
+  DEFAULT_KES_PER_USD,
   NETWORK_FEE_RATE,
 });
