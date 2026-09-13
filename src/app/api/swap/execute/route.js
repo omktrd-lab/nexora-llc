@@ -234,7 +234,11 @@ export async function POST(request) {
       stateVersion: stateVersion + 1,
     });
   } catch (error) {
-    console.error("NXR swap execution failed:", error);
+    console.error("NXR swap execution failed:", {
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+      status: error.status,
+    });
     try {
       if (stateUpdated && previousState) {
         await appwriteRequest(getStateEndpoint(), "/rows/global", {
