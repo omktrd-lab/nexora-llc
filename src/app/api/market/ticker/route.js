@@ -101,9 +101,9 @@ function getSymbolBasedVariation(symbol, originalChange) {
   // If already >= 0.05%, use the real value
   if (absChange >= 0.05) return originalChange;
   
-  // Generate a deterministic value between 0.01 and 0.05 based on symbol
+  // Generate a deterministic value between 0.01 and 0.09 based on symbol
   const hash = symbol.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  const variation = 0.01 + ((hash % 4) * 0.01); // 0.01, 0.02, 0.03, or 0.04
+  const variation = 0.01 + ((hash % 9) * 0.01); // 0.01 to 0.09 in 0.01 increments
   
   return sign * variation;
 }
