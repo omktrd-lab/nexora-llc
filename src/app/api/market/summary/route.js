@@ -70,39 +70,23 @@ function calculateChange24h(bars) {
 
 export async function GET() {
   try {
-    // Fetch both ticker data and klines for all markets
-    const [rawMap, klinesMap] = await Promise.all([
-      fetchWithCache("summary:mexc:24hr", async () => {
-        const entries = await Promise.all(
-          [...new Set(MARKETS.map((m) => m.binanceSymbol))].map(async (symbol) => {
-            try {
-              const data = await fetchMexcTicker(symbol);
-              return [symbol, data];
-            } catch {
-              return [symbol, null];
-            }
-          }),
-        );
-        return Object.fromEntries(entries.filter(([, value]) => value));
-      }, 2000),
-      fetchWithCache("summary:mexc:klines", async () => {
-        const entries = await Promise.all(
-          [...new Set(MARKETS.map((m) => m.binanceSymbol))].map(async (symbol) => {
-            try {
-              const data = await fetchMexcKlines(symbol, 180, "15m");
-              return [symbol, data];
-            } catch {
-              return [symbol, []];
-            }
-          }),
-        );
-        return Object.fromEntries(entries);
-      }, 2000),
-    ]);
+    // Fetch ticker data for all markets
+    const rawMap = await fetchWithCache("summary:mexc:24hr", async () => {
+      const entries = await Promise.all(
+        [...new Set(MARKETS.map((m) => m.binanceSymbol))].map(async (symbol) => {
+          try {
+            const data = await fetchMexcTicker(symbol);
+            return [symbol, data];
+          } catch {
+            return [symbol, null];
+          }
+        }),
+      );
+      return Object.fromEntries(entries.filter(([, value]) => value));
+    }, 2000);
 
     const markets = MARKETS.map((market) => {
       const raw = rawMap[market.binanceSymbol];
-      const klines = klinesMap[market.binanceSymbol] || [];
       const priceScalar = market.useScalar ? BINANCE_PRICE_SCALAR : 1;
       const volumeScalar = market.useScalar ? BINANCE_VOLUME_SCALAR : 1;
 
@@ -128,21 +112,16 @@ export async function GET() {
       const low24h = Number(raw.lowPrice) * priceScalar;
       const quoteVolume24h = Number(raw.quoteVolume) * priceScalar * volumeScalar;
       
-      // For NXRUSDT, use UNI values directly with small lag offset; for others, use kline calculation
-      let change24h;
-      if (market.symbol === "NXRUSDT") {
-        change24h = Number(raw.priceChangePercent || 0) - 0.1; // Slight change lag
-      } else {
-        change24h = klines.length > 0 ? calculateChange24h(klines) : Number(raw.priceChangePercent || 0);
-      }
-      
-      // Apply lag offset to NXRUSDT price and volume
+      // For all markets, use MEXC 24h ticker for stable metrics
+      // Apply lag offset only to NXRUSDT
+      let change24h = Number(raw.priceChangePercent || 0);
       let finalPrice = price;
       let finalHigh24h = high24h;
       let finalLow24h = low24h;
       let finalQuoteVolume24h = quoteVolume24h;
       
       if (market.symbol === "NXRUSDT") {
+        change24h = change24h - 0.1; // Slight change lag
         finalPrice = Number(raw.lastPrice) - 0.05; // Small price lag
         finalHigh24h = Number(raw.highPrice) - 0.05;
         finalLow24h = Number(raw.lowPrice) - 0.05;
