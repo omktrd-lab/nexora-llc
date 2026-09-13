@@ -294,7 +294,7 @@ export default function MarketsPage() {
   const avatarSeed = user?.$id || displayName;
 
   function goToTrade(symbol) {
-    router.push(`/?market=${symbol}`);
+    router.push(`/trade?market=${symbol}`);
   }
 
   return (
