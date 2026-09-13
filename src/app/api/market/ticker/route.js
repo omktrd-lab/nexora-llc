@@ -224,36 +224,34 @@ export async function GET(request) {
         );
       }
 
-      const stats = buildTickerStats(
-        await fetchMexcKlines(
-          binanceSymbol,
-          historyLimit,
-          interval,
-          priceScalar,
-          volumeScalar,
-        ),
-      );
+      // Use MEXC 24h ticker for stable metrics
+      const ticker24h = await fetchMexcTicker24h(binanceSymbol);
       return NextResponse.json({
         pair: pairLabel,
         symbol: platformSymbol,
-        source: "mexc-proxy",
+        source: "mexc-24hr-ticker",
         bar: latestBar,
-        price: latestBar.close,
-        change24h: stats.change24h,
-        high24h: stats.high24h,
-        low24h: stats.low24h,
-        volume24h: stats.volume24h,
+        price: Number(ticker24h.lastPrice),
+        change24h: Number(ticker24h.priceChangePercent),
+        high24h: Number(ticker24h.highPrice),
+        low24h: Number(ticker24h.lowPrice),
+        volume24h: Number(ticker24h.quoteVolume),
         timestamp: latestBar.time,
       });
     }
 
-    // Default: full ticker stats for non-NXRUSDT symbols
-    const stats = buildTickerStats(bars);
+    // Default: use MEXC 24h ticker for stable metrics
+    const ticker24h = await fetchMexcTicker24h(binanceSymbol);
     return NextResponse.json({
       pair: pairLabel,
       symbol: platformSymbol,
-      source: "mexc-proxy",
-      ...stats,
+      source: "mexc-24hr-ticker",
+      price: Number(ticker24h.lastPrice),
+      change24h: Number(ticker24h.priceChangePercent),
+      high24h: Number(ticker24h.highPrice),
+      low24h: Number(ticker24h.lowPrice),
+      volume24h: Number(ticker24h.quoteVolume),
+      timestamp: Math.floor(Date.now() / 1000),
     });
   } catch (error) {
     console.error("MEXC market proxy failed:", error instanceof Error ? error.message : error);
