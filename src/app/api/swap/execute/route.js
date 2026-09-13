@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { calculateSwapQuote } from "@/lib/nxr-pricing";
+import { calculateSwapQuote, getExecutableNxrPrice } from "@/lib/nxr-pricing";
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -145,10 +145,15 @@ export async function POST(request) {
     const supplyBefore = Number(stateData.circulatingSupply);
     const stateVersion = Number(stateData.version);
     const btc24hChangePercent = getBtcTrend();
+    const executablePrice = await getExecutableNxrPrice({
+      circulatingSupply: supplyBefore,
+      btc24hChangePercent,
+    });
     const quote = calculateSwapQuote({
       kesAmount,
       circulatingSupply: supplyBefore,
       btc24hChangePercent,
+      livePriceUsd: executablePrice.priceUsd,
     });
     const supplyAfter = supplyBefore + quote.nxrReceived;
     const now = new Date().toISOString();

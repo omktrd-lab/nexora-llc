@@ -136,7 +136,7 @@ export async function GET(request) {
           kesAmount: amount,
           circulatingSupply,
           btc24hChangePercent,
-          currentPriceUsd: executablePrice.priceUsd,
+          livePriceUsd: executablePrice.priceUsd,
         });
 
     console.error("[SWAP QUOTE] Quote calculated", {

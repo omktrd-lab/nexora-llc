@@ -115,14 +115,27 @@ export function calculateSwapQuote({
   kesAmount,
   circulatingSupply = VIRTUAL_INITIAL_SUPPLY,
   btc24hChangePercent = 0,
+  livePriceUsd = null,
 } = {}) {
   assertFiniteNonNegative(kesAmount, "KES amount");
   const feeKes = Math.max(0.01, kesAmount * NETWORK_FEE_RATE);
   const netKes = kesAmount - feeKes;
   const usdAmount = kesAmount / KES_PER_USD;
   const netUsdAmount = netKes / KES_PER_USD;
-  const { priceUsd, btcBetaAdjustment, supplyBeyondBaseline } =
-    getCurrentNxrPrice({ circulatingSupply, btc24hChangePercent });
+  
+  // Use live market price if provided, otherwise fall back to curve model
+  let priceUsd, btcBetaAdjustment, supplyBeyondBaseline;
+  if (livePriceUsd && Number.isFinite(livePriceUsd) && livePriceUsd > 0) {
+    priceUsd = livePriceUsd;
+    btcBetaAdjustment = 0;
+    supplyBeyondBaseline = 0;
+  } else {
+    const curvePrice = getCurrentNxrPrice({ circulatingSupply, btc24hChangePercent });
+    priceUsd = curvePrice.priceUsd;
+    btcBetaAdjustment = curvePrice.btcBetaAdjustment;
+    supplyBeyondBaseline = curvePrice.supplyBeyondBaseline;
+  }
+  
   const nxrReceived = calculateNxrReceived({
     usdAmount: netUsdAmount,
     currentPriceUsd: priceUsd,
