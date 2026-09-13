@@ -792,10 +792,10 @@ function HomeContent() {
       <section className="mobile-trade-surface lg:hidden">
         <div className="flex items-start justify-between px-4 pt-4 pb-3">
           <div className="text-left">
-            <p className="text-muted-foreground text-xs font-medium tracking-[.2em]">
+            <p className="text-muted-foreground text-xs font-black tracking-[.2em]">
               BALANCE
             </p>
-            <p className="mt-1 text-sm font-semibold text-white">
+            <p className="mt-1 text-sm font-black text-white">
               {(() => {
                 const KES_PER_USD = 130;
                 const nxrPriceUsd = portfolioSummary?.priceUsd || tickerData?.lastPrice || 0;
@@ -810,14 +810,13 @@ function HomeContent() {
             </p>
           </div>
           <div className="pt-1 text-right">
-            <p className="text-muted-foreground text-[10px] font-bold tracking-[.16em]">
-              NXR / USDT
-            </p>
-            <p className="mt-1 font-mono text-xs text-white">
-              {tickerData?.lastPrice
-                ? `$${Number(tickerData.lastPrice).toFixed(4)}`
-                : "—"}
-            </p>
+            <button
+              type="button"
+              onClick={() => router.push("/portfolio")}
+              className="text-muted-foreground text-[10px] font-medium tracking-[.16em] hover:text-white transition-colors"
+            >
+              Portfolio →
+            </button>
           </div>
         </div>
         <NxrMarketChart
