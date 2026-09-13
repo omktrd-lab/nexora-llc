@@ -126,6 +126,11 @@ export async function GET() {
       const change24hFormatted = Math.abs(change24h) < 0.01 
         ? change24h.toFixed(4) 
         : change24h.toFixed(2);
+      
+      // If still 0.00 after formatting, show more precision
+      const finalChange24h = Number(change24hFormatted) === 0 
+        ? Number(change24h.toFixed(4)) 
+        : Number(change24hFormatted);
 
       return {
         symbol: market.symbol,
@@ -134,7 +139,7 @@ export async function GET() {
         isNative: market.isNative,
         decimals: market.decimals,
         price: Number(price.toFixed(8)),
-        change24h: Number(change24hFormatted),
+        change24h: finalChange24h,
         high24h: Number(high24h.toFixed(8)),
         low24h: Number(low24h.toFixed(8)),
         volume24h: Number(volume24h.toFixed(2)),

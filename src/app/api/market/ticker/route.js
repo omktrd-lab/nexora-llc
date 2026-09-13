@@ -169,6 +169,11 @@ export async function GET(request) {
         const change24hFormatted = Math.abs(change24h) < 0.01 
           ? change24h.toFixed(4) 
           : change24h.toFixed(2);
+        
+        // If still 0.00 after formatting, show more precision
+        const finalChange24h = Number(change24hFormatted) === 0 
+          ? Number(change24h.toFixed(4)) 
+          : Number(change24hFormatted);
 
         if (type === "latest") {
           if (!latestBar) {
@@ -183,7 +188,7 @@ export async function GET(request) {
             source: "mexc-24hr-ticker",
             bar: latestBar,
             price: Number(price.toFixed(8)),
-            change24h: Number(change24hFormatted),
+            change24h: finalChange24h,
             high24h: Number(high24h.toFixed(8)),
             low24h: Number(low24h.toFixed(8)),
             volume24h: Number(quoteVolume24h.toFixed(2)),
@@ -197,7 +202,7 @@ export async function GET(request) {
           symbol: platformSymbol,
           source: "mexc-24hr-ticker",
           price: Number(price.toFixed(8)),
-          change24h: Number(change24hFormatted),
+          change24h: finalChange24h,
           high24h: Number(high24h.toFixed(8)),
           low24h: Number(low24h.toFixed(8)),
           volume24h: Number(quoteVolume24h.toFixed(2)),
@@ -236,13 +241,18 @@ export async function GET(request) {
         ? change24h.toFixed(4) 
         : change24h.toFixed(2);
       
+      // If still 0.00 after formatting, show more precision
+      const finalChange24h = Number(change24hFormatted) === 0 
+        ? Number(change24h.toFixed(4)) 
+        : Number(change24hFormatted);
+      
       return NextResponse.json({
         pair: pairLabel,
         symbol: platformSymbol,
         source: "mexc-24hr-ticker",
         bar: latestBar,
         price: Number(ticker24h.lastPrice),
-        change24h: Number(change24hFormatted),
+        change24h: finalChange24h,
         high24h: Number(ticker24h.highPrice),
         low24h: Number(ticker24h.lowPrice),
         volume24h: Number(ticker24h.quoteVolume),
@@ -257,12 +267,17 @@ export async function GET(request) {
       ? change24h.toFixed(4) 
       : change24h.toFixed(2);
     
+    // If still 0.00 after formatting, show more precision
+    const finalChange24h = Number(change24hFormatted) === 0 
+      ? Number(change24h.toFixed(4)) 
+      : Number(change24hFormatted);
+    
     return NextResponse.json({
       pair: pairLabel,
       symbol: platformSymbol,
       source: "mexc-24hr-ticker",
       price: Number(ticker24h.lastPrice),
-      change24h: Number(change24hFormatted),
+      change24h: finalChange24h,
       high24h: Number(ticker24h.highPrice),
       low24h: Number(ticker24h.lowPrice),
       volume24h: Number(ticker24h.quoteVolume),
