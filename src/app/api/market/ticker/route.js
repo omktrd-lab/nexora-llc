@@ -27,9 +27,8 @@ async function fetchMexcKlines(
   interval = "15m",
   priceScalar = 1,
   volumeScalar = 1,
-  startTime = null,
 ) {
-  const cacheKey = `klines:${binanceSymbol}:${interval}:${limit}:${startTime || 'now'}`;
+  const cacheKey = `klines:${binanceSymbol}:${interval}:${limit}`;
   const rawData = await fetchWithCache(cacheKey, async () => {
     const pages = [];
     let endTime;
@@ -42,7 +41,6 @@ async function fetchMexcKlines(
       url.searchParams.set("interval", interval);
       url.searchParams.set("limit", String(pageLimit));
       if (endTime != null) url.searchParams.set("endTime", String(endTime));
-      if (startTime != null) url.searchParams.set("startTime", String(startTime));
 
       const response = await fetch(url, {
         cache: "no-store",
@@ -153,21 +151,17 @@ export async function GET(request) {
 
     const pairLabel = `${market.base}/USDT`;
 
-    // For NXRUSDT, use MEXC 24h ticker for volume but klines for change calculation
+    // For NXRUSDT, use MEXC 24h ticker for stable metrics
     if (platformSymbol === "NXRUSDT" && type !== "history") {
       try {
         const ticker24h = await fetchMexcTicker24h(binanceSymbol);
         const latestBar = bars.at(-1);
         
-        // Calculate 24h change from klines using fixed 24-hour timestamp window
-        const twentyFourHoursAgo = Date.now() - (24 * 60 * 60 * 1000);
-        const bars24h = await fetchMexcKlines(binanceSymbol, 96, "15m", priceScalar, volumeScalar, twentyFourHoursAgo);
-        const change24h = calculateChange24h(bars24h);
-        
         const price = latestBar ? latestBar.close : Number(ticker24h.lastPrice) * priceScalar;
         const high24h = Number(ticker24h.highPrice) * priceScalar;
         const low24h = Number(ticker24h.lowPrice) * priceScalar;
         const quoteVolume24h = Number(ticker24h.quoteVolume) * priceScalar * volumeScalar;
+        const change24h = Number(ticker24h.priceChangePercent);
 
         if (type === "latest") {
           if (!latestBar) {

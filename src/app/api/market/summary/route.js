@@ -26,12 +26,11 @@ async function fetchMexcTicker(symbol) {
   return data;
 }
 
-async function fetchMexcKlines(symbol, limit = 180, interval = "15m", priceScalar = 1, startTime = null) {
+async function fetchMexcKlines(symbol, limit = 180, interval = "15m", priceScalar = 1) {
   const url = new URL(MEXC_KLINE_URL);
   url.searchParams.set("symbol", symbol);
   url.searchParams.set("interval", interval);
   url.searchParams.set("limit", String(limit));
-  if (startTime != null) url.searchParams.set("startTime", String(startTime));
 
   const response = await fetch(url, {
     cache: "no-store",
@@ -90,10 +89,7 @@ export async function GET() {
         const entries = await Promise.all(
           [...new Set(MARKETS.map((m) => m.binanceSymbol))].map(async (symbol) => {
             try {
-              // For NXRUSDT, use fixed 24-hour timestamp window to avoid jumping
-              const isNxr = MARKETS.find(m => m.binanceSymbol === symbol)?.symbol === "NXRUSDT";
-              const startTime = isNxr ? Date.now() - (24 * 60 * 60 * 1000) : null;
-              const data = await fetchMexcKlines(symbol, 180, "15m", 1, startTime);
+              const data = await fetchMexcKlines(symbol, 180, "15m");
               return [symbol, data];
             } catch {
               return [symbol, []];
@@ -132,10 +128,9 @@ export async function GET() {
       const low24h = Number(raw.lowPrice) * priceScalar;
       const quoteVolume24h = Number(raw.quoteVolume) * priceScalar * volumeScalar;
       
-      // For NXRUSDT, use klines for 24h change (real-time updates) and ticker for volume (stable)
-      // For other markets, use kline calculation for change
+      // For NXRUSDT, use MEXC 24h ticker for stable change; for others, use kline calculation
       const change24h = market.symbol === "NXRUSDT"
-        ? (klines.length > 0 ? calculateChange24h(klines) : Number(raw.priceChangePercent || 0))
+        ? Number(raw.priceChangePercent || 0)
         : (klines.length > 0 ? calculateChange24h(klines) : Number(raw.priceChangePercent || 0));
 
       return {
