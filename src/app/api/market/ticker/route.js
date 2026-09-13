@@ -3,6 +3,7 @@ import { resolveMarket } from "@/lib/market-symbols";
 import { fetchWithCache } from "@/lib/api-cache";
 
 const MEXC_KLINE_URL = "https://api.mexc.com/api/v3/klines";
+const MEXC_TICKER_URL = "https://api.mexc.com/api/v3/ticker/24hr";
 const SUPPORTED_INTERVALS = new Set(["1m", "5m", "15m", "1h", "4h", "1d"]);
 
 function transformMexcKline(klinesEntry, priceScalar, volumeScalar) {
@@ -64,6 +65,27 @@ async function fetchMexcKlines(
   return rawData.map((entry) =>
     transformMexcKline(entry, priceScalar, volumeScalar),
   );
+}
+
+async function fetchMexcTicker24h(symbol) {
+  const url = new URL(MEXC_TICKER_URL);
+  url.searchParams.set("symbol", symbol);
+
+  const response = await fetch(url, {
+    cache: "no-store",
+    signal: AbortSignal.timeout(8000),
+  });
+
+  if (!response.ok) {
+    throw new Error(`MEXC 24hr ticker failed with status ${response.status}`);
+  }
+
+  const data = await response.json();
+  if (!data || typeof data !== "object" || Array.isArray(data)) {
+    throw new Error("Unexpected MEXC ticker response format");
+  }
+
+  return data;
 }
 
 function buildTickerStats(bars) {
@@ -129,6 +151,57 @@ export async function GET(request) {
 
     const pairLabel = `${market.base}/USDT`;
 
+    // For NXRUSDT, use MEXC 24h ticker for stable metrics
+    if (platformSymbol === "NXRUSDT" && type !== "history") {
+      try {
+        const ticker24h = await fetchMexcTicker24h(binanceSymbol);
+        const latestBar = bars.at(-1);
+        
+        const price = latestBar ? latestBar.close : Number(ticker24h.lastPrice) * priceScalar;
+        const high24h = Number(ticker24h.highPrice) * priceScalar;
+        const low24h = Number(ticker24h.lowPrice) * priceScalar;
+        const quoteVolume24h = Number(ticker24h.quoteVolume) * priceScalar * volumeScalar;
+        const change24h = Number(ticker24h.priceChangePercent);
+
+        if (type === "latest") {
+          if (!latestBar) {
+            return NextResponse.json(
+              { message: "No latest MEXC candle available." },
+              { status: 204 },
+            );
+          }
+          return NextResponse.json({
+            pair: pairLabel,
+            symbol: platformSymbol,
+            source: "mexc-24hr-ticker",
+            bar: latestBar,
+            price,
+            change24h: Number(change24h.toFixed(2)),
+            high24h: Number(high24h.toFixed(8)),
+            low24h: Number(low24h.toFixed(8)),
+            volume24h: Number(quoteVolume24h.toFixed(2)),
+            timestamp: latestBar.time,
+          });
+        }
+
+        // Default ticker for NXRUSDT
+        return NextResponse.json({
+          pair: pairLabel,
+          symbol: platformSymbol,
+          source: "mexc-24hr-ticker",
+          price: Number(price.toFixed(8)),
+          change24h: Number(change24h.toFixed(2)),
+          high24h: Number(high24h.toFixed(8)),
+          low24h: Number(low24h.toFixed(8)),
+          volume24h: Number(quoteVolume24h.toFixed(2)),
+          timestamp: Math.floor(Date.now() / 1000),
+        });
+      } catch (error) {
+        console.warn("MEXC 24h ticker failed for NXRUSDT, falling back to kline stats:", error instanceof Error ? error.message : error);
+        // Fall through to kline-based calculation
+      }
+    }
+
     if (type === "history") {
       const stats = buildTickerStats(bars);
       return NextResponse.json({
@@ -172,7 +245,7 @@ export async function GET(request) {
       });
     }
 
-    // Default: full ticker stats
+    // Default: full ticker stats for non-NXRUSDT symbols
     const stats = buildTickerStats(bars);
     return NextResponse.json({
       pair: pairLabel,
