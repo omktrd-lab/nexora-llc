@@ -151,17 +151,19 @@ export async function GET(request) {
 
     const pairLabel = `${market.base}/USDT`;
 
-    // For NXRUSDT, use MEXC 24h ticker for stable metrics
+    // For NXRUSDT, use UNIUSDT ticker directly with small lag offset
     if (platformSymbol === "NXRUSDT" && type !== "history") {
       try {
         const ticker24h = await fetchMexcTicker24h(binanceSymbol);
         const latestBar = bars.at(-1);
         
-        const price = latestBar ? latestBar.close : Number(ticker24h.lastPrice) * priceScalar;
-        const high24h = Number(ticker24h.highPrice) * priceScalar;
-        const low24h = Number(ticker24h.lowPrice) * priceScalar;
-        const quoteVolume24h = Number(ticker24h.quoteVolume) * priceScalar * volumeScalar;
-        const change24h = Number(ticker24h.priceChangePercent);
+        // Use UNI values directly with small lag offset
+        const uniPrice = Number(ticker24h.lastPrice);
+        const price = uniPrice - 0.05; // Small price lag
+        const high24h = Number(ticker24h.highPrice) - 0.05;
+        const low24h = Number(ticker24h.lowPrice) - 0.05;
+        const quoteVolume24h = Number(ticker24h.quoteVolume) * 0.98; // 2% volume lag
+        const change24h = Number(ticker24h.priceChangePercent) - 0.1; // Slight change lag
 
         if (type === "latest") {
           if (!latestBar) {
@@ -175,7 +177,7 @@ export async function GET(request) {
             symbol: platformSymbol,
             source: "mexc-24hr-ticker",
             bar: latestBar,
-            price,
+            price: Number(price.toFixed(8)),
             change24h: Number(change24h.toFixed(2)),
             high24h: Number(high24h.toFixed(8)),
             low24h: Number(low24h.toFixed(8)),

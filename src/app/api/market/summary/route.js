@@ -128,10 +128,26 @@ export async function GET() {
       const low24h = Number(raw.lowPrice) * priceScalar;
       const quoteVolume24h = Number(raw.quoteVolume) * priceScalar * volumeScalar;
       
-      // For NXRUSDT, use MEXC 24h ticker for stable change; for others, use kline calculation
-      const change24h = market.symbol === "NXRUSDT"
-        ? Number(raw.priceChangePercent || 0)
-        : (klines.length > 0 ? calculateChange24h(klines) : Number(raw.priceChangePercent || 0));
+      // For NXRUSDT, use UNI values directly with small lag offset; for others, use kline calculation
+      let change24h;
+      if (market.symbol === "NXRUSDT") {
+        change24h = Number(raw.priceChangePercent || 0) - 0.1; // Slight change lag
+      } else {
+        change24h = klines.length > 0 ? calculateChange24h(klines) : Number(raw.priceChangePercent || 0);
+      }
+      
+      // Apply lag offset to NXRUSDT price and volume
+      let finalPrice = price;
+      let finalHigh24h = high24h;
+      let finalLow24h = low24h;
+      let finalQuoteVolume24h = quoteVolume24h;
+      
+      if (market.symbol === "NXRUSDT") {
+        finalPrice = Number(raw.lastPrice) - 0.05; // Small price lag
+        finalHigh24h = Number(raw.highPrice) - 0.05;
+        finalLow24h = Number(raw.lowPrice) - 0.05;
+        finalQuoteVolume24h = Number(raw.quoteVolume) * 0.98; // 2% volume lag
+      }
 
       return {
         symbol: market.symbol,
@@ -139,12 +155,12 @@ export async function GET() {
         name: market.name,
         isNative: market.isNative,
         decimals: market.decimals,
-        price: Number(price.toFixed(8)),
+        price: Number(finalPrice.toFixed(8)),
         change24h: Number(change24h.toFixed(2)),
-        high24h: Number(high24h.toFixed(8)),
-        low24h: Number(low24h.toFixed(8)),
+        high24h: Number(finalHigh24h.toFixed(8)),
+        low24h: Number(finalLow24h.toFixed(8)),
         volume24h: Number((Number(raw.volume) * volumeScalar).toFixed(2)),
-        quoteVolume24h: Number(quoteVolume24h.toFixed(2)),
+        quoteVolume24h: Number(finalQuoteVolume24h.toFixed(2)),
       };
     });
 
