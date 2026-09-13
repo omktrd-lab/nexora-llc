@@ -183,20 +183,7 @@ export async function GET(request) {
         const high24h = Number(ticker24h.highPrice) - 0.05;
         const low24h = Number(ticker24h.lowPrice) - 0.05;
         const quoteVolume24h = Number(ticker24h.quoteVolume); // No volume lag for stability
-        let change24h = Number(ticker24h.priceChangePercent) - 0.1; // Slight change lag
-
-        // Apply symbol-based variation for tiny values
-        change24h = getSymbolBasedVariation(platformSymbol, change24h);
-
-        // Format change24h with appropriate precision
-        const change24hFormatted = Math.abs(change24h) < 0.01 
-          ? change24h.toFixed(4) 
-          : change24h.toFixed(2);
-        
-        // If still 0.00 after formatting, show more precision
-        const finalChange24h = Number(change24hFormatted) === 0 
-          ? Number(change24h.toFixed(4)) 
-          : Number(change24hFormatted);
+        const finalChange24h = 0; // Temporarily disabled
 
         if (type === "latest") {
           if (!latestBar) {
@@ -259,19 +246,7 @@ export async function GET(request) {
 
       // Use MEXC 24h ticker for stable metrics
       const ticker24h = await fetchMexcTicker24h(binanceSymbol);
-      let change24h = Number(ticker24h.priceChangePercent);
-      
-      // Apply symbol-based variation for tiny values
-      change24h = getSymbolBasedVariation(platformSymbol, change24h);
-      
-      const change24hFormatted = Math.abs(change24h) < 0.01 
-        ? change24h.toFixed(4) 
-        : change24h.toFixed(2);
-      
-      // If still 0.00 after formatting, show more precision
-      const finalChange24h = Number(change24hFormatted) === 0 
-        ? Number(change24h.toFixed(4)) 
-        : Number(change24hFormatted);
+      const finalChange24h = 0; // Temporarily disabled
       
       return NextResponse.json({
         pair: pairLabel,
@@ -289,19 +264,7 @@ export async function GET(request) {
 
     // Default: use MEXC 24h ticker for stable metrics
     const ticker24h = await fetchMexcTicker24h(binanceSymbol);
-    let change24h = Number(ticker24h.priceChangePercent);
-    
-    // Apply symbol-based variation for tiny values
-    change24h = getSymbolBasedVariation(platformSymbol, change24h);
-    
-    const change24hFormatted = Math.abs(change24h) < 0.01 
-      ? change24h.toFixed(4) 
-      : change24h.toFixed(2);
-    
-    // If still 0.00 after formatting, show more precision
-    const finalChange24h = Number(change24hFormatted) === 0 
-      ? Number(change24h.toFixed(4)) 
-      : Number(change24hFormatted);
+    const finalChange24h = 0; // Temporarily disabled
     
     return NextResponse.json({
       pair: pairLabel,

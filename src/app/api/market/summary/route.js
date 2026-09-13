@@ -130,7 +130,7 @@ export async function GET() {
       let high24h = Number(raw.highPrice);
       let low24h = Number(raw.lowPrice);
       let quoteVolume24h = Number(raw.quoteVolume);
-      let change24h = Number(raw.priceChangePercent || 0);
+      let change24h = 0; // Temporarily disabled
       let volume24h = Number(raw.volume);
       
       // Apply lag offset only to NXRUSDT
@@ -139,21 +139,9 @@ export async function GET() {
         high24h = high24h - 0.05;
         low24h = low24h - 0.05;
         // No volume lag for stability
-        change24h = change24h - 0.1;
       }
 
-      // Apply symbol-based variation for tiny values
-      change24h = getSymbolBasedVariation(market.symbol, change24h);
-
-      // Format change24h with appropriate precision
-      const change24hFormatted = Math.abs(change24h) < 0.01 
-        ? change24h.toFixed(4) 
-        : change24h.toFixed(2);
-      
-      // If still 0.00 after formatting, show more precision
-      const finalChange24h = Number(change24hFormatted) === 0 
-        ? Number(change24h.toFixed(4)) 
-        : Number(change24hFormatted);
+      const finalChange24h = 0; // Temporarily disabled
 
       return {
         symbol: market.symbol,
