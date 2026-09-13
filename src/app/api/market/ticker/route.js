@@ -88,6 +88,20 @@ async function fetchMexcTicker24h(symbol, useCache = true) {
   return data;
 }
 
+function getSymbolBasedVariation(symbol, originalChange) {
+  const absChange = Math.abs(originalChange);
+  const sign = Math.sign(originalChange) || 1;
+  
+  // If already >= 0.05%, use the real value
+  if (absChange >= 0.05) return originalChange;
+  
+  // Generate a deterministic value between 0.01 and 0.05 based on symbol
+  const hash = symbol.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const variation = 0.01 + ((hash % 4) * 0.01); // 0.01, 0.02, 0.03, or 0.04
+  
+  return sign * variation;
+}
+
 function buildTickerStats(bars) {
   if (!bars.length) {
     return {
@@ -163,7 +177,10 @@ export async function GET(request) {
         const high24h = Number(ticker24h.highPrice) - 0.05;
         const low24h = Number(ticker24h.lowPrice) - 0.05;
         const quoteVolume24h = Number(ticker24h.quoteVolume); // No volume lag for stability
-        const change24h = Number(ticker24h.priceChangePercent) - 0.1; // Slight change lag
+        let change24h = Number(ticker24h.priceChangePercent) - 0.1; // Slight change lag
+
+        // Apply symbol-based variation for tiny values
+        change24h = getSymbolBasedVariation(platformSymbol, change24h);
 
         // Format change24h with appropriate precision
         const change24hFormatted = Math.abs(change24h) < 0.01 
@@ -236,7 +253,11 @@ export async function GET(request) {
 
       // Use MEXC 24h ticker for stable metrics
       const ticker24h = await fetchMexcTicker24h(binanceSymbol);
-      const change24h = Number(ticker24h.priceChangePercent);
+      let change24h = Number(ticker24h.priceChangePercent);
+      
+      // Apply symbol-based variation for tiny values
+      change24h = getSymbolBasedVariation(platformSymbol, change24h);
+      
       const change24hFormatted = Math.abs(change24h) < 0.01 
         ? change24h.toFixed(4) 
         : change24h.toFixed(2);
@@ -262,7 +283,11 @@ export async function GET(request) {
 
     // Default: use MEXC 24h ticker for stable metrics
     const ticker24h = await fetchMexcTicker24h(binanceSymbol);
-    const change24h = Number(ticker24h.priceChangePercent);
+    let change24h = Number(ticker24h.priceChangePercent);
+    
+    // Apply symbol-based variation for tiny values
+    change24h = getSymbolBasedVariation(platformSymbol, change24h);
+    
     const change24hFormatted = Math.abs(change24h) < 0.01 
       ? change24h.toFixed(4) 
       : change24h.toFixed(2);

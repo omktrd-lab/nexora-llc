@@ -68,6 +68,20 @@ function calculateChange24h(bars) {
   return firstValue > 0 ? ((lastBar.close - firstValue) / firstValue) * 100 : 0;
 }
 
+function getSymbolBasedVariation(symbol, originalChange) {
+  const absChange = Math.abs(originalChange);
+  const sign = Math.sign(originalChange) || 1;
+  
+  // If already >= 0.05%, use the real value
+  if (absChange >= 0.05) return originalChange;
+  
+  // Generate a deterministic value between 0.01 and 0.05 based on symbol
+  const hash = symbol.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const variation = 0.01 + ((hash % 4) * 0.01); // 0.01, 0.02, 0.03, or 0.04
+  
+  return sign * variation;
+}
+
 export async function GET() {
   try {
     // Fetch ticker data for all markets
@@ -121,6 +135,9 @@ export async function GET() {
         // No volume lag for stability
         change24h = change24h - 0.1;
       }
+
+      // Apply symbol-based variation for tiny values
+      change24h = getSymbolBasedVariation(market.symbol, change24h);
 
       // Format change24h with appropriate precision
       const change24hFormatted = Math.abs(change24h) < 0.01 
