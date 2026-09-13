@@ -791,22 +791,24 @@ function HomeContent() {
       {/* ── Mobile Section ── */}
       <section className="mobile-trade-surface lg:hidden">
         <div className="flex items-start justify-between px-4 pt-4 pb-3">
-          <button
-            type="button"
-            onClick={() => router.push("/portfolio")}
-            className="text-left"
-          >
+          <div className="text-left">
             <p className="text-muted-foreground text-xs font-medium tracking-[.2em]">
-              PORTFOLIO
+              BALANCE
             </p>
-            <p
-              className={`mt-1 text-sm font-semibold ${Number(portfolioSummary?.totalPnlUsd || 0) >= 0 ? "text-[#22c55e]" : "text-[#a855f7]"}`}
-            >
-              {portfolioSummary?.costBasisKnown
-                ? `${Number(portfolioSummary.totalPnlUsd) >= 0 ? "+" : ""}$${Number(portfolioSummary.totalPnlUsd).toFixed(2)} P/L`
-                : `${nxrBalance.toFixed(4)} NXR`}
+            <p className="mt-1 text-sm font-semibold text-white">
+              {(() => {
+                const KES_PER_USD = 130;
+                const nxrPriceUsd = portfolioSummary?.priceUsd || tickerData?.lastPrice || 0;
+                const botProfitUsdt = portfolioSummary?.botProfitUsdt || 0;
+                const totalKes =
+                  balanceKes +
+                  (nxrBalance * nxrPriceUsd * KES_PER_USD) +
+                  (usdtBalance * KES_PER_USD) +
+                  (botProfitUsdt * KES_PER_USD);
+                return `KES ${Math.round(totalKes).toLocaleString()}`;
+              })()}
             </p>
-          </button>
+          </div>
           <div className="pt-1 text-right">
             <p className="text-muted-foreground text-[10px] font-bold tracking-[.16em]">
               NXR / USDT
