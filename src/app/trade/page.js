@@ -805,7 +805,7 @@ function HomeContent() {
                   (nxrBalance * nxrPriceUsd * KES_PER_USD) +
                   (usdtBalance * KES_PER_USD) +
                   (botProfitUsdt * KES_PER_USD);
-                return `KES ${Math.round(totalKes).toLocaleString()}`;
+                return `KES ${totalKes.toFixed(2).toLocaleString()}`;
               })()}
             </p>
           </div>
