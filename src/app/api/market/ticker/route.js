@@ -27,8 +27,9 @@ async function fetchMexcKlines(
   interval = "15m",
   priceScalar = 1,
   volumeScalar = 1,
+  startTime = null,
 ) {
-  const cacheKey = `klines:${binanceSymbol}:${interval}:${limit}`;
+  const cacheKey = `klines:${binanceSymbol}:${interval}:${limit}:${startTime || 'now'}`;
   const rawData = await fetchWithCache(cacheKey, async () => {
     const pages = [];
     let endTime;
@@ -41,6 +42,7 @@ async function fetchMexcKlines(
       url.searchParams.set("interval", interval);
       url.searchParams.set("limit", String(pageLimit));
       if (endTime != null) url.searchParams.set("endTime", String(endTime));
+      if (startTime != null) url.searchParams.set("startTime", String(startTime));
 
       const response = await fetch(url, {
         cache: "no-store",
@@ -67,12 +69,12 @@ async function fetchMexcKlines(
   );
 }
 
-async function fetchMexcTicker24h(symbol) {
+async function fetchMexcTicker24h(symbol, useCache = true) {
   const url = new URL(MEXC_TICKER_URL);
   url.searchParams.set("symbol", symbol);
 
   const response = await fetch(url, {
-    cache: "no-store",
+    cache: useCache ? "no-store" : "no-store",
     signal: AbortSignal.timeout(8000),
   });
 
@@ -157,8 +159,9 @@ export async function GET(request) {
         const ticker24h = await fetchMexcTicker24h(binanceSymbol);
         const latestBar = bars.at(-1);
         
-        // Calculate 24h change from klines for real-time updates
-        const bars24h = await fetchMexcKlines(binanceSymbol, 96, "15m", priceScalar); // 96 bars of 15m = 24 hours
+        // Calculate 24h change from klines using fixed 24-hour timestamp window
+        const twentyFourHoursAgo = Date.now() - (24 * 60 * 60 * 1000);
+        const bars24h = await fetchMexcKlines(binanceSymbol, 96, "15m", priceScalar, volumeScalar, twentyFourHoursAgo);
         const change24h = calculateChange24h(bars24h);
         
         const price = latestBar ? latestBar.close : Number(ticker24h.lastPrice) * priceScalar;

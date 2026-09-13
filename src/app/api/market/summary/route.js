@@ -26,11 +26,12 @@ async function fetchMexcTicker(symbol) {
   return data;
 }
 
-async function fetchMexcKlines(symbol, limit = 180, interval = "15m", priceScalar = 1) {
+async function fetchMexcKlines(symbol, limit = 180, interval = "15m", priceScalar = 1, startTime = null) {
   const url = new URL(MEXC_KLINE_URL);
   url.searchParams.set("symbol", symbol);
   url.searchParams.set("interval", interval);
   url.searchParams.set("limit", String(limit));
+  if (startTime != null) url.searchParams.set("startTime", String(startTime));
 
   const response = await fetch(url, {
     cache: "no-store",
@@ -89,7 +90,10 @@ export async function GET() {
         const entries = await Promise.all(
           [...new Set(MARKETS.map((m) => m.binanceSymbol))].map(async (symbol) => {
             try {
-              const data = await fetchMexcKlines(symbol, 180, "15m");
+              // For NXRUSDT, use fixed 24-hour timestamp window to avoid jumping
+              const isNxr = MARKETS.find(m => m.binanceSymbol === symbol)?.symbol === "NXRUSDT";
+              const startTime = isNxr ? Date.now() - (24 * 60 * 60 * 1000) : null;
+              const data = await fetchMexcKlines(symbol, 180, "15m", 1, startTime);
               return [symbol, data];
             } catch {
               return [symbol, []];
