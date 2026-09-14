@@ -179,9 +179,9 @@ export async function GET(request) {
         
         // Use UNI values directly without lag offset for natural price movement
         const uniPrice = Number(ticker24h.lastPrice);
-        const price = uniPrice;
-        const high24h = Number(ticker24h.highPrice);
-        const low24h = Number(ticker24h.lowPrice);
+        const price = Number((uniPrice * priceScalar).toFixed(8));
+        const high24h = Number((Number(ticker24h.highPrice) * priceScalar).toFixed(8));
+        const low24h = Number((Number(ticker24h.lowPrice) * priceScalar).toFixed(8));
         const quoteVolume24h = Number(ticker24h.quoteVolume);
 
         if (type === "latest") {
