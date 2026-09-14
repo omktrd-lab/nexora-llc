@@ -930,7 +930,7 @@ function HomeContent() {
           }`}
         >
           <div className="relative mb-0.5">
-            <Coins className="size-4" />
+            <Coins className="size-4 text-current" />
             <Lock className="absolute -top-1 -right-1.5 size-2 text-muted-foreground" />
           </div>
           <span className="tracking-tight uppercase">Earn</span>
