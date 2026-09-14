@@ -100,7 +100,7 @@ function ChangeCell({ change }) {
 
 function SkeletonRow() {
   return (
-    <div className="flex animate-pulse items-center gap-4 border-b border-border px-4 py-3.5">
+    <div className="flex animate-pulse items-center gap-4 border-b border-border px-4 py-3.5 bg-background">
       <div className="size-8 rounded-full bg-muted" />
       <div className="flex-1 space-y-1.5">
         <div className="h-3 w-24 rounded bg-muted" />
@@ -117,26 +117,26 @@ function SkeletonRow() {
 
 function MobileMarketRow({ market, onTrade }) {
   return (
-    <div className="border-b border-border px-4 py-3.5 last:border-b-0">
+    <div className="border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 py-3.5 last:border-b-0">
       <div className="grid min-h-[52px] grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 overflow-hidden">
         <div className="flex min-w-0 items-center gap-3 overflow-hidden">
           <AssetBadge symbol={market.base} isNative={market.isNative} />
           <div className="min-w-0">
-            <span className="truncate text-sm font-semibold text-foreground">
+            <span className="truncate text-sm font-semibold text-zinc-900 dark:text-zinc-100">
               {market.base}
             </span>
-            <span className="shrink-0 text-[10px] text-muted-foreground">/USDT</span>
+            <span className="shrink-0 text-[10px] text-zinc-500 dark:text-zinc-400">/USDT</span>
             {market.isNative && (
               <span className="shrink-0 rounded bg-green-500/20 px-1 py-0.5 text-[8px] font-bold text-green-500">
                 NXR
               </span>
             )}
           </div>
-          <p className="mt-0.5 truncate text-[10px] text-muted-foreground">
+          <p className="mt-0.5 truncate text-[10px] text-zinc-500 dark:text-zinc-400">
             {market.name}
           </p>
         </div>
-        <p className="shrink-0 whitespace-nowrap font-mono text-sm font-medium text-foreground tabular-nums">
+        <p className="shrink-0 whitespace-nowrap font-mono text-sm font-medium text-zinc-900 dark:text-zinc-100 tabular-nums">
           {formatMarketPrice(market.price, market.decimals)}
         </p>
       </div>
@@ -146,7 +146,7 @@ function MobileMarketRow({ market, onTrade }) {
         <button
           type="button"
           onClick={onTrade}
-          className="shrink-0 rounded border border-border px-3 py-1.5 text-[10px] font-semibold tracking-wide text-foreground uppercase transition-colors hover:border-green-500 hover:bg-green-500 hover:text-black"
+          className="shrink-0 rounded border border-zinc-300 dark:border-zinc-700 px-3 py-1.5 text-[10px] font-semibold tracking-wide text-zinc-900 dark:text-zinc-100 uppercase transition-colors hover:border-green-500 hover:bg-green-500 hover:text-black"
         >
           Trade
         </button>
@@ -297,35 +297,32 @@ export default function MarketsPage() {
 
   return (
     <main
-      className="min-h-screen pb-24 md:pb-0"
-      style={{ background: "#090a0c", color: "#f5f5f5" }}
+      className="min-h-screen pb-24 md:pb-0 bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100"
     >
       {/* ── Desktop Header ── */}
       <header
-        className="relative z-20 hidden h-14 items-center gap-8 border-b px-4 lg:flex"
-        style={{ background: "#0d0d0f", borderColor: "#16181d" }}
+        className="relative z-20 hidden h-14 items-center gap-8 border-b border-zinc-200 dark:border-zinc-800 px-4 lg:flex bg-zinc-50 dark:bg-zinc-900"
       >
         <div className="flex items-center gap-2.5">
           <div
-            className="flex size-7 items-center justify-center rounded text-xs font-black"
-            style={{ background: "#f5f5f5", color: "#090a0c" }}
+            className="flex size-7 items-center justify-center rounded text-xs font-black bg-foreground text-background"
           >
             N
           </div>
           <span className="text-sm font-bold tracking-wide">NEXORA</span>
         </div>
 
-        <nav className="flex items-center gap-4 overflow-x-auto text-xs whitespace-nowrap text-zinc-500">
+        <nav className="flex items-center gap-4 overflow-x-auto text-xs whitespace-nowrap text-muted-foreground">
           <button
             onClick={() => router.push("/trade?focus=buy")}
-            className="text-zinc-400 transition-colors hover:text-white"
+            className="text-muted-foreground transition-colors hover:text-foreground"
           >
             Buy Crypto
           </button>
-          <button className="font-medium text-white">Markets</button>
+          <button className="font-medium text-foreground">Markets</button>
           <button
             onClick={() => router.push("/trade")}
-            className="text-zinc-400 transition-colors hover:text-white"
+            className="text-muted-foreground transition-colors hover:text-foreground"
           >
             Trade
           </button>
@@ -338,7 +335,7 @@ export default function MarketsPage() {
                   description: feat.description,
                 })
               }
-              className="group flex shrink-0 items-center gap-1 text-zinc-500 transition-colors hover:text-zinc-300"
+              className="group flex shrink-0 items-center gap-1 text-muted-foreground transition-colors hover:text-foreground"
               title={`${feat.name} — Coming Soon`}
             >
               <span>{feat.name}</span>
@@ -348,12 +345,12 @@ export default function MarketsPage() {
               </span>
             </button>
           ))}
-          <button className="text-zinc-400 transition-colors hover:text-white">
+          <button className="text-muted-foreground transition-colors hover:text-foreground">
             Portfolio
           </button>
           <button
             onClick={() => router.push("/referrals")}
-            className="text-zinc-400 transition-colors hover:text-white"
+            className="text-muted-foreground transition-colors hover:text-foreground"
           >
             Referrals
           </button>
@@ -404,9 +401,9 @@ export default function MarketsPage() {
         {/* Phone-native market list: price gets its own right-aligned column,
             while change and the trade action get a dedicated second line. */}
         <div
-          className="markets-mobile-list overflow-hidden border border-border bg-card md:hidden"
+          className="markets-mobile-list overflow-hidden border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 md:hidden"
         >
-          <div className="flex items-center justify-between border-b border-border px-4 py-2.5 text-[10px] font-semibold tracking-widest text-muted-foreground uppercase">
+          <div className="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 px-4 py-2.5 text-[10px] font-semibold tracking-widest text-zinc-600 dark:text-zinc-400 uppercase">
             <span>Markets</span>
             <span>Live prices</span>
           </div>
@@ -429,10 +426,10 @@ export default function MarketsPage() {
 
         {/* Table header */}
         <div
-          className="hidden rounded-t-lg border border-b-0 border-border bg-card md:block"
+          className="hidden rounded-t-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 md:block"
         >
           <div
-            className="grid items-center gap-4 border-b border-border px-4 py-2.5 text-[10px] font-semibold tracking-widest text-muted-foreground uppercase"
+            className="grid items-center gap-4 border-b border-zinc-200 dark:border-zinc-800 px-4 py-2.5 text-[10px] font-semibold tracking-widest text-zinc-600 dark:text-zinc-400 uppercase"
             style={{
               gridTemplateColumns: "1fr 1fr 80px 1fr 1fr 80px",
             }}
@@ -448,7 +445,7 @@ export default function MarketsPage() {
 
         {/* Rows */}
         <div
-          className="hidden overflow-hidden rounded-b-lg border border-border bg-card md:block"
+          className="hidden overflow-hidden rounded-b-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 md:block"
         >
           {loading ? (
             Array.from({ length: 8 }).map((_, i) => <SkeletonRow key={i} />)
@@ -460,7 +457,7 @@ export default function MarketsPage() {
             markets.map((market, idx) => (
               <div
                 key={market.symbol}
-                className="grid cursor-pointer items-center gap-4 border-b border-border px-4 py-3.5 transition-colors hover:bg-muted/50"
+                className="grid cursor-pointer items-center gap-4 border-b border-zinc-200 dark:border-zinc-800 px-4 py-3.5 transition-colors hover:bg-zinc-100 dark:hover:bg-zinc-800"
                 style={{
                   gridTemplateColumns: "1fr 1fr 80px 1fr 1fr 80px",
                 }}
@@ -471,7 +468,7 @@ export default function MarketsPage() {
                   <AssetBadge symbol={market.base} isNative={market.isNative} />
                   <div className="min-w-0">
                     <div className="flex items-center gap-1.5">
-                      <span className="text-sm font-semibold text-foreground">
+                      <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
                         {market.base}
                       </span>
                       {market.isNative && (
@@ -480,7 +477,7 @@ export default function MarketsPage() {
                         </span>
                       )}
                     </div>
-                    <p className="truncate text-[10px] text-muted-foreground">
+                    <p className="truncate text-[10px] text-zinc-500 dark:text-zinc-400">
                       {market.name}
                     </p>
                   </div>
@@ -488,7 +485,7 @@ export default function MarketsPage() {
 
                 {/* Price */}
                 <div className="text-right">
-                  <p className="font-mono text-sm font-medium text-foreground tabular-nums">
+                  <p className="font-mono text-sm font-medium text-zinc-900 dark:text-zinc-100 tabular-nums">
                     {formatMarketPrice(market.price, market.decimals)}
                   </p>
                 </div>
@@ -505,7 +502,7 @@ export default function MarketsPage() {
 
                 {/* Volume */}
                 <div className="hidden text-right lg:block">
-                  <p className="font-mono text-[11px] text-muted-foreground tabular-nums">
+                  <p className="font-mono text-[11px] text-zinc-500 dark:text-zinc-400 tabular-nums">
                     {market.quoteVolume24h >= 1_000_000
                       ? `$${(market.quoteVolume24h / 1_000_000).toFixed(2)}M`
                       : market.quoteVolume24h >= 1_000
@@ -522,7 +519,7 @@ export default function MarketsPage() {
                       e.stopPropagation();
                       goToTrade(market.symbol);
                     }}
-                    className="rounded border border-border px-3 py-1.5 text-[10px] font-semibold tracking-wide uppercase transition-colors hover:border-green-500 hover:bg-green-500 hover:text-black"
+                    className="rounded border border-zinc-300 dark:border-zinc-700 px-3 py-1.5 text-[10px] font-semibold tracking-wide text-zinc-900 dark:text-zinc-100 uppercase transition-colors hover:border-green-500 hover:bg-green-500 hover:text-black"
                   >
                     Trade
                   </button>
