@@ -151,20 +151,20 @@ export default function AdminUserBalancesPage() {
         </div>
 
         {error && (
-          <div className="mb-4 p-3 bg-red-900/30 border border-red-700 rounded text-red-300">
+          <div className="mb-4 text-red-400">
             {error}
           </div>
         )}
 
         {updateSuccess && (
-          <div className="mb-4 p-3 bg-green-900/30 border border-green-700 rounded text-green-300">
+          <div className="mb-4 text-green-400">
             Balance updated successfully!
           </div>
         )}
 
         {userData && (
-          <div className="space-y-6">
-            <div className="bg-[#1a1b1e] border border-zinc-700 rounded p-4">
+          <div className="space-y-8">
+            <div>
               <h2 className="text-lg font-semibold mb-4">User Details</h2>
               <div className="space-y-2 text-sm">
                 <div><span className="text-zinc-400">Name:</span> {userData.name}</div>
@@ -175,7 +175,7 @@ export default function AdminUserBalancesPage() {
               </div>
             </div>
 
-            <div className="bg-[#1a1b1e] border border-zinc-700 rounded p-4">
+            <div>
               <h2 className="text-lg font-semibold mb-4">Current Balances</h2>
               <div className="space-y-2 text-sm">
                 <div><span className="text-zinc-400">KES:</span> {userData.balanceKes.toLocaleString()}</div>
@@ -186,7 +186,7 @@ export default function AdminUserBalancesPage() {
               </div>
             </div>
 
-            <div className="bg-[#1a1b1e] border border-zinc-700 rounded p-4">
+            <div>
               <h2 className="text-lg font-semibold mb-4">Update KES Balance</h2>
               <div className="space-y-4">
                 <div>
