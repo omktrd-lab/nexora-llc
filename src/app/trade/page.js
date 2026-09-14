@@ -820,7 +820,7 @@ function HomeContent() {
             <p className="text-muted-foreground text-xs font-black tracking-[.2em]">
               BALANCE
             </p>
-            <p className="mt-1 text-sm font-black text-white">
+            <p className="mt-1 text-sm font-black text-zinc-900 dark:text-zinc-100">
               {(() => {
                 const nxrPriceUsd = portfolioSummary?.priceUsd || tickerData?.lastPrice || 0;
                 const botProfitUsdt = portfolioSummary?.botProfitUsdt || 0;
