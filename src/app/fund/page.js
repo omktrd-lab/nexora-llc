@@ -11,7 +11,9 @@ import {
   LineChart,
   Lock,
   LogOut,
+  Moon,
   ShieldAlert,
+  Sun,
   Users,
   WalletCards,
   X,
@@ -23,6 +25,7 @@ import { Input } from "@/components/ui/input";
 import { canUserWithdraw } from "@/lib/referrals";
 import { toast } from "sonner";
 import { getKesPerUsd } from "@/lib/nxr-pricing";
+import { useTheme } from "next-themes";
 import {
   InputOTP,
   InputOTPGroup,
@@ -1134,6 +1137,8 @@ function ProfileSheet({
   isSigningOut,
   onClose,
 }) {
+  const { theme, setTheme } = useTheme();
+
   return (
     <SheetContent side="right" className="w-[min(22rem,85vw)]">
       <SheetHeader>
@@ -1169,7 +1174,24 @@ function ProfileSheet({
           )}
         </div>
       </div>
-      <div className="mt-auto border-t border-border p-4">
+      <div className="mt-auto border-t border-border p-4 space-y-2">
+        <button
+          type="button"
+          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+          className="text-foreground hover:bg-muted flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors"
+        >
+          {theme === "dark" ? (
+            <>
+              <Sun className="size-4" aria-hidden="true" />
+              Light mode
+            </>
+          ) : (
+            <>
+              <Moon className="size-4" aria-hidden="true" />
+              Dark mode
+            </>
+          )}
+        </button>
         <button
           type="button"
           onClick={onSignOut}

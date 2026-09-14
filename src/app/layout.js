@@ -3,6 +3,7 @@ import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
 import { Toaster } from "@/components/ui/sonner";
 import { NavigationFeedback } from "@/components/navigation-feedback";
+import { ThemeProvider } from "@/components/theme-provider";
 
 export const metadata = {
   title: "Nexora",
@@ -16,7 +17,7 @@ export const viewport = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`dark ${GeistSans.variable} ${GeistMono.variable}`}>
+    <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable}`} suppressHydrationWarning>
       <head>
         <link rel="icon" href="/favicon.svg" />
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -27,9 +28,16 @@ export default function RootLayout({ children }) {
         <meta name="apple-mobile-web-app-title" content="Nexora" />
       </head>
       <body className="font-sans text-sm">
-        {children}
-        <NavigationFeedback />
-        <Toaster />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+          <NavigationFeedback />
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );

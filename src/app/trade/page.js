@@ -21,9 +21,11 @@ import {
   Lock,
   LogOut,
   Menu,
+  Moon,
   Search,
   Settings,
   Sparkles,
+  Sun,
   TrendingUp,
   Users,
   WalletCards,
@@ -34,6 +36,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { NxrMarketChart } from "@/components/nxr-market-chart";
 import { toast } from "sonner";
+import { useTheme } from "next-themes";
 import {
   InputOTP,
   InputOTPGroup,
@@ -1679,6 +1682,8 @@ function ProfileSheet({
   isBalanceVisible,
   setIsBalanceVisible,
 }) {
+  const { theme, setTheme } = useTheme();
+
   return (
     <SheetContent side="right" className="w-[min(22rem,85vw)]">
       <SheetHeader>
@@ -1714,7 +1719,24 @@ function ProfileSheet({
           )}
         </div>
       </div>
-      <div className="border-border mt-auto border-t p-4">
+      <div className="border-border mt-auto border-t p-4 space-y-2">
+        <button
+          type="button"
+          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+          className="text-foreground hover:bg-muted flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors"
+        >
+          {theme === "dark" ? (
+            <>
+              <Sun className="size-4" aria-hidden="true" />
+              Light mode
+            </>
+          ) : (
+            <>
+              <Moon className="size-4" aria-hidden="true" />
+              Dark mode
+            </>
+          )}
+        </button>
         <button
           type="button"
           onClick={onSignOut}
