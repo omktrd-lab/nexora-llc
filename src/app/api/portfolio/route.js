@@ -72,11 +72,8 @@ export async function GET(request) {
     const unrealisedPnlUsd = costBasisKnown ? nxrValueUsd - costBasisUsd : 0;
     return NextResponse.json({
       balanceKes: Number(user.prefs?.balanceKes || 0),
-      totalDepositedKes: Number(user.prefs?.totalDepositedKes || 0),
-      totalDepositedKnown: Object.prototype.hasOwnProperty.call(
-        user.prefs || {},
-        "totalDepositedKes",
-      ),
+      totalDepositedKes: Number(user.prefs?.balanceKes || 0),
+      totalDepositedKnown: true,
       nxrBalance,
       usdtBalance,
       botProfitUsdt,
