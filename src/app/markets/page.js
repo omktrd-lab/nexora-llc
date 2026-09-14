@@ -56,7 +56,7 @@ function ShapeMark({ seed }) {
 
 function AssetBadge({ symbol, isNative }) {
   const colors = {
-    N: "bg-[#22c55e]/20 text-[#22c55e]",
+    N: "bg-green-500/20 text-green-500",
     B: "bg-orange-500/20 text-orange-400",
     E: "bg-blue-500/20 text-blue-400",
     S: "bg-purple-500/20 text-purple-400",
@@ -83,7 +83,7 @@ function ChangeCell({ change }) {
   return (
     <div
       className={`flex items-center gap-1 font-mono text-xs font-medium ${
-        positive ? "text-[#22c55e]" : "text-[#a855f7]"
+        positive ? "text-green-500" : "text-purple-500"
       }`}
     >
       {positive ? (
@@ -99,45 +99,43 @@ function ChangeCell({ change }) {
 
 function SkeletonRow() {
   return (
-    <div className="flex animate-pulse items-center gap-4 border-b border-[#16181d] px-4 py-3.5">
-      <div className="size-8 rounded-full bg-[#16181d]" />
+    <div className="flex animate-pulse items-center gap-4 border-b border-border px-4 py-3.5">
+      <div className="size-8 rounded-full bg-muted" />
       <div className="flex-1 space-y-1.5">
-        <div className="h-3 w-24 rounded bg-[#16181d]" />
-        <div className="h-2.5 w-16 rounded bg-[#16181d]" />
+        <div className="h-3 w-24 rounded bg-muted" />
+        <div className="h-2.5 w-16 rounded bg-muted" />
       </div>
-      <div className="hidden h-3 w-20 rounded bg-[#16181d] sm:block" />
-      <div className="h-3 w-14 rounded bg-[#16181d]" />
-      <div className="hidden h-3 w-28 rounded bg-[#16181d] md:block" />
-      <div className="hidden h-3 w-20 rounded bg-[#16181d] lg:block" />
-      <div className="h-7 w-14 rounded bg-[#16181d]" />
+      <div className="hidden h-3 w-20 rounded bg-muted sm:block" />
+      <div className="h-3 w-14 rounded bg-muted" />
+      <div className="hidden h-3 w-28 rounded bg-muted md:block" />
+      <div className="hidden h-3 w-20 rounded bg-muted lg:block" />
+      <div className="h-7 w-14 rounded bg-muted" />
     </div>
   );
 }
 
 function MobileMarketRow({ market, onTrade }) {
   return (
-    <div className="border-b border-[#16181d] px-4 py-3.5 last:border-b-0">
+    <div className="border-b border-border px-4 py-3.5 last:border-b-0">
       <div className="grid min-h-[52px] grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 overflow-hidden">
         <div className="flex min-w-0 items-center gap-3 overflow-hidden">
           <AssetBadge symbol={market.base} isNative={market.isNative} />
-          <div className="min-w-0 overflow-hidden">
-            <div className="flex min-w-0 items-center gap-1.5 overflow-hidden">
-              <span className="truncate text-sm font-semibold text-white">
-                {market.base}
+          <div className="min-w-0">
+            <span className="truncate text-sm font-semibold text-foreground">
+              {market.base}
+            </span>
+            <span className="shrink-0 text-[10px] text-muted-foreground">/USDT</span>
+            {market.isNative && (
+              <span className="shrink-0 rounded bg-green-500/20 px-1 py-0.5 text-[8px] font-bold text-green-500">
+                NXR
               </span>
-              <span className="shrink-0 text-[10px] text-zinc-500">/USDT</span>
-              {market.isNative && (
-                <span className="shrink-0 rounded bg-[#22c55e]/20 px-1 py-0.5 text-[8px] font-bold text-[#22c55e]">
-                  NXR
-                </span>
-              )}
-            </div>
-            <p className="mt-0.5 truncate text-[10px] text-zinc-500">
-              {market.name}
-            </p>
+            )}
           </div>
+          <p className="mt-0.5 truncate text-[10px] text-muted-foreground">
+            {market.name}
+          </p>
         </div>
-        <p className="shrink-0 whitespace-nowrap font-mono text-sm font-medium text-white tabular-nums">
+        <p className="shrink-0 whitespace-nowrap font-mono text-sm font-medium text-foreground tabular-nums">
           {formatMarketPrice(market.price, market.decimals)}
         </p>
       </div>
@@ -147,7 +145,7 @@ function MobileMarketRow({ market, onTrade }) {
         <button
           type="button"
           onClick={onTrade}
-          className="shrink-0 rounded border border-[#2a2a2e] px-3 py-1.5 text-[10px] font-semibold tracking-wide text-zinc-300 uppercase transition-colors hover:border-[#22c55e] hover:bg-[#22c55e] hover:text-black"
+          className="shrink-0 rounded border border-border px-3 py-1.5 text-[10px] font-semibold tracking-wide text-foreground uppercase transition-colors hover:border-green-500 hover:bg-green-500 hover:text-black"
         >
           Trade
         </button>
@@ -161,18 +159,18 @@ function MobileFeatureView({ feature, onClose, onGoToMarkets }) {
   const Icon = feature.icon || Lock;
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col overflow-y-auto bg-[#090a0c] pb-16 text-white">
+    <div className="fixed inset-0 z-50 flex flex-col overflow-y-auto bg-background pb-16 text-foreground">
       {/* Top bar */}
-      <div className="flex h-14 shrink-0 items-center justify-between border-b border-[#16181d] bg-[#0d0d0f] px-4">
+      <div className="flex h-14 shrink-0 items-center justify-between border-b border-border bg-muted px-4">
         <button
           type="button"
           onClick={onClose}
-          className="flex items-center gap-2 text-xs font-medium text-zinc-400 transition-colors hover:text-white"
+          className="flex items-center gap-2 text-xs font-bold tracking-wide"
         >
           <ArrowLeft className="size-4" />
           <span>Markets</span>
         </button>
-        <span className="flex items-center gap-1 rounded border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold tracking-wider text-[#22c55e] uppercase">
+        <span className="flex items-center gap-1 rounded border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold tracking-wider text-green-500 uppercase">
           <Lock className="size-2.5" />
           Coming Soon
         </span>
@@ -180,24 +178,24 @@ function MobileFeatureView({ feature, onClose, onGoToMarkets }) {
 
       {/* Main full viewport content */}
       <div className="mx-auto flex w-full max-w-lg flex-1 flex-col justify-center px-6 py-8">
-        <div className="mx-auto mb-5 flex size-16 items-center justify-center rounded-2xl border border-zinc-800 bg-[#16181d] text-[#22c55e] shadow-2xl">
+        <div className="mx-auto mb-5 flex size-16 items-center justify-center rounded-2xl border border-zinc-800 bg-muted text-green-500 shadow-2xl">
           <Icon className="size-8" />
         </div>
 
         <div className="mb-6 text-center">
-          <div className="mb-2.5 inline-flex items-center gap-2 rounded-full border border-zinc-800 bg-[#16181d] px-3 py-1">
+          <div className="mb-2.5 inline-flex items-center gap-2 rounded-full border border-zinc-800 bg-muted px-3 py-1">
             <span className="size-1.5 animate-pulse rounded-full bg-emerald-500" />
-            <span className="text-[10px] font-bold tracking-[0.2em] text-[#22c55e] uppercase">
+            <span className="text-[10px] font-bold tracking-[0.2em] text-green-500 uppercase">
               NEXORA {feature.name.toUpperCase()}
             </span>
-            <span className="py-0.2 rounded bg-zinc-800 px-1.5 font-mono text-[8px] text-zinc-400">
+            <span className="py-0.2 rounded bg-zinc-800 px-1.5 font-mono text-[8px] text-muted-foreground">
               {feature.badge}
             </span>
           </div>
-          <h1 className="mb-2 text-xl leading-snug font-bold tracking-tight text-white">
+          <h1 className="mb-2 text-xl leading-snug font-bold tracking-tight text-foreground">
             {feature.tagline}
           </h1>
-          <p className="mx-auto max-w-sm text-xs leading-relaxed text-zinc-400">
+          <p className="mx-auto max-w-sm text-xs leading-relaxed text-muted-foreground">
             {feature.description}
           </p>
         </div>
@@ -207,22 +205,22 @@ function MobileFeatureView({ feature, onClose, onGoToMarkets }) {
           {feature.highlights.map((h, i) => (
             <div
               key={i}
-              className="rounded-lg border border-[#16181d] bg-[#0d0d0f] p-3 text-left"
+              className="rounded-lg border border-border bg-muted p-3 text-left"
             >
-              <p className="mb-1 text-[9px] tracking-wider text-zinc-500 uppercase">
+              <p className="mb-1 text-[9px] tracking-wider text-muted-foreground uppercase">
                 {h.label}
               </p>
-              <p className="font-mono text-xs font-semibold text-white">
-                {h.val}
+              <p className="font-mono text-xs font-semibold text-foreground">
+                {h.value}
               </p>
             </div>
           ))}
         </div>
 
         {/* Phase Status */}
-        <div className="mb-6 flex items-center justify-between rounded-lg border border-[#16181d] bg-[#0d0d0f] px-4 py-2.5 text-xs">
-          <span className="text-zinc-500">Current Phase:</span>
-          <span className="flex items-center gap-1.5 font-semibold text-zinc-200">
+        <div className="mb-6 flex items-center justify-between rounded-lg border border-border bg-muted px-4 py-2.5 text-xs">
+          <span className="text-muted-foreground">Current Phase:</span>
+          <span className="flex items-center gap-1.5 font-semibold text-foreground">
             <span className="size-2 animate-pulse rounded-full bg-emerald-500" />
             {feature.status}
           </span>
@@ -233,14 +231,14 @@ function MobileFeatureView({ feature, onClose, onGoToMarkets }) {
           <button
             type="button"
             onClick={onClose}
-            className="w-full rounded-md bg-[#22c55e] py-2.5 text-xs font-bold tracking-wider text-black uppercase shadow-md transition-colors hover:bg-[#22c55e]/90"
+            className="w-full rounded-md bg-green-500 py-2.5 text-xs font-bold tracking-wider text-black uppercase shadow-md transition-colors hover:bg-green-500/90"
           >
             Stay on Markets
           </button>
           <button
             type="button"
             onClick={onGoToMarkets}
-            className="w-full rounded-md border border-[#16181d] bg-[#16181d] py-2.5 text-xs font-medium tracking-wider text-zinc-300 uppercase transition-colors hover:text-white"
+            className="w-full rounded-md border border-border bg-muted py-2.5 text-xs font-medium tracking-wider text-foreground uppercase transition-colors hover:text-foreground"
           >
             Go to Trading Terminal
           </button>
@@ -344,7 +342,7 @@ export default function MarketsPage() {
             >
               <span>{feat.name}</span>
               <Lock className="size-2.5 opacity-60 transition-opacity group-hover:opacity-100" />
-              <span className="py-0.2 rounded bg-zinc-800/90 px-1 text-[8px] font-semibold text-zinc-400 transition-colors group-hover:bg-emerald-950/40 group-hover:text-emerald-400">
+              <span className="py-0.2 rounded bg-zinc-800/90 px-1 text-[8px] font-semibold text-muted-foreground transition-colors group-hover:bg-emerald-950/40 group-hover:text-emerald-400">
                 SOON
               </span>
             </button>
@@ -399,16 +397,15 @@ export default function MarketsPage() {
             Terminal
           </button>
           <span className="text-zinc-700">/</span>
-          <h1 className="text-sm font-semibold text-white">Markets</h1>
+          <h1 className="text-sm font-semibold text-foreground">Markets</h1>
         </div>
 
         {/* Phone-native market list: price gets its own right-aligned column,
             while change and the trade action get a dedicated second line. */}
         <div
-          className="markets-mobile-list overflow-hidden md:hidden"
-          style={{ borderColor: "#16181d", background: "#0d0d0f" }}
+          className="markets-mobile-list overflow-hidden border border-border bg-muted md:hidden"
         >
-          <div className="flex items-center justify-between border-b border-[#16181d] px-4 py-2.5 text-[10px] font-semibold tracking-widest text-zinc-500 uppercase">
+          <div className="flex items-center justify-between border-b border-border px-4 py-2.5 text-[10px] font-semibold tracking-widest text-muted-foreground uppercase">
             <span>Markets</span>
             <span>Live prices</span>
           </div>
@@ -431,13 +428,11 @@ export default function MarketsPage() {
 
         {/* Table header */}
         <div
-          className="hidden rounded-t-lg border border-b-0 md:block"
-          style={{ borderColor: "#16181d", background: "#0d0d0f" }}
+          className="hidden rounded-t-lg border border-b-0 border-border bg-muted md:block"
         >
           <div
-            className="grid items-center gap-4 border-b px-4 py-2.5 text-[10px] font-semibold tracking-widest text-zinc-500 uppercase"
+            className="grid items-center gap-4 border-b border-border px-4 py-2.5 text-[10px] font-semibold tracking-widest text-muted-foreground uppercase"
             style={{
-              borderColor: "#16181d",
               gridTemplateColumns: "1fr 1fr 80px 1fr 1fr 80px",
             }}
           >
@@ -452,8 +447,7 @@ export default function MarketsPage() {
 
         {/* Rows */}
         <div
-          className="hidden overflow-hidden rounded-b-lg border md:block"
-          style={{ borderColor: "#16181d", background: "#0d0d0f" }}
+          className="hidden overflow-hidden rounded-b-lg border border-border bg-muted md:block"
         >
           {loading ? (
             Array.from({ length: 8 }).map((_, i) => <SkeletonRow key={i} />)
@@ -465,9 +459,8 @@ export default function MarketsPage() {
             markets.map((market, idx) => (
               <div
                 key={market.symbol}
-                className="grid cursor-pointer items-center gap-4 border-b px-4 py-3.5 transition-colors hover:bg-[#16181d]"
+                className="grid cursor-pointer items-center gap-4 border-b border-border px-4 py-3.5 transition-colors hover:bg-muted"
                 style={{
-                  borderColor: "#16181d",
                   gridTemplateColumns: "1fr 1fr 80px 1fr 1fr 80px",
                 }}
                 onClick={() => goToTrade(market.symbol)}
@@ -477,16 +470,16 @@ export default function MarketsPage() {
                   <AssetBadge symbol={market.base} isNative={market.isNative} />
                   <div className="min-w-0">
                     <div className="flex items-center gap-1.5">
-                      <span className="text-sm font-semibold text-white">
+                      <span className="text-sm font-semibold text-foreground">
                         {market.base}
                       </span>
                       {market.isNative && (
-                        <span className="hidden rounded bg-[#22c55e]/20 px-1 py-0.5 text-[8px] font-bold tracking-wide text-[#22c55e] uppercase sm:inline">
+                        <span className="hidden rounded bg-green-500/20 px-1 py-0.5 text-[8px] font-bold tracking-wide text-green-500 uppercase sm:inline">
                           NATIVE
                         </span>
                       )}
                     </div>
-                    <p className="truncate text-[10px] text-zinc-500">
+                    <p className="truncate text-[10px] text-muted-foreground">
                       {market.name}
                     </p>
                   </div>
@@ -494,24 +487,24 @@ export default function MarketsPage() {
 
                 {/* Price */}
                 <div className="text-right">
-                  <p className="font-mono text-sm font-medium text-white tabular-nums">
+                  <p className="font-mono text-sm font-medium text-foreground tabular-nums">
                     {formatMarketPrice(market.price, market.decimals)}
                   </p>
                 </div>
 
                 {/* High / Low */}
                 <div className="hidden text-right md:block">
-                  <p className="font-mono text-[11px] text-[#22c55e] tabular-nums">
+                  <p className="font-mono text-[11px] text-green-500 tabular-nums">
                     {formatMarketPrice(market.high24h, market.decimals)}
                   </p>
-                  <p className="font-mono text-[11px] text-[#a855f7] tabular-nums">
+                  <p className="font-mono text-[11px] text-purple-500 tabular-nums">
                     {formatMarketPrice(market.low24h, market.decimals)}
                   </p>
                 </div>
 
                 {/* Volume */}
                 <div className="hidden text-right lg:block">
-                  <p className="font-mono text-[11px] text-zinc-400 tabular-nums">
+                  <p className="font-mono text-[11px] text-muted-foreground tabular-nums">
                     {market.quoteVolume24h >= 1_000_000
                       ? `$${(market.quoteVolume24h / 1_000_000).toFixed(2)}M`
                       : market.quoteVolume24h >= 1_000
@@ -528,8 +521,7 @@ export default function MarketsPage() {
                       e.stopPropagation();
                       goToTrade(market.symbol);
                     }}
-                    className="rounded border px-3 py-1.5 text-[10px] font-semibold tracking-wide uppercase transition-colors hover:border-[#22c55e] hover:bg-[#22c55e] hover:text-black"
-                    style={{ borderColor: "#2a2a2e", color: "#a1a1aa" }}
+                    className="rounded border border-border px-3 py-1.5 text-[10px] font-semibold tracking-wide uppercase transition-colors hover:border-green-500 hover:bg-green-500 hover:text-black"
                   >
                     Trade
                   </button>
@@ -542,14 +534,13 @@ export default function MarketsPage() {
 
       {/* ── Mobile Bottom Nav ── */}
       <nav
-        className="fixed right-0 bottom-0 left-0 z-40 grid h-14 grid-cols-6 items-center border-t px-1 md:hidden"
-        style={{ background: "#090a0c", borderColor: "#16181d" }}
+        className="fixed right-0 bottom-0 left-0 z-40 grid h-14 grid-cols-6 items-center border-t border-border bg-background px-1 md:hidden"
       >
         {/* 1. Trade */}
         <button
           type="button"
           onClick={() => router.push("/trade")}
-          className="flex w-full flex-col items-center justify-center py-1 text-[9px] text-zinc-400 transition-colors hover:text-white"
+          className="flex w-full flex-col items-center justify-center py-1 text-[9px] text-muted-foreground transition-colors hover:text-foreground"
         >
           <ArrowLeftRight className="mb-0.5 size-4" />
           <span className="tracking-tight uppercase">Trade</span>
@@ -561,8 +552,8 @@ export default function MarketsPage() {
           onClick={() => setActiveFeature(null)}
           className={`flex w-full flex-col items-center justify-center py-1 text-[9px] transition-colors ${
             !activeFeature
-              ? "font-semibold text-white"
-              : "text-zinc-400 hover:text-white"
+              ? "font-semibold text-foreground"
+              : "text-muted-foreground hover:text-foreground"
           }`}
         >
           <LineChart className="mb-0.5 size-4" />
@@ -575,13 +566,13 @@ export default function MarketsPage() {
           onClick={() => setActiveFeature(UPCOMING_FEATURES[0])}
           className={`relative flex w-full flex-col items-center justify-center py-1 text-[9px] transition-colors ${
             activeFeature?.id === "futures"
-              ? "text-[#22c55e]"
-              : "text-zinc-400 hover:text-white"
+              ? "text-green-500"
+              : "text-muted-foreground hover:text-foreground"
           }`}
         >
           <div className="relative mb-0.5">
             <TrendingUp className="size-4" />
-            <Lock className="absolute -top-1 -right-1.5 size-2 text-zinc-400" />
+            <Lock className="absolute -top-1 -right-1.5 size-2 text-muted-foreground" />
           </div>
           <span className="tracking-tight uppercase">Futures</span>
         </button>
@@ -592,13 +583,13 @@ export default function MarketsPage() {
           onClick={() => setActiveFeature(UPCOMING_FEATURES[2])}
           className={`relative flex w-full flex-col items-center justify-center py-1 text-[9px] transition-colors ${
             activeFeature?.id === "earn"
-              ? "text-[#22c55e]"
-              : "text-zinc-400 hover:text-white"
+              ? "text-green-500"
+              : "text-muted-foreground hover:text-foreground"
           }`}
         >
           <div className="relative mb-0.5">
             <Coins className="size-4" />
-            <Lock className="absolute -top-1 -right-1.5 size-2 text-zinc-400" />
+            <Lock className="absolute -top-1 -right-1.5 size-2 text-muted-foreground" />
           </div>
           <span className="tracking-tight uppercase">Earn</span>
         </button>
@@ -607,10 +598,10 @@ export default function MarketsPage() {
         <button
           type="button"
           onClick={() => router.push("/referrals")}
-          className="flex w-full flex-col items-center justify-center py-1 text-[9px] text-zinc-400 transition-colors hover:text-white"
+          className="flex w-full flex-col items-center justify-center py-1 text-[9px] text-muted-foreground transition-colors hover:text-foreground"
         >
           <Users className="mb-0.5 size-4" />
-          <span className="tracking-tight uppercase">Ref</span>
+          <span className="tracking-tight uppercase">Referrals</span>
         </button>
 
         {/* 6. Profile */}
@@ -620,13 +611,9 @@ export default function MarketsPage() {
               <button
                 type="button"
                 aria-label="Open profile"
-                className="flex w-full flex-col items-center justify-center py-1 text-[9px] text-zinc-400 transition-colors hover:text-white"
+                className="flex w-full flex-col items-center justify-center py-1 text-[9px] text-muted-foreground transition-colors hover:text-foreground"
               >
-                <Avatar className="mb-0.5 size-4 border border-zinc-700 bg-black">
-                  <AvatarFallback className="bg-black">
-                    <ShapeMark seed={avatarSeed} />
-                  </AvatarFallback>
-                </Avatar>
+                <User className="mb-0.5 size-4" />
                 <span className="tracking-tight uppercase">Profile</span>
               </button>
             }
