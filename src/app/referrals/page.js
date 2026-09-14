@@ -117,15 +117,15 @@ export default function ReferralsPage() {
 
   if (loading) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-[#090a0c]">
-        <p className="text-sm text-zinc-500">Loading referrals...</p>
+      <main className="flex min-h-screen items-center justify-center bg-background">
+        <p className="text-sm text-muted-foreground">Loading referrals...</p>
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen w-full bg-[#090a0c]">
-      <header className="terminal-header relative z-20 hidden h-14 items-center border-b px-4 lg:flex">
+    <main className="min-h-screen w-full bg-background">
+      <header className="terminal-header relative z-20 hidden h-14 items-center border-b border-border px-4 lg:flex">
         <div className="flex min-w-0 items-center gap-8">
           <button
             type="button"
@@ -190,8 +190,8 @@ export default function ReferralsPage() {
         </div>
       </header>
 
-      <header className="border-b border-[#16181d] bg-[#090a0c] px-4 py-4 lg:hidden">
-        <h1 className="text-sm font-semibold tracking-wide text-white uppercase">
+      <header className="border-b border-border bg-background px-4 py-4 lg:hidden">
+        <h1 className="text-sm font-semibold tracking-wide text-foreground uppercase">
           Referrals & Rewards
         </h1>
       </header>
@@ -199,36 +199,36 @@ export default function ReferralsPage() {
       {/* Mobile View - Single Column */}
       <div className="md:hidden">
         {/* Metrics Bar */}
-        <div className="grid grid-cols-3 divide-x divide-[#16181d] border-b border-[#16181d]">
+        <div className="grid grid-cols-3 divide-x divide-border border-b border-border">
           <div className="px-4 py-3">
-            <p className="text-xs tracking-wide text-zinc-500 uppercase">
+            <p className="text-xs tracking-wide text-muted-foreground uppercase">
               Total Referrals
             </p>
-            <p className="mt-1 text-xl font-semibold text-white">
+            <p className="mt-1 text-xl font-semibold text-foreground">
               {stats.total}
             </p>
           </div>
           <div className="px-4 py-3">
-            <p className="text-xs tracking-wide text-zinc-500 uppercase">
+            <p className="text-xs tracking-wide text-muted-foreground uppercase">
               Valid Depositors
             </p>
-            <p className="mt-1 text-xl font-semibold text-[#00E676]">
+            <p className="mt-1 text-xl font-semibold text-green-500">
               {stats.valid}
             </p>
           </div>
           <div className="px-4 py-3">
-            <p className="text-xs tracking-wide text-zinc-500 uppercase">
+            <p className="text-xs tracking-wide text-muted-foreground uppercase">
               Pending
             </p>
-            <p className="mt-1 text-xl font-semibold text-[#00F0FF]">
+            <p className="mt-1 text-xl font-semibold text-cyan-400">
               {stats.pending}
             </p>
           </div>
         </div>
 
         {/* Your Referral Code */}
-        <div className="border-b border-[#16181d] px-4 py-4">
-          <p className="mb-2 text-xs tracking-wide text-zinc-500 uppercase">
+        <div className="border-b border-border px-4 py-4">
+          <p className="mb-2 text-xs tracking-wide text-muted-foreground uppercase">
             Your Referral Code
           </p>
           <div className="flex gap-2">
@@ -236,11 +236,11 @@ export default function ReferralsPage() {
               type="text"
               value={referralCode}
               readOnly
-              className="flex-1 border border-[#16181d] bg-[#0d0e12] px-3 py-2 font-mono text-sm text-zinc-300 outline-none"
+              className="flex-1 border border-border bg-muted px-3 py-2 font-mono text-sm text-foreground outline-none"
             />
             <button
               onClick={copyToClipboard}
-              className="bg-[#00E676] px-4 py-2 text-sm font-medium text-black transition-colors hover:bg-[#00c853]"
+              className="bg-green-500 px-4 py-2 text-sm font-medium text-black transition-colors hover:bg-green-600"
             >
               {copied ? (
                 <CheckCircle2 className="size-4" />
@@ -252,8 +252,8 @@ export default function ReferralsPage() {
         </div>
 
         {/* Enter Referral Code */}
-        <div className="border-b border-[#16181d] px-4 py-4">
-          <p className="mb-2 text-xs tracking-wide text-zinc-500 uppercase">
+        <div className="border-b border-border px-4 py-4">
+          <p className="mb-2 text-xs tracking-wide text-muted-foreground uppercase">
             Enter Referral Code
           </p>
           <div className="flex gap-2">
@@ -262,18 +262,18 @@ export default function ReferralsPage() {
               value={codeInput}
               onChange={(e) => setCodeInput(e.target.value.toUpperCase())}
               placeholder="NXR-XXXX"
-              className="flex-1 border border-[#16181d] bg-[#0d0e12] px-3 py-2 font-mono text-sm text-zinc-300 uppercase outline-none"
+              className="flex-1 border border-border bg-muted px-3 py-2 font-mono text-sm text-foreground uppercase outline-none"
             />
             <button
               onClick={handleEnterCode}
-              className="bg-[#00F0FF] px-4 py-2 text-sm font-medium text-black transition-colors hover:bg-[#00b8cc]"
+              className="bg-cyan-400 px-4 py-2 text-sm font-medium text-black transition-colors hover:bg-cyan-500"
             >
               Apply
             </button>
           </div>
           {codeMessage && (
             <p
-              className={`mt-2 text-xs ${codeMessageType === "success" ? "text-[#00E676]" : "text-red-500"}`}
+              className={`mt-2 text-xs ${codeMessageType === "success" ? "text-green-500" : "text-red-500"}`}
             >
               {codeMessage}
             </p>
@@ -284,8 +284,8 @@ export default function ReferralsPage() {
         <div className="w-full overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-[#16181d] bg-[#0d0e12]">
-                <th className="px-4 py-3 text-left text-xs font-medium tracking-wide text-zinc-500 uppercase">
+              <tr className="border-b border-border bg-muted">
+                <th className="px-4 py-3 text-left text-xs font-medium tracking-wide text-muted-foreground uppercase">
                   User
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium tracking-wide text-zinc-500 uppercase">
@@ -312,8 +312,8 @@ export default function ReferralsPage() {
                 </tr>
               ) : (
                 referrals.map((referral) => (
-                  <tr key={referral.$id} className="border-b border-[#16181d]">
-                    <td className="px-4 py-3 text-xs text-zinc-300">
+                  <tr key={referral.$id} className="border-b border-border">
+                    <td className="px-4 py-3 text-xs text-foreground">
                       {referral.referredUserName || "Unknown"}
                     </td>
                     <td className="px-4 py-3 text-xs text-zinc-400">
@@ -323,8 +323,8 @@ export default function ReferralsPage() {
                       <span
                         className={`text-xs font-medium ${
                           referral.status === "VALID"
-                            ? "text-[#00E676]"
-                            : "text-[#00F0FF]"
+                            ? "text-green-500"
+                            : "text-cyan-400"
                         }`}
                       >
                         {referral.status}
@@ -343,12 +343,12 @@ export default function ReferralsPage() {
 
       {/* Desktop View - Fused Terminal Panel Layout */}
       <div className="mx-auto my-6 hidden w-full max-w-7xl md:block">
-        <div className="border border-[#16181d] bg-[#090a0c]">
+        <div className="border border-border bg-background">
           {/* Top Banner Row */}
-          <div className="grid grid-cols-2 border-b border-[#16181d]">
+          <div className="grid grid-cols-2 border-b border-border">
             {/* Left: Your Referral Code */}
-            <div className="border-r border-[#16181d] p-5">
-              <p className="mb-3 text-xs tracking-wide text-zinc-500 uppercase">
+            <div className="border-r border-border p-5">
+              <p className="mb-3 text-xs tracking-wide text-muted-foreground uppercase">
                 Your Referral Code
               </p>
               <div className="flex gap-2">
@@ -356,11 +356,11 @@ export default function ReferralsPage() {
                   type="text"
                   value={referralCode}
                   readOnly
-                  className="flex-1 border border-[#16181d] bg-[#0d0e12] px-3 py-2 font-mono text-sm text-zinc-300 outline-none"
+                  className="flex-1 border border-border bg-muted px-3 py-2 font-mono text-sm text-foreground outline-none"
                 />
                 <button
                   onClick={copyToClipboard}
-                  className="bg-[#00E676] px-4 py-2 text-sm font-medium text-black transition-colors hover:bg-[#00c853]"
+                  className="bg-green-500 px-4 py-2 text-sm font-medium text-black transition-colors hover:bg-green-600"
                 >
                   {copied ? (
                     <CheckCircle2 className="size-4" />
@@ -372,7 +372,7 @@ export default function ReferralsPage() {
             </div>
             {/* Right: Enter Referral Code */}
             <div className="p-5">
-              <p className="mb-3 text-xs tracking-wide text-zinc-500 uppercase">
+              <p className="mb-3 text-xs tracking-wide text-muted-foreground uppercase">
                 Enter Referral Code
               </p>
               <div className="flex gap-2">
@@ -381,18 +381,18 @@ export default function ReferralsPage() {
                   value={codeInput}
                   onChange={(e) => setCodeInput(e.target.value.toUpperCase())}
                   placeholder="NXR-XXXX"
-                  className="flex-1 border border-[#16181d] bg-[#0d0e12] px-3 py-2 font-mono text-sm text-zinc-300 uppercase outline-none"
+                  className="flex-1 border border-border bg-muted px-3 py-2 font-mono text-sm text-foreground uppercase outline-none"
                 />
                 <button
                   onClick={handleEnterCode}
-                  className="bg-[#00F0FF] px-4 py-2 text-sm font-medium text-black transition-colors hover:bg-[#00b8cc]"
+                  className="bg-cyan-400 px-4 py-2 text-sm font-medium text-black transition-colors hover:bg-cyan-500"
                 >
                   Apply
                 </button>
               </div>
               {codeMessage && (
                 <p
-                  className={`mt-2 text-xs ${codeMessageType === "success" ? "text-[#00E676]" : "text-red-500"}`}
+                  className={`mt-2 text-xs ${codeMessageType === "success" ? "text-green-500" : "text-red-500"}`}
                 >
                   {codeMessage}
                 </p>
@@ -401,28 +401,28 @@ export default function ReferralsPage() {
           </div>
 
           {/* Middle Metrics Strip */}
-          <div className="grid grid-cols-3 border-b border-[#16181d]">
-            <div className="border-r border-[#16181d] px-5 py-4">
-              <p className="text-xs tracking-wide text-zinc-500 uppercase">
+          <div className="grid grid-cols-3 border-b border-border">
+            <div className="border-r border-border px-5 py-4">
+              <p className="text-xs tracking-wide text-muted-foreground uppercase">
                 Total Referrals
               </p>
-              <p className="mt-1 text-2xl font-semibold text-white">
+              <p className="mt-1 text-2xl font-semibold text-foreground">
                 {stats.total}
               </p>
             </div>
-            <div className="border-r border-[#16181d] px-5 py-4">
-              <p className="text-xs tracking-wide text-zinc-500 uppercase">
+            <div className="border-r border-border px-5 py-4">
+              <p className="text-xs tracking-wide text-muted-foreground uppercase">
                 Valid Depositors
               </p>
-              <p className="mt-1 text-2xl font-semibold text-[#00E676]">
+              <p className="mt-1 text-2xl font-semibold text-green-500">
                 {stats.valid}
               </p>
             </div>
             <div className="px-5 py-4">
-              <p className="text-xs tracking-wide text-zinc-500 uppercase">
+              <p className="text-xs tracking-wide text-muted-foreground uppercase">
                 Pending
               </p>
-              <p className="mt-1 text-2xl font-semibold text-[#00F0FF]">
+              <p className="mt-1 text-2xl font-semibold text-cyan-400">
                 {stats.pending}
               </p>
             </div>
@@ -432,17 +432,17 @@ export default function ReferralsPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-[#16181d] bg-[#0d0e12]">
-                  <th className="px-5 py-3 text-left text-xs font-medium tracking-wide text-zinc-500 uppercase">
+                <tr className="border-b border-border bg-muted">
+                  <th className="px-5 py-3 text-left text-xs font-medium tracking-wide text-muted-foreground uppercase">
                     User
                   </th>
-                  <th className="px-5 py-3 text-left text-xs font-medium tracking-wide text-zinc-500 uppercase">
+                  <th className="px-5 py-3 text-left text-xs font-medium tracking-wide text-muted-foreground uppercase">
                     Phone
                   </th>
-                  <th className="px-5 py-3 text-left text-xs font-medium tracking-wide text-zinc-500 uppercase">
+                  <th className="px-5 py-3 text-left text-xs font-medium tracking-wide text-muted-foreground uppercase">
                     Status
                   </th>
-                  <th className="px-5 py-3 text-left text-xs font-medium tracking-wide text-zinc-500 uppercase">
+                  <th className="px-5 py-3 text-left text-xs font-medium tracking-wide text-muted-foreground uppercase">
                     Date
                   </th>
                 </tr>
@@ -462,26 +462,26 @@ export default function ReferralsPage() {
                   referrals.map((referral) => (
                     <tr
                       key={referral.$id}
-                      className="border-b border-[#16181d]"
+                      className="border-b border-border"
                     >
-                      <td className="px-5 py-3 text-xs text-zinc-300">
+                      <td className="px-5 py-3 text-xs text-foreground">
                         {referral.referredUserName || "Unknown"}
                       </td>
-                      <td className="px-5 py-3 text-xs text-zinc-400">
+                      <td className="px-5 py-3 text-xs text-muted-foreground">
                         {referral.phoneNumber || "Not set"}
                       </td>
                       <td className="px-5 py-3">
                         <span
                           className={`text-xs font-medium ${
                             referral.status === "VALID"
-                              ? "text-[#00E676]"
-                              : "text-[#00F0FF]"
+                              ? "text-green-500"
+                              : "text-cyan-400"
                           }`}
                         >
                           {referral.status}
                         </span>
                       </td>
-                      <td className="px-5 py-3 text-xs text-zinc-500">
+                      <td className="px-5 py-3 text-xs text-muted-foreground">
                         {new Date(referral.createdAt).toLocaleDateString()}
                       </td>
                     </tr>
