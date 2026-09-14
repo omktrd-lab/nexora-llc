@@ -279,17 +279,17 @@ function MobileFeatureView({ feature, onClose, onGoToMarkets }) {
   const Icon = feature.icon || Lock;
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col overflow-y-auto bg-[#090a0c] pb-14 text-white">
+    <div className="fixed inset-0 z-50 flex flex-col overflow-y-auto bg-background pb-14 text-foreground">
       <div className="flex h-14 shrink-0 items-center justify-between px-4">
         <button
           type="button"
           onClick={onClose}
-          className="flex items-center gap-2 text-xs font-medium text-zinc-400 transition-colors hover:text-white"
+          className="flex items-center gap-2 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
         >
           <ArrowLeft className="size-4" />
           <span>Trading Terminal</span>
         </button>
-        <span className="flex items-center gap-1 text-[10px] font-bold tracking-wider text-[#22c55e] uppercase">
+        <span className="flex items-center gap-1 text-[10px] font-bold tracking-wider text-green-500 uppercase">
           <Lock className="size-2.5" />
           Coming Soon
         </span>
@@ -297,17 +297,17 @@ function MobileFeatureView({ feature, onClose, onGoToMarkets }) {
 
       <div className="flex-1 px-5 pt-10 pb-8">
         <div className="mb-12">
-          <div className="mb-5 flex items-center gap-3 text-[#22c55e]">
+          <div className="mb-5 flex items-center gap-3 text-green-500">
             <Icon className="size-5" />
             <span className="text-[10px] font-bold tracking-[0.22em] uppercase">
               Nexora {feature.name}
             </span>
-            <span className="text-zinc-600">/ {feature.badge}</span>
+            <span className="text-muted-foreground">/ {feature.badge}</span>
           </div>
-          <h1 className="mb-3 text-3xl leading-tight font-semibold tracking-tight text-white">
+          <h1 className="mb-3 text-3xl leading-tight font-semibold tracking-tight text-foreground">
             {feature.tagline}
           </h1>
-          <p className="max-w-md text-sm leading-6 text-zinc-400">
+          <p className="max-w-md text-sm leading-6 text-muted-foreground">
             {feature.description}
           </p>
         </div>
@@ -315,10 +315,10 @@ function MobileFeatureView({ feature, onClose, onGoToMarkets }) {
         <div className="mb-10 grid grid-cols-2 gap-x-8 gap-y-7">
           {feature.highlights.map((h, i) => (
             <div key={i}>
-              <p className="mb-1 text-[10px] tracking-wider text-zinc-500 uppercase">
+              <p className="mb-1 text-[10px] tracking-wider text-muted-foreground uppercase">
                 {h.label}
               </p>
-              <p className="font-mono text-sm font-semibold text-white">
+              <p className="font-mono text-sm font-semibold text-foreground">
                 {h.val}
               </p>
             </div>
@@ -326,8 +326,8 @@ function MobileFeatureView({ feature, onClose, onGoToMarkets }) {
         </div>
 
         <div className="mb-10 flex items-center gap-2 text-xs">
-          <span className="text-zinc-500">Current phase</span>
-          <span className="flex items-center gap-1.5 font-medium text-zinc-200">
+          <span className="text-muted-foreground">Current phase</span>
+          <span className="flex items-center gap-1.5 font-medium text-foreground">
             <span className="size-2 animate-pulse rounded-full bg-emerald-500" />
             {feature.status}
           </span>
@@ -337,14 +337,14 @@ function MobileFeatureView({ feature, onClose, onGoToMarkets }) {
           <button
             type="button"
             onClick={onClose}
-            className="text-[#22c55e] transition-colors hover:text-white"
+            className="text-green-500 transition-colors hover:text-foreground"
           >
             Return to trade
           </button>
           <button
             type="button"
             onClick={onGoToMarkets}
-            className="text-zinc-500 transition-colors hover:text-white"
+            className="text-muted-foreground transition-colors hover:text-foreground"
           >
             Spot markets
           </button>
