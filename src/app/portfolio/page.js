@@ -263,11 +263,11 @@ export default function PortfolioPage() {
 
   const pnl = Number(portfolio?.totalPnlUsd || 0);
   return (
-    <main className="min-h-screen bg-[#090a0c] pb-20 text-white">
+    <main className="min-h-screen bg-background pb-20 text-foreground">
       <header className="flex h-14 items-center px-4">
         <button
           onClick={() => router.push("/trade")}
-          className="text-xs text-zinc-500 hover:text-white"
+          className="text-xs text-muted-foreground hover:text-foreground"
         >
           ← Trade
         </button>
@@ -277,7 +277,7 @@ export default function PortfolioPage() {
         {error ? (
           <p className="text-sm text-red-400">{error}</p>
         ) : !portfolio ? (
-          <p className="text-sm text-zinc-500">Loading portfolio…</p>
+          <p className="text-sm text-muted-foreground">Loading portfolio…</p>
         ) : (
           <>
             {syncState !== "live" && (
@@ -287,7 +287,7 @@ export default function PortfolioPage() {
                   : "Portfolio offline"}
               </div>
             )}
-            <p className="text-[10px] font-bold tracking-[.2em] text-zinc-500 uppercase">
+            <p className="text-[10px] font-bold tracking-[.2em] text-muted-foreground uppercase">
               Portfolio value
             </p>
             <p className="mt-2 text-3xl font-semibold">
@@ -295,13 +295,13 @@ export default function PortfolioPage() {
             </p>
             {portfolio.costBasisKnown ? (
               <p
-                className={`mt-2 text-sm ${pnl >= 0 ? "text-[#22c55e]" : "text-[#a855f7]"}`}
+                className={`mt-2 text-sm ${pnl >= 0 ? "text-green-500" : "text-purple-500"}`}
               >
                 {pnl >= 0 ? "+" : ""}
                 {usd(pnl)} total P/L
               </p>
             ) : (
-              <p className="mt-2 text-sm text-zinc-500">
+              <p className="mt-2 text-sm text-muted-foreground">
                 P/L tracking begins with your next NXR purchase.
               </p>
             )}
@@ -379,7 +379,7 @@ function Asset({ label, value, detail }) {
     <div className="flex items-start justify-between">
       <div>
         <p className="font-semibold">{label}</p>
-        <p className="mt-1 text-xs text-zinc-500">{detail}</p>
+        <p className="mt-1 text-xs text-muted-foreground">{detail}</p>
       </div>
       <p className="font-mono text-sm">{value}</p>
     </div>
@@ -388,7 +388,7 @@ function Asset({ label, value, detail }) {
 function Metric({ label, value }) {
   return (
     <div>
-      <p className="text-[10px] tracking-wider text-zinc-500 uppercase">
+      <p className="text-[10px] tracking-wider text-muted-foreground uppercase">
         {label}
       </p>
       <p className="mt-1 font-mono text-sm">{value}</p>
