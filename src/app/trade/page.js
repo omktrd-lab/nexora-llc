@@ -867,12 +867,12 @@ function HomeContent() {
       </div>
 
       {/* ── Mobile Bottom Nav ── */}
-      <nav className="fixed right-0 bottom-0 left-0 z-40 grid h-14 grid-cols-6 items-center border-t border-[#16181d] bg-[#090a0c] px-1 md:hidden">
+      <nav className="fixed right-0 bottom-0 left-0 z-40 grid h-14 grid-cols-6 items-center border-t border-border bg-background px-1 md:hidden">
         {/* 1. Deposit */}
         <button
           type="button"
           onClick={() => router.push("/fund")}
-          className="flex w-full flex-col items-center justify-center py-1 text-[9px] text-zinc-400 transition-colors hover:text-white"
+          className="flex w-full flex-col items-center justify-center py-1 text-[9px] text-muted-foreground transition-colors hover:text-foreground"
         >
           <WalletCards className="mb-0.5 size-4" />
           <span className="tracking-tight uppercase">Deposit</span>
@@ -886,7 +886,7 @@ function HomeContent() {
             setIsSwapOpen(true);
           }}
           className={`flex w-full flex-col items-center justify-center py-1 text-[9px] transition-colors ${
-            !activeFeature ? "text-[#22c55e]" : "text-zinc-400 hover:text-white"
+            !activeFeature ? "text-green-500" : "text-muted-foreground hover:text-foreground"
           }`}
         >
           <ArrowLeftRight className="mb-0.5 size-4" />
@@ -900,7 +900,7 @@ function HomeContent() {
             setActiveFeature(null);
             router.push("/markets");
           }}
-          className="flex w-full flex-col items-center justify-center py-1 text-[9px] text-zinc-400 transition-colors hover:text-white"
+          className="flex w-full flex-col items-center justify-center py-1 text-[9px] text-muted-foreground transition-colors hover:text-foreground"
         >
           <LineChart className="mb-0.5 size-4" />
           <span className="tracking-tight uppercase">Markets</span>
@@ -913,7 +913,7 @@ function HomeContent() {
             setActiveFeature(null);
             router.push("/bots");
           }}
-          className="flex w-full flex-col items-center justify-center py-1 text-[9px] text-zinc-400 transition-colors hover:text-white"
+          className="flex w-full flex-col items-center justify-center py-1 text-[9px] text-muted-foreground transition-colors hover:text-foreground"
         >
           <Bot className="mb-0.5 size-4" />
           <span className="tracking-tight uppercase">Bots</span>
@@ -925,13 +925,13 @@ function HomeContent() {
           onClick={() => setActiveFeature(UPCOMING_FEATURES[2])}
           className={`relative flex w-full flex-col items-center justify-center py-1 text-[9px] transition-colors ${
             activeFeature?.id === "earn"
-              ? "text-[#22c55e]"
-              : "text-zinc-400 hover:text-white"
+              ? "text-green-500"
+              : "text-muted-foreground hover:text-foreground"
           }`}
         >
           <div className="relative mb-0.5">
             <Coins className="size-4" />
-            <Lock className="absolute -top-1 -right-1.5 size-2 text-zinc-400" />
+            <Lock className="absolute -top-1 -right-1.5 size-2 text-muted-foreground" />
           </div>
           <span className="tracking-tight uppercase">Earn</span>
         </button>
@@ -943,7 +943,7 @@ function HomeContent() {
               <button
                 type="button"
                 aria-label="Open profile"
-                className="flex w-full flex-col items-center justify-center py-1 text-[9px] text-zinc-400 transition-colors hover:text-white"
+                className="flex w-full flex-col items-center justify-center py-1 text-[9px] text-muted-foreground transition-colors hover:text-foreground"
               >
                 <Avatar className="border-foreground mb-0.5 size-4 border bg-black">
                   <AvatarFallback className="bg-black">
