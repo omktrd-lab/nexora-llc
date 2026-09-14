@@ -210,14 +210,14 @@ function SidebarMarketList({ activeSymbol, onSelectSymbol }) {
     : merged;
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col overflow-hidden border-t border-[#16181d] bg-[#0d0d0f]">
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden border-t border-border bg-muted">
       {/* Header */}
-      <div className="flex shrink-0 items-center justify-between border-b border-[#16181d] bg-[#0d0d0f] px-3 py-2">
+      <div className="flex shrink-0 items-center justify-between border-b border-border bg-muted px-3 py-2">
         <div className="flex items-center gap-1.5">
-          <span className="text-[10px] font-bold tracking-wider text-zinc-300 uppercase">
+          <span className="text-[10px] font-bold tracking-wider text-foreground uppercase">
             Markets
           </span>
-          <span className="py-0.2 rounded bg-zinc-800 px-1 font-mono text-[8px] text-zinc-400">
+          <span className="py-0.2 rounded bg-muted px-1 font-mono text-[8px] text-muted-foreground">
             {merged.length}
           </span>
         </div>
@@ -226,12 +226,12 @@ function SidebarMarketList({ activeSymbol, onSelectSymbol }) {
           placeholder="Filter..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-20 rounded border border-transparent bg-[#16181d] px-2 py-0.5 text-[10px] text-white placeholder-zinc-500 focus:border-zinc-700 focus:outline-none"
+          className="w-20 rounded border border-transparent bg-background px-2 py-0.5 text-[10px] text-foreground placeholder-muted-foreground focus:border-border focus:outline-none"
         />
       </div>
 
       {/* Column Labels */}
-      <div className="grid shrink-0 grid-cols-[1fr_auto] items-center gap-2 border-b border-[#16181d] bg-[#090a0c] px-3 py-1 text-[9px] font-semibold tracking-wider text-zinc-500 uppercase">
+      <div className="grid shrink-0 grid-cols-[1fr_auto] items-center gap-2 border-b border-border bg-background px-3 py-1 text-[9px] font-semibold tracking-wider text-muted-foreground uppercase">
         <span>Pair</span>
         <span className="text-right">Price</span>
       </div>
@@ -245,24 +245,24 @@ function SidebarMarketList({ activeSymbol, onSelectSymbol }) {
               key={m.symbol}
               type="button"
               onClick={() => onSelectSymbol(m.symbol)}
-              className={`grid w-full grid-cols-[1fr_auto] items-center gap-2 px-3 py-2 text-left text-xs transition-colors hover:bg-[#16181d] ${
+              className={`grid w-full grid-cols-[1fr_auto] items-center gap-2 px-3 py-2 text-left text-xs transition-colors hover:bg-muted ${
                 isSelected
-                  ? "border-l-2 border-[#22c55e] bg-[#16181d]"
+                  ? "border-l-2 border-green-500 bg-muted"
                   : "border-l-2 border-transparent"
               }`}
             >
               <div className="flex min-w-0 items-center gap-1.5">
-                <span className="truncate text-[11px] font-semibold text-white">
+                <span className="truncate text-[11px] font-semibold text-foreground">
                   {m.base}
                 </span>
-                <span className="text-[9px] text-zinc-500">/USDT</span>
+                <span className="text-[9px] text-muted-foreground">/USDT</span>
                 {m.isNative && (
                   <span className="shrink-0 rounded bg-emerald-500/20 px-1 text-[7px] font-bold text-[#22c55e]">
                     NXR
                   </span>
                 )}
               </div>
-              <span className="text-right font-mono text-[11px] text-zinc-200 tabular-nums">
+              <span className="text-right font-mono text-[11px] text-foreground tabular-nums">
                 {m.price > 0 ? formatMarketPrice(m.price, m.decimals) : "--"}
               </span>
             </button>
