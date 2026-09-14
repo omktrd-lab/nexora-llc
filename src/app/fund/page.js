@@ -263,14 +263,14 @@ function FundPageContent() {
       </div>
 
       {!phoneNumber || isEditingPhone ? null : (
-        <div className="fixed inset-x-0 bottom-0 z-40 grid h-14 grid-cols-2 items-center border-t border-[#16181d] bg-[#090a0c] px-2 md:hidden">
+        <div className="fixed inset-x-0 bottom-0 z-40 grid h-14 grid-cols-2 items-center border-t border-border bg-background px-2 md:hidden">
           <button
             type="button"
             onClick={() => setActiveFlow("fund")}
             className={`flex h-full items-center justify-center text-xs font-medium transition-colors ${
               activeFlow === "fund"
-                ? "text-[#22c55e]"
-                : "text-zinc-500 hover:text-white"
+                ? "text-green-500"
+                : "text-muted-foreground hover:text-foreground"
             }`}
           >
             Fund
@@ -280,8 +280,8 @@ function FundPageContent() {
             onClick={() => setActiveFlow("withdraw")}
             className={`flex h-full items-center justify-center text-xs font-medium transition-colors ${
               activeFlow === "withdraw"
-                ? "text-[#22c55e]"
-                : "text-zinc-500 hover:text-white"
+                ? "text-green-500"
+                : "text-muted-foreground hover:text-foreground"
             }`}
           >
             Withdraw
@@ -290,14 +290,14 @@ function FundPageContent() {
       )}
 
       {/* ── Mobile Bottom Navigation ── */}
-      <nav className="fixed inset-x-0 bottom-0 z-40 grid h-14 grid-cols-5 items-center border-t border-[#16181d] bg-[#090a0c] px-1 md:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-40 grid h-14 grid-cols-5 items-center border-t border-border bg-background px-1 md:hidden">
         <button
           type="button"
           onClick={() => router.push("/fund")}
           className={`flex flex-col items-center justify-center text-[10px] transition-colors ${
             activeFlow === "fund"
-              ? "text-[#22c55e] font-semibold"
-              : "text-zinc-400 hover:text-white"
+              ? "text-green-500 font-semibold"
+              : "text-muted-foreground hover:text-foreground"
           }`}
         >
           <WalletCards className="mb-0.5 size-4" />
@@ -309,8 +309,8 @@ function FundPageContent() {
           onClick={() => router.push("/fund?view=withdraw")}
           className={`flex flex-col items-center justify-center text-[10px] transition-colors ${
             activeFlow === "withdraw"
-              ? "text-[#22c55e] font-semibold"
-              : "text-zinc-400 hover:text-white"
+              ? "text-green-500 font-semibold"
+              : "text-muted-foreground hover:text-foreground"
           }`}
         >
           <ArrowLeftRight className="mb-0.5 size-4" />
@@ -320,7 +320,7 @@ function FundPageContent() {
         <button
           type="button"
           onClick={() => router.push("/trade")}
-          className="flex flex-col items-center justify-center text-[10px] text-zinc-400 hover:text-white transition-colors"
+          className="flex flex-col items-center justify-center text-[10px] text-muted-foreground hover:text-foreground transition-colors"
         >
           <ArrowLeftRight className="mb-0.5 size-4" />
           <span>Trade</span>
@@ -329,7 +329,7 @@ function FundPageContent() {
         <button
           type="button"
           onClick={() => router.push("/markets")}
-          className="flex flex-col items-center justify-center text-[10px] text-zinc-400 hover:text-white transition-colors"
+          className="flex flex-col items-center justify-center text-[10px] text-muted-foreground hover:text-foreground transition-colors"
         >
           <LineChart className="mb-0.5 size-4" />
           <span>Markets</span>
@@ -338,7 +338,7 @@ function FundPageContent() {
         <button
           type="button"
           onClick={() => setIsProfileOpen(true)}
-          className="flex flex-col items-center justify-center text-[10px] text-zinc-400 hover:text-white transition-colors"
+          className="flex flex-col items-center justify-center text-[10px] text-muted-foreground hover:text-foreground transition-colors"
         >
           <Users className="mb-0.5 size-4" />
           <span>Profile</span>
