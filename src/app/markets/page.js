@@ -404,7 +404,7 @@ export default function MarketsPage() {
         {/* Phone-native market list: price gets its own right-aligned column,
             while change and the trade action get a dedicated second line. */}
         <div
-          className="markets-mobile-list overflow-hidden border border-border bg-muted md:hidden"
+          className="markets-mobile-list overflow-hidden border border-border bg-card md:hidden"
         >
           <div className="flex items-center justify-between border-b border-border px-4 py-2.5 text-[10px] font-semibold tracking-widest text-muted-foreground uppercase">
             <span>Markets</span>
@@ -429,7 +429,7 @@ export default function MarketsPage() {
 
         {/* Table header */}
         <div
-          className="hidden rounded-t-lg border border-b-0 border-border bg-muted md:block"
+          className="hidden rounded-t-lg border border-b-0 border-border bg-card md:block"
         >
           <div
             className="grid items-center gap-4 border-b border-border px-4 py-2.5 text-[10px] font-semibold tracking-widest text-muted-foreground uppercase"
@@ -448,7 +448,7 @@ export default function MarketsPage() {
 
         {/* Rows */}
         <div
-          className="hidden overflow-hidden rounded-b-lg border border-border bg-muted md:block"
+          className="hidden overflow-hidden rounded-b-lg border border-border bg-card md:block"
         >
           {loading ? (
             Array.from({ length: 8 }).map((_, i) => <SkeletonRow key={i} />)
@@ -460,7 +460,7 @@ export default function MarketsPage() {
             markets.map((market, idx) => (
               <div
                 key={market.symbol}
-                className="grid cursor-pointer items-center gap-4 border-b border-border px-4 py-3.5 transition-colors hover:bg-muted"
+                className="grid cursor-pointer items-center gap-4 border-b border-border px-4 py-3.5 transition-colors hover:bg-muted/50"
                 style={{
                   gridTemplateColumns: "1fr 1fr 80px 1fr 1fr 80px",
                 }}
