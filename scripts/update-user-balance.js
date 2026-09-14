@@ -28,7 +28,7 @@ async function updateBalance() {
     if (nxrBalance !== undefined) console.log(`NXR Balance: ${nxrBalance}`);
     if (usdtBalance !== undefined) console.log(`USDT Balance: ${usdtBalance}`);
 
-    // Get current user prefs
+    // Get current user details
     const userResponse = await fetch(
       `${APPWRITE_ENDPOINT}/users/${encodeURIComponent(userId)}`,
       {
@@ -47,7 +47,12 @@ async function updateBalance() {
     const user = await userResponse.json();
     const currentPrefs = user.prefs || {};
 
-    console.log("Current balances:");
+    console.log("\nUser Details:");
+    console.log(`  Name: ${user.name || "Not set"}`);
+    console.log(`  Email: ${user.email || "Not set"}`);
+    console.log(`  User ID: ${user.$id}`);
+
+    console.log("\nCurrent balances:");
     console.log(`  KES: ${currentPrefs.balanceKes || 0}`);
     console.log(`  NXR: ${currentPrefs.nxrBalance || 0}`);
     console.log(`  USDT: ${currentPrefs.usdtBalance || 0}`);
