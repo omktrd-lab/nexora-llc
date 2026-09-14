@@ -1069,7 +1069,7 @@ function PhoneNumberPrompt({ initialValue, isEditing, onSaved }) {
   }
 
   return (
-    <div className="w-full max-w-lg rounded-xl border border-[#1e1e22] bg-[#0d0d0f] px-4 py-5 text-left md:px-8 md:py-7">
+    <div className="w-full max-w-lg rounded-xl border border-border bg-muted px-4 py-5 text-left md:px-8 md:py-7">
       <p className="text-muted-foreground text-sm font-medium">
         Before you fund your account
       </p>
@@ -1081,7 +1081,7 @@ function PhoneNumberPrompt({ initialValue, isEditing, onSaved }) {
       </p>
 
       <form onSubmit={savePhoneNumber} className="mt-9">
-        <div className="w-full rounded-lg border border-[#1e1e22] bg-[#111214] p-3 sm:p-4">
+        <div className="w-full rounded-lg border border-border bg-background p-3 sm:p-4">
           <InputOTP
             maxLength={10}
             pattern="[0-9]*"
@@ -1096,7 +1096,7 @@ function PhoneNumberPrompt({ initialValue, isEditing, onSaved }) {
                 <InputOTPSlot
                   key={index}
                   index={index}
-                  className="h-9 flex-1 rounded-md border border-[#2a2a2d] bg-[#0b0b0d] text-base text-white sm:h-10 sm:text-lg"
+                  className="h-9 flex-1 rounded-md border border-border bg-background text-base text-foreground sm:h-10 sm:text-lg"
                 />
               ))}
             </InputOTPGroup>
