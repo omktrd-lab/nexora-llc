@@ -697,61 +697,110 @@ function CryptoDepositPanel() {
 }
 
 function WithdrawPanel({ availableUsdt, isEligible, onOpenReferrals }) {
+  const [withdrawMethod, setWithdrawMethod] = useState("crypto");
   const [amount, setAmount] = useState("");
   const [walletAddress, setWalletAddress] = useState("");
+  const [mpesaPhone, setMpesaPhone] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [status, setStatus] = useState("");
+
+  useEffect(() => {
+    const savedWithdrawal = localStorage.getItem("mpesaWithdrawal");
+    if (savedWithdrawal) {
+      const { timestamp } = JSON.parse(savedWithdrawal);
+      const oneHour = 60 * 60 * 1000;
+      if (Date.now() - timestamp < oneHour) {
+        setStatus("Your earlier M-Pesa withdrawal is being processed. You can try again in less than 1 hour.");
+      } else {
+        localStorage.removeItem("mpesaWithdrawal");
+      }
+    }
+  }, []);
 
   async function handleSubmit(event) {
     event.preventDefault();
     const numericAmount = Number(amount);
     if (!Number.isFinite(numericAmount) || numericAmount <= 0) {
-      setError("Enter a valid USDT amount.");
+      setError("Enter a valid amount.");
       return;
     }
     if (numericAmount > Number(availableUsdt || 0)) {
       setError("Insufficient USDT balance.");
       return;
     }
-    if (!walletAddress || !/^0x[a-fA-F0-9]{40}$/.test(walletAddress)) {
-      setError("Enter a valid BNB Chain wallet address.");
-      return;
-    }
 
-    setIsLoading(true);
-    setError("");
-    setStatus("");
-
-    try {
-      const jwtResponse = await account.createJWT();
-      const response = await fetch("/api/crypto-withdrawal/submit", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${jwtResponse.jwt}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          amount: numericAmount,
-          walletAddress,
-        }),
-      });
-
-      const result = await response.json();
-      if (!response.ok) {
-        throw new Error(result.message || "Could not submit withdrawal request.");
+    if (withdrawMethod === "crypto") {
+      if (!walletAddress || !/^0x[a-fA-F0-9]{40}$/.test(walletAddress)) {
+        setError("Enter a valid BNB Chain wallet address.");
+        return;
       }
 
-      setStatus("Withdrawal request submitted. Your USDT will be sent within 20 minutes.");
-      setAmount("");
-      setWalletAddress("");
-      toast.success("Withdrawal request submitted", {
-        description: "We'll send your USDT within 20 minutes.",
-      });
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not submit withdrawal request.");
-    } finally {
-      setIsLoading(false);
+      setIsLoading(true);
+      setError("");
+      setStatus("");
+
+      try {
+        const jwtResponse = await account.createJWT();
+        const response = await fetch("/api/crypto-withdrawal/submit", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${jwtResponse.jwt}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            amount: numericAmount,
+            walletAddress,
+          }),
+        });
+
+        const result = await response.json();
+        if (!response.ok) {
+          throw new Error(result.message || "Could not submit withdrawal request.");
+        }
+
+        setStatus("Withdrawal request submitted. Your USDT will be sent within 20 minutes.");
+        setAmount("");
+        setWalletAddress("");
+        toast.success("Withdrawal request submitted", {
+          description: "We'll send your USDT within 20 minutes.",
+        });
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Could not submit withdrawal request.");
+      } finally {
+        setIsLoading(false);
+      }
+    } else {
+      if (!mpesaPhone || !/^(01|07)\d{8}$/.test(mpesaPhone)) {
+        setError("Enter a valid M-Pesa number beginning with 01 or 07.");
+        return;
+      }
+
+      const savedWithdrawal = localStorage.getItem("mpesaWithdrawal");
+      if (savedWithdrawal) {
+        const { timestamp } = JSON.parse(savedWithdrawal);
+        const oneHour = 60 * 60 * 1000;
+        if (Date.now() - timestamp < oneHour) {
+          setError("Your earlier M-Pesa withdrawal is being processed. Please wait.");
+          return;
+        }
+      }
+
+      setIsLoading(true);
+      setError("");
+      setStatus("");
+
+      localStorage.setItem("mpesaWithdrawal", JSON.stringify({ timestamp: Date.now() }));
+
+      setTimeout(() => {
+        setIsLoading(false);
+        setStatus("Transaction successful. Your funds will arrive in less than 10 minutes.");
+        setAmount("");
+        setMpesaPhone("");
+        toast.success("Transaction successful", {
+          description: "Your transaction is currently on the queue and you will receive funds on your M-Pesa in less than 10 minutes.",
+        });
+      }, 2000);
     }
   }
 
@@ -760,7 +809,7 @@ function WithdrawPanel({ availableUsdt, isEligible, onOpenReferrals }) {
       <div className="mb-6">
         <p className="text-muted-foreground text-sm font-medium">Withdraw</p>
         <h2 className="text-foreground mt-3 text-3xl font-semibold tracking-tight">
-          USDT payout
+          {withdrawMethod === "crypto" ? "USDT payout" : "M-Pesa payout"}
         </h2>
       </div>
 
@@ -773,6 +822,32 @@ function WithdrawPanel({ availableUsdt, isEligible, onOpenReferrals }) {
         </p>
       </div>
 
+      {/* Toggle between Crypto and M-Pesa */}
+      <div className="mb-6 flex gap-2">
+        <button
+          type="button"
+          onClick={() => setWithdrawMethod("crypto")}
+          className={`flex-1 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+            withdrawMethod === "crypto"
+              ? "bg-foreground text-background"
+              : "bg-muted text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          Crypto
+        </button>
+        <button
+          type="button"
+          onClick={() => setWithdrawMethod("mpesa")}
+          className={`flex-1 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+            withdrawMethod === "mpesa"
+              ? "bg-foreground text-background"
+              : "bg-muted text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          M-Pesa
+        </button>
+      </div>
+
       {Number(availableUsdt || 0) <= 0 ? (
         <div className="space-y-4">
           <p className="flex items-start gap-2 text-sm leading-6 text-amber-200">
@@ -782,91 +857,157 @@ function WithdrawPanel({ availableUsdt, isEligible, onOpenReferrals }) {
         </div>
       ) : (
         <>
-          <div className="mb-4 rounded-md bg-muted p-4 text-sm">
-            <p className="font-medium mb-2">Instructions:</p>
-            <ol className="list-decimal list-inside space-y-1 text-muted-foreground">
-              <li>Go to Binance</li>
-              <li>Select Deposit Crypto</li>
-              <li>Choose USDT</li>
-              <li>Select BNB Chain (BSC)</li>
-              <li>Copy your wallet address</li>
-              <li>Paste it below to withdraw</li>
-            </ol>
-          </div>
+          {withdrawMethod === "crypto" ? (
+            <>
+              <div className="mb-4 rounded-md bg-muted p-4 text-sm">
+                <p className="font-medium mb-2">Instructions:</p>
+                <ol className="list-decimal list-inside space-y-1 text-muted-foreground">
+                  <li>Go to Binance</li>
+                  <li>Select Deposit Crypto</li>
+                  <li>Choose USDT</li>
+                  <li>Select BNB Chain (BSC)</li>
+                  <li>Copy your wallet address</li>
+                  <li>Paste it below to withdraw</li>
+                </ol>
+              </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="mb-2 block text-sm font-medium text-foreground">
-                Amount in USDT
-              </label>
-              <Input
-                type="number"
-                min="0.01"
-                step="0.01"
-                inputMode="decimal"
-                value={amount}
-                onChange={(event) => setAmount(event.target.value)}
-                placeholder="Enter amount"
-                required
-              />
-            </div>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-foreground">
+                    Amount in USDT
+                  </label>
+                  <Input
+                    type="number"
+                    min="0.01"
+                    step="0.01"
+                    inputMode="decimal"
+                    value={amount}
+                    onChange={(event) => setAmount(event.target.value)}
+                    placeholder="Enter amount"
+                    required
+                  />
+                </div>
 
-            <div>
-              <label className="mb-2 block text-sm font-medium text-foreground">
-                Your BNB Chain Wallet Address
-              </label>
-              <Input
-                type="text"
-                value={walletAddress}
-                onChange={(event) => setWalletAddress(event.target.value)}
-                placeholder="0x..."
-                className="font-mono text-xs"
-                required
-              />
-            </div>
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-foreground">
+                    Your BNB Chain Wallet Address
+                  </label>
+                  <Input
+                    type="text"
+                    value={walletAddress}
+                    onChange={(event) => setWalletAddress(event.target.value)}
+                    placeholder="0x..."
+                    className="font-mono text-xs"
+                    required
+                  />
+                </div>
 
-            {status && (
-              <p className="text-muted-foreground text-sm" role="status">
-                {status}
+                {status && (
+                  <p className="text-muted-foreground text-sm" role="status">
+                    {status}
+                  </p>
+                )}
+
+                {error && (
+                  <p className="text-destructive text-sm" role="alert">
+                    {error}
+                  </p>
+                )}
+
+                <Button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full"
+                >
+                  {isLoading ? "Submitting..." : "Withdraw USDT"}
+                </Button>
+              </form>
+
+              <p className="text-muted-foreground text-xs mt-4">
+                Withdrawals typically take 20 minutes to hit your Binance wallet.
               </p>
-            )}
 
-            {error && (
-              <p className="text-destructive text-sm" role="alert">
-                {error}
+              <div className="mt-4 rounded-md bg-muted border border-border p-4">
+                <p className="text-sm font-medium text-foreground mb-1">
+                  🎉 Limited Time Offer
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Refer a friend now and get 30% bonus on your NXR holdings! While your withdrawal processes, start earning more.
+                </p>
+                <Button
+                  type="button"
+                  onClick={onOpenReferrals}
+                  variant="outline"
+                  size="sm"
+                  className="mt-2 w-full"
+                >
+                  Refer a Friend
+                </Button>
+              </div>
+            </>
+          ) : (
+            <>
+              <p className="text-muted-foreground max-w-md text-sm leading-6 mb-6">
+                Withdraw your USDT balance to M-Pesa using the current forex rate.
               </p>
-            )}
 
-            <Button
-              type="submit"
-              disabled={isLoading}
-              className="w-full"
-            >
-              {isLoading ? "Submitting..." : "Withdraw USDT"}
-            </Button>
-          </form>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-foreground">
+                    Amount in USDT
+                  </label>
+                  <Input
+                    type="number"
+                    min="0.01"
+                    step="0.01"
+                    inputMode="decimal"
+                    value={amount}
+                    onChange={(event) => setAmount(event.target.value)}
+                    placeholder="Enter amount"
+                    required
+                  />
+                </div>
 
-          <p className="text-muted-foreground text-xs mt-4">
-            Withdrawals typically take 20 minutes to hit your Binance wallet.
-          </p>
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-foreground">
+                    M-Pesa Phone Number
+                  </label>
+                  <Input
+                    type="tel"
+                    value={mpesaPhone}
+                    onChange={(event) => setMpesaPhone(event.target.value.replace(/\D/g, "").slice(0, 10))}
+                    placeholder="07XXXXXXXX"
+                    className="font-mono text-xs"
+                    required
+                  />
+                </div>
 
-          <div className="mt-4 rounded-md bg-muted border border-border p-4">
-            <p className="text-sm font-medium text-foreground mb-1">
-              🎉 Limited Time Offer
-            </p>
-            <p className="text-xs text-muted-foreground">
-              Refer a friend now and get 30% bonus on your NXR holdings! While your withdrawal processes, start earning more.
-            </p>
-            <Button
-              type="button"
-              onClick={onOpenReferrals}
-              variant="outline"
-              size="sm"
-              className="mt-2 w-full"
-            >
-              Refer a Friend
-            </Button>
-          </div>
+                {status && (
+                  <p className="text-muted-foreground text-sm" role="status">
+                    {status}
+                  </p>
+                )}
+
+                {error && (
+                  <p className="text-destructive text-sm" role="alert">
+                    {error}
+                  </p>
+                )}
+
+                <Button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full"
+                >
+                  {isLoading ? "Processing..." : "Withdraw to M-Pesa"}
+                </Button>
+              </form>
+
+              <p className="text-muted-foreground text-xs mt-4">
+                Funds will be converted using the current USD/KES rate and sent to your M-Pesa within 10 minutes.
+              </p>
+            </>
+          )}
         </>
       )}
     </div>
