@@ -168,7 +168,30 @@ export async function POST(request) {
       const users = new Users(appwriteClient);
       const user = await users.get(withdrawal.userId);
       const currentUsdtBalance = Number(user.prefs?.usdtBalance || 0);
-      const newUsdtBalance = currentUsdtBalance - withdrawal.amount;
+      const botProfitUsdt = Number(user.prefs?.botProfitUsdt || 0);
+      const withdrawalAmount = withdrawal.amount;
+
+      // Deduct from usdtBalance first, then from botProfitUsdt
+      let newUsdtBalance = currentUsdtBalance;
+      let newBotProfitUsdt = botProfitUsdt;
+      let remainingDeduction = withdrawalAmount;
+
+      // Deduct from usdtBalance first
+      if (newUsdtBalance >= remainingDeduction) {
+        newUsdtBalance -= remainingDeduction;
+        remainingDeduction = 0;
+      } else {
+        remainingDeduction -= newUsdtBalance;
+        newUsdtBalance = 0;
+      }
+
+      // Deduct remaining from botProfitUsdt
+      if (remainingDeduction > 0) {
+        newBotProfitUsdt -= remainingDeduction;
+        if (newBotProfitUsdt < 0) {
+          newBotProfitUsdt = 0;
+        }
+      }
 
       await fetch(
         `${getAppwriteEndpoint()}/users/${encodeURIComponent(withdrawal.userId)}/prefs`,
@@ -179,6 +202,7 @@ export async function POST(request) {
             prefs: {
               ...(user.prefs || {}),
               usdtBalance: newUsdtBalance,
+              botProfitUsdt: newBotProfitUsdt,
             },
           }),
         },

@@ -84,9 +84,12 @@ export async function POST(request) {
       .setJWT(jwt);
     const currentUser = await new Account(appwriteClient).get();
 
-    // Check user's USDT balance
+    // Check user's combined USDT balance (usdtBalance + botProfitUsdt)
     const currentUsdtBalance = Number(currentUser.prefs?.usdtBalance || 0);
-    if (amount > currentUsdtBalance) {
+    const botProfitUsdt = Number(currentUser.prefs?.botProfitUsdt || 0);
+    const totalUsdtBalance = currentUsdtBalance + botProfitUsdt;
+    
+    if (amount > totalUsdtBalance) {
       return jsonError("Insufficient USDT balance.", 400);
     }
 
