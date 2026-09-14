@@ -177,12 +177,12 @@ export async function GET(request) {
         const ticker24h = await fetchMexcTicker24h(binanceSymbol);
         const latestBar = bars.at(-1);
         
-        // Use UNI values directly with small lag offset
+        // Use UNI values directly without lag offset for natural price movement
         const uniPrice = Number(ticker24h.lastPrice);
-        const price = uniPrice - 0.05; // Small price lag
-        const high24h = Number(ticker24h.highPrice) - 0.05;
-        const low24h = Number(ticker24h.lowPrice) - 0.05;
-        const quoteVolume24h = Number(ticker24h.quoteVolume); // No volume lag for stability
+        const price = uniPrice;
+        const high24h = Number(ticker24h.highPrice);
+        const low24h = Number(ticker24h.lowPrice);
+        const quoteVolume24h = Number(ticker24h.quoteVolume);
 
         if (type === "latest") {
           if (!latestBar) {
