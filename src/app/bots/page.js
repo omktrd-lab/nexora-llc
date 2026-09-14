@@ -11,6 +11,7 @@ import {
   CircleHelp,
   Landmark,
   Lock,
+  PieChart,
   Search,
   ShieldCheck,
   Waves,
