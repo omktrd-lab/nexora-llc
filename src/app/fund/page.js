@@ -22,6 +22,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { canUserWithdraw } from "@/lib/referrals";
 import { toast } from "sonner";
+import { getKesPerUsd } from "@/lib/nxr-pricing";
 import {
   InputOTP,
   InputOTPGroup,
@@ -704,6 +705,11 @@ function WithdrawPanel({ availableUsdt, isEligible, onOpenReferrals }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [status, setStatus] = useState("");
+  const [kesPerUsd, setKesPerUsd] = useState(130);
+
+  useEffect(() => {
+    getKesPerUsd().then(setKesPerUsd);
+  }, []);
 
   useEffect(() => {
     const savedWithdrawal = localStorage.getItem("mpesaWithdrawal");
@@ -966,6 +972,11 @@ function WithdrawPanel({ availableUsdt, isEligible, onOpenReferrals }) {
                     placeholder="Enter amount"
                     required
                   />
+                  {amount && Number(amount) > 0 && (
+                    <p className="mt-2 text-sm text-muted-foreground">
+                      You will receive: <span className="font-semibold text-foreground">KES {(Number(amount) * kesPerUsd).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                    </p>
+                  )}
                 </div>
 
                 <div>
