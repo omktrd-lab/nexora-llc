@@ -16,6 +16,7 @@ import {
   Sparkles,
   TrendingDown,
   TrendingUp,
+  User,
   Users,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
