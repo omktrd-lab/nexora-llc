@@ -131,14 +131,14 @@ function TickerSelector({ activeSymbol, onSelectSymbol }) {
       </button>
 
       {open && (
-        <div className="absolute top-full left-0 z-50 mt-2 w-56 rounded border border-[#16181d] bg-[#0d0d0f] py-1 shadow-xl">
+        <div className="absolute top-full left-0 z-50 mt-2 w-56 rounded border border-border bg-muted py-1 shadow-xl">
           {MARKETS.map((m) => (
             <button
               key={m.symbol}
               type="button"
-              className={`flex w-full items-center gap-3 px-3 py-2 text-left text-xs transition-colors hover:bg-[#16181d] ${
+              className={`flex w-full items-center gap-3 px-3 py-2 text-left text-xs transition-colors hover:bg-muted ${
                 m.symbol === activeSymbol
-                  ? "text-foreground bg-[#16181d]"
+                  ? "text-foreground bg-muted"
                   : "text-muted-foreground"
               }`}
               onClick={() => {
@@ -146,7 +146,7 @@ function TickerSelector({ activeSymbol, onSelectSymbol }) {
                 setOpen(false);
               }}
             >
-              <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-[#1c1c1f] text-[9px] font-bold text-white">
+              <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-muted text-[9px] font-bold text-foreground">
                 {m.base[0]}
               </span>
               <span className="text-foreground font-medium">{m.base}/USDT</span>
