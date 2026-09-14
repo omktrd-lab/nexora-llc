@@ -95,8 +95,8 @@ export default function BotsPage() {
     : 0;
 
   return (
-    <main className="bots-arena flex min-h-screen flex-col bg-[#090a0c] pb-8 text-white lg:h-svh lg:min-h-0 lg:overflow-hidden lg:pb-0">
-      <header className="terminal-header hidden h-14 shrink-0 items-center border-b border-[#27272a] px-4 lg:flex">
+    <main className="bots-arena flex min-h-screen flex-col bg-background pb-8 text-foreground lg:h-svh lg:min-h-0 lg:overflow-hidden lg:pb-0">
+      <header className="terminal-header hidden h-14 shrink-0 items-center border-b border-border px-4 lg:flex">
         <div className="flex items-center gap-8">
           <button
             onClick={() => router.push("/trade")}
@@ -136,52 +136,49 @@ export default function BotsPage() {
             {["Futures", "Margin", "Earn"].map((item) => (
               <button
                 key={item}
-                className="group flex items-center gap-1 transition-colors hover:text-zinc-200"
+                className="group flex items-center gap-1 transition-colors hover:text-foreground"
               >
                 <span>{item}</span>
                 <Lock className="size-2.5 opacity-60" />
-                <span className="rounded bg-zinc-800 px-1 text-[8px] text-zinc-400">
+                <span className="rounded bg-muted px-1 text-[8px] text-muted-foreground">
                   SOON
                 </span>
               </button>
             ))}
-            <button className="flex items-center gap-1 font-medium text-white">
-              <Bot className="size-3.5 text-[#22c55e]" /> Bots
+            <button className="flex items-center gap-1 font-medium text-foreground">
+              <Bot className="size-3.5 text-green-500" /> Bots
             </button>
-            <button className="group flex items-center gap-1 transition-colors hover:text-zinc-200">
+            <button className="group flex items-center gap-1 transition-colors hover:text-foreground">
               <span>Launchpad</span>
               <Lock className="size-2.5 opacity-60" />
-              <span className="rounded bg-zinc-800 px-1 text-[8px] text-zinc-400">
+              <span className="rounded bg-muted px-1 text-[8px] text-muted-foreground">
                 SOON
               </span>
             </button>
             <button
               onClick={() => router.push("/portfolio")}
-              className="transition-colors hover:text-white"
+              className="transition-colors hover:text-foreground"
             >
               Portfolio
             </button>
             <button
               onClick={() => router.push("/referrals")}
-              className="transition-colors hover:text-white"
+              className="transition-colors hover:text-foreground"
             >
               Referrals
             </button>
           </nav>
         </div>
         <div className="ml-auto flex items-center gap-3">
-          <div className="flex w-44 items-center gap-2 rounded bg-[#1a1b1f] px-3 py-2 text-xs text-zinc-500">
+          <div className="flex w-44 items-center gap-2 rounded bg-muted px-3 py-2 text-xs text-muted-foreground">
             <Search className="size-3.5" /> Search markets
           </div>
-          <button className="text-zinc-500">
+          <button className="text-muted-foreground">
             <Bell className="size-4" />
-          </button>
-          <button className="text-zinc-500">
-            <CircleHelp className="size-4" />
           </button>
           <button
             onClick={() => router.push("/portfolio")}
-            className="grid size-7 place-items-center rounded-full border border-zinc-500 text-[10px] font-bold"
+            className="grid size-7 place-items-center rounded-full border border-muted-foreground text-[10px] font-bold"
           >
             N
           </button>
@@ -195,18 +192,18 @@ export default function BotsPage() {
         >
           NEXORA
         </button>
-        <span className="flex items-center gap-1 text-[10px] text-[#22c55e]">
+        <span className="flex items-center gap-1 text-[10px] text-green-500">
           <Activity className="size-3" /> BOTS
         </span>
         <button
           onClick={() => router.push("/portfolio")}
-          className="text-[10px] text-zinc-400"
+          className="text-[10px] text-muted-foreground"
         >
           Portfolio
         </button>
       </header>
 
-      <section className="shrink-0 px-4 py-5 lg:border-b lg:border-[#27272a] lg:py-3">
+      <section className="shrink-0 px-4 py-5 lg:border-b lg:border-border lg:py-3">
         <div className="flex flex-wrap items-center gap-x-8 gap-y-3">
           <div>
             <h1 className="mt-1 text-lg font-semibold tracking-tight">
@@ -222,32 +219,32 @@ export default function BotsPage() {
               good={Number(arena?.totalBotPnlUsd) >= 0}
             />
           </div>
-          <div className="hidden min-w-0 flex-1 items-center justify-between gap-6 text-[10px] text-zinc-500 lg:flex">
+          <div className="hidden min-w-0 flex-1 items-center justify-between gap-6 text-[10px] text-muted-foreground lg:flex">
             <span>
-              Pool <strong className="font-mono font-normal text-zinc-300">{money(arena?.liquidityPoolUsd || 233000)}</strong>
+              Pool <strong className="font-mono font-normal text-foreground">{money(arena?.liquidityPoolUsd || 233000)}</strong>
             </span>
             <span>
-              Reserve <strong className="font-mono font-normal text-zinc-300">{money(arena?.privateReserveUsd || 1400000)}</strong>
+              Reserve <strong className="font-mono font-normal text-foreground">{money(arena?.privateReserveUsd || 1400000)}</strong>
             </span>
             <span>
-              Distribution <strong className="font-mono font-normal text-[#22c55e]">{money(arena?.holderDistributionUsd)}</strong>
+              Distribution <strong className="font-mono font-normal text-green-500">{money(arena?.holderDistributionUsd)}</strong>
             </span>
-            <span className="font-mono text-zinc-400">
+            <span className="font-mono text-muted-foreground">
               {arena?.executions?.length || 0} events
             </span>
           </div>
         </div>
       </section>
 
-      <section className="grid min-h-0 flex-1 overflow-hidden lg:border-b lg:border-[#27272a] lg:grid-cols-[minmax(0,1fr)_340px]">
+      <section className="grid min-h-0 flex-1 overflow-hidden lg:border-b lg:border-border lg:grid-cols-[minmax(0,1fr)_340px]">
         <div className="min-w-0">
-          <div className="hidden grid-cols-2 border-b border-[#27272a] lg:grid">
+          <div className="hidden grid-cols-2 border-b border-border lg:grid">
             {ARENA_MARKETS.map((symbol) => (
               <button
                 key={symbol}
                 type="button"
                 onClick={() => setSelected(symbol)}
-                className={`min-w-0 border-r border-b border-[#27272a] text-left ${selected === symbol ? "ring-1 ring-[#22c55e]/60 ring-inset" : ""}`}
+                className={`min-w-0 border-r border-b border-border text-left ${selected === symbol ? "ring-1 ring-green-500/60 ring-inset" : ""}`}
               >
                 <NxrMarketChart
                   symbol={symbol}
@@ -264,7 +261,7 @@ export default function BotsPage() {
                 <button
                   key={symbol}
                   onClick={() => setSelected(symbol)}
-                  className={`shrink-0 px-3 py-2 text-[10px] font-semibold ${selected === symbol ? "border-b border-[#22c55e] text-[#22c55e]" : "text-zinc-500"}`}
+                  className={`shrink-0 px-3 py-2 text-[10px] font-semibold ${selected === symbol ? "border-b border-green-500 text-green-500" : "text-muted-foreground"}`}
                 >
                   {shortPair(symbol)}
                 </button>
@@ -296,26 +293,26 @@ export default function BotsPage() {
           label="Nexora liquidity pool"
           value={money(arena?.liquidityPoolUsd || 233000)}
           detail="Holder liquidity · steady inflow"
-          tone="text-[#22c55e]"
+          tone="text-green-500"
         />
         <Pool
           icon={Landmark}
           label="Private reserve"
           value={money(arena?.privateReserveUsd || 1400000)}
-          detail="Strategy credit and settlement"
-          tone="text-white"
+          detail="Risk buffer · operational fund"
+          tone="text-foreground"
         />
         <Pool
-          icon={CircleDollarSign}
+          icon={PieChart}
           label="Holder distribution"
           value={money(arena?.holderDistributionUsd)}
           detail="Allocated through NXR ownership"
-          tone="text-[#22c55e]"
+          tone="text-green-500"
         />
       </section>
 
       <section className="px-4 py-5 lg:hidden">
-        <div className="flex items-center justify-between py-2 text-[10px] font-semibold tracking-[.16em] text-zinc-500 uppercase">
+        <div className="flex items-center justify-between py-2 text-[10px] font-semibold tracking-[.16em] text-muted-foreground uppercase">
           <span>Execution ledger</span>
           <span>{arena?.executions?.length || 0} events</span>
         </div>
@@ -335,9 +332,9 @@ export default function BotsPage() {
 function Stat({ label, value, good = false }) {
   return (
     <div>
-      <p className="text-zinc-600 uppercase">{label}</p>
+      <p className="text-muted-foreground uppercase">{label}</p>
       <p
-        className={`mt-1 font-mono text-xs ${good ? "text-[#22c55e]" : "text-white"}`}
+        className={`mt-1 font-mono text-xs ${good ? "text-green-500" : "text-foreground"}`}
       >
         {value}
       </p>
@@ -347,11 +344,11 @@ function Stat({ label, value, good = false }) {
 function Pool({ icon: Icon, label, value, detail, tone }) {
   return (
     <div className="px-0 py-1">
-      <p className="flex items-center gap-2 text-[10px] font-bold tracking-[.15em] text-zinc-500 uppercase">
+      <p className="flex items-center gap-2 text-[10px] font-bold tracking-[.15em] text-muted-foreground uppercase">
         <Icon className="size-3.5" /> {label}
       </p>
       <p className={`mt-2 font-mono text-xl font-semibold ${tone}`}>{value}</p>
-      <p className="mt-1 text-[10px] text-zinc-500">{detail}</p>
+      <p className="mt-1 text-[10px] text-muted-foreground">{detail}</p>
     </div>
   );
 }
@@ -388,19 +385,19 @@ function ArenaSidebar({ selected, arena, activity }) {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="relative flex size-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#22c55e] opacity-75" />
-              <span className="relative inline-flex size-2 rounded-full bg-[#22c55e]" />
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-500 opacity-75" />
+              <span className="relative inline-flex size-2 rounded-full bg-green-500" />
             </span>
-            <span className="font-mono text-xs font-bold tracking-wide text-white">
+            <span className="font-mono text-xs font-bold tracking-wide text-foreground">
               {shortPair(selected)}
             </span>
-            <span className="font-mono text-[9px] text-zinc-400">
+            <span className="font-mono text-[9px] text-muted-foreground">
               {strategyCode(activePosition?.strategy)}
             </span>
           </div>
           <div className="flex items-center gap-1.5 font-mono text-[10px]">
-            <span className="text-zinc-500">SPREAD</span>
-            <span className="font-semibold text-zinc-200">
+            <span className="text-muted-foreground">SPREAD</span>
+            <span className="font-semibold text-foreground">
               {currentSpread} bps
             </span>
           </div>
@@ -409,26 +406,26 @@ function ArenaSidebar({ selected, arena, activity }) {
         {/* Snapshot Metrics Grid */}
         <div className="mt-3 grid grid-cols-3 gap-1.5 text-center font-mono">
           <div className="px-2 py-1.5">
-            <p className="text-[8px] tracking-wider text-zinc-500 uppercase">
+            <p className="text-[8px] tracking-wider text-muted-foreground uppercase">
               Committed
             </p>
-            <p className="mt-0.5 text-[11px] font-semibold text-white">
+            <p className="mt-0.5 text-[11px] font-semibold text-foreground">
               {capitalCommitted > 0 ? money(capitalCommitted) : "$0.00"}
             </p>
           </div>
           <div className="px-2 py-1.5">
-            <p className="text-[8px] tracking-wider text-zinc-500 uppercase">
+            <p className="text-[8px] tracking-wider text-muted-foreground uppercase">
               Positions
             </p>
-            <p className="mt-0.5 text-[11px] font-semibold text-zinc-300">
+            <p className="mt-0.5 text-[11px] font-semibold text-foreground">
               {openPositions.length ? `${openPositions.length} Live` : "0 Open"}
             </p>
           </div>
           <div className="px-2 py-1.5">
-            <p className="text-[8px] tracking-wider text-zinc-500 uppercase">
+            <p className="text-[8px] tracking-wider text-muted-foreground uppercase">
               Model
             </p>
-            <p className="mt-0.5 text-[11px] font-semibold text-[#22c55e]">
+            <p className="mt-0.5 text-[11px] font-semibold text-green-500">
               {strategyCode(activePosition?.strategy)}
             </p>
           </div>
@@ -438,10 +435,10 @@ function ArenaSidebar({ selected, arena, activity }) {
       {/* ── MIDDLE LAYER: Active Execution ── */}
       <div className="shrink-0 p-3.5">
         <div className="mb-2 flex items-center justify-between">
-          <span className="text-[9px] font-bold tracking-[0.16em] text-zinc-500 uppercase">
+          <span className="text-[9px] font-bold tracking-[0.16em] text-muted-foreground uppercase">
             Active Execution
           </span>
-          <span className="font-mono text-[9px] text-zinc-400">
+          <span className="font-mono text-[9px] text-muted-foreground">
             {activePosition ? "ROUTING IN-FLIGHT" : "IDLE"}
           </span>
         </div>
@@ -449,37 +446,37 @@ function ArenaSidebar({ selected, arena, activity }) {
         {activePosition ? (
           <div className="p-2.5 font-mono">
             <div className="flex items-center justify-between text-xs">
-              <span className="font-bold text-white">
+              <span className="font-bold text-foreground">
                 {routeNotation(activePosition.symbol)}
               </span>
-              <span className="font-semibold text-white">
+              <span className="font-semibold text-foreground">
                 {money(activePosition.capitalUsd)}
               </span>
             </div>
-            <div className="mt-1 flex items-center justify-between text-[10px] text-zinc-400">
+            <div className="mt-1 flex items-center justify-between text-[10px] text-muted-foreground">
               <span className="truncate">{activePosition.strategy}</span>
-              <span className="text-zinc-300">
+              <span className="text-foreground">
                 entry: {activePosition.spreadBps} bps
               </span>
             </div>
             <div className="mt-2.5 flex items-center gap-2">
-              <div className="h-1 flex-1 overflow-hidden rounded-full bg-zinc-800">
-                <div className="h-full w-2/3 animate-pulse bg-[#22c55e]" />
+              <div className="h-1 flex-1 overflow-hidden rounded-full bg-muted">
+                <div className="h-full w-2/3 animate-pulse bg-green-500" />
               </div>
-              <span className="text-[8px] font-bold tracking-wider text-[#22c55e]">
+              <span className="text-[8px] font-bold tracking-wider text-green-500">
                 EXECUTING
               </span>
             </div>
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-3.5 text-center">
-            <div className="flex items-center gap-1.5 text-zinc-400">
-              <Activity className="size-3 animate-pulse text-zinc-500" />
-              <span className="font-mono text-[10px] text-zinc-300">
+            <div className="flex items-center gap-1.5 text-muted-foreground">
+              <Activity className="size-3 animate-pulse text-muted-foreground" />
+              <span className="font-mono text-[10px] text-foreground">
                 Scanning spread routes…
               </span>
             </div>
-            <p className="mt-1 font-mono text-[8px] text-zinc-600">
+            <p className="mt-1 font-mono text-[8px] text-muted-foreground">
               Threshold: ≥ 3.0 bps · Latency: ~12ms
             </p>
           </div>
@@ -487,23 +484,23 @@ function ArenaSidebar({ selected, arena, activity }) {
       </div>
 
       {/* ── BOTTOM LAYER: Recent Completed Executions ── */}
-      <div className="flex min-h-0 flex-1 flex-col lg:bg-[#0c0d10]">
+      <div className="flex min-h-0 flex-1 flex-col lg:bg-muted">
         <div className="flex shrink-0 items-center justify-between px-3.5 py-2">
-          <span className="text-[9px] font-bold tracking-[0.16em] text-zinc-500 uppercase">
+          <span className="text-[9px] font-bold tracking-[0.16em] text-muted-foreground uppercase">
             Execution Ledger
           </span>
           <div className="flex items-center gap-1 font-mono text-[9px]">
             <button
               type="button"
               onClick={() => setTab("market")}
-              className={`px-1.5 py-0.5 transition-colors ${tab === "market" ? "text-white underline underline-offset-4" : "text-zinc-500 hover:text-zinc-300"}`}
+              className={`px-1.5 py-0.5 transition-colors ${tab === "market" ? "text-foreground underline underline-offset-4" : "text-muted-foreground hover:text-foreground"}`}
             >
               {shortPair(selected).split("/")[0]}
             </button>
             <button
               type="button"
               onClick={() => setTab("all")}
-              className={`px-1.5 py-0.5 transition-colors ${tab === "all" ? "text-white underline underline-offset-4" : "text-zinc-500 hover:text-zinc-300"}`}
+              className={`px-1.5 py-0.5 transition-colors ${tab === "all" ? "text-foreground underline underline-offset-4" : "text-muted-foreground hover:text-foreground"}`}
             >
               All
             </button>
@@ -511,7 +508,7 @@ function ArenaSidebar({ selected, arena, activity }) {
         </div>
 
         {/* Ledger Column Headers */}
-        <div className="grid shrink-0 grid-cols-[48px_56px_40px_38px_1fr] items-center gap-1 px-3 py-1.5 font-mono text-[8px] tracking-wider text-zinc-600 uppercase">
+        <div className="grid shrink-0 grid-cols-[48px_56px_40px_38px_1fr] items-center gap-1 px-3 py-1.5 font-mono text-[8px] tracking-wider text-muted-foreground uppercase">
           <span>Time</span>
           <span>Route</span>
           <span>Model</span>
@@ -520,7 +517,7 @@ function ArenaSidebar({ selected, arena, activity }) {
         </div>
 
         {/* Ledger Rows */}
-        <div className="overflow-y-auto font-mono lg:divide-y lg:divide-[#16171d]/60">
+        <div className="overflow-y-auto font-mono lg:divide-y lg:divide-border/60">
           {displayedHistory.length ? (
             displayedHistory.map((entry, idx) => {
               const positive = Number(entry.pnlUsd) >= 0;
@@ -532,20 +529,20 @@ function ArenaSidebar({ selected, arena, activity }) {
               return (
                 <div
                   key={`${entry.id || entry.positionId}-${entry.type || ""}-${idx}`}
-                  className="grid grid-cols-[48px_56px_40px_38px_1fr] items-center gap-1 px-3 py-1.5 text-[9px] transition-colors hover:bg-[#13151c]"
+                  className="grid grid-cols-[48px_56px_40px_38px_1fr] items-center gap-1 px-3 py-1.5 text-[9px] transition-colors hover:bg-muted"
                 >
-                  <span className="text-[8px] text-zinc-500">{timeStr}</span>
-                  <span className="font-medium text-zinc-300">
+                  <span className="text-[8px] text-muted-foreground">{timeStr}</span>
+                  <span className="font-medium text-foreground">
                     {routeNotation(entry.symbol)}
                   </span>
-                  <span className="text-[8px] text-zinc-500">
+                  <span className="text-[8px] text-muted-foreground">
                     {strategyCode(entry.strategy)}
                   </span>
                   <span
                     className={
                       entry.type === "OPEN"
                         ? "text-[8px] text-amber-400"
-                        : "text-[8px] text-zinc-400"
+                        : "text-[8px] text-muted-foreground"
                     }
                   >
                     {entry.type}
@@ -553,10 +550,10 @@ function ArenaSidebar({ selected, arena, activity }) {
                   <span
                     className={`text-right font-semibold ${
                       entry.type === "OPEN"
-                        ? "text-zinc-600"
+                        ? "text-muted-foreground"
                         : positive
-                          ? "text-[#22c55e]"
-                          : "text-[#a855f7]"
+                          ? "text-green-500"
+                          : "text-purple-500"
                     }`}
                   >
                     {entry.type === "OPEN"
@@ -567,7 +564,7 @@ function ArenaSidebar({ selected, arena, activity }) {
               );
             })
           ) : (
-            <div className="p-4 text-center text-[10px] text-zinc-600">
+            <div className="p-4 text-center text-[10px] text-muted-foreground">
               No recent executions
             </div>
           )}
@@ -580,21 +577,21 @@ function ArenaSidebar({ selected, arena, activity }) {
 function LedgerRow({ entry }) {
   const positive = Number(entry.pnlUsd) >= 0;
   return (
-    <div className="grid grid-cols-[68px_80px_70px_1fr_auto] items-center gap-2 border-t border-[#18191d] px-4 py-2 font-mono text-[10px] hover:bg-[#101217]">
-      <span className="text-[9px] text-zinc-600">
+    <div className="grid grid-cols-[68px_80px_70px_1fr_auto] items-center gap-2 border-t border-border px-4 py-2 font-mono text-[10px] hover:bg-muted">
+      <span className="text-[9px] text-muted-foreground">
         {new Date(entry.timestamp).toLocaleTimeString([], {
           hour: "2-digit",
           minute: "2-digit",
           second: "2-digit",
         })}
       </span>
-      <span className="font-semibold text-zinc-300">
+      <span className="font-semibold text-foreground">
         {routeNotation(entry.symbol)}
       </span>
-      <span className="text-[9px] text-zinc-500">
+      <span className="text-[9px] text-muted-foreground">
         {strategyCode(entry.strategy)}
       </span>
-      <span className="truncate text-[9px] text-zinc-500">
+      <span className="truncate text-[9px] text-muted-foreground">
         {entry.type === "OPEN"
           ? "Routing liquidity"
           : entry.status || "Completed"}
@@ -602,10 +599,10 @@ function LedgerRow({ entry }) {
       <span
         className={`text-right font-semibold ${
           entry.type === "OPEN"
-            ? "text-zinc-500"
+            ? "text-muted-foreground"
             : positive
-              ? "text-[#22c55e]"
-              : "text-[#a855f7]"
+              ? "text-green-500"
+              : "text-purple-500"
         }`}
       >
         {entry.type === "OPEN"
