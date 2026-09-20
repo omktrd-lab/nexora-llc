@@ -406,8 +406,8 @@ function FundPanel({ onBalanceUpdated, onCollapse }) {
   async function startPayment(event) {
     event.preventDefault();
     const numericAmount = Number(amount);
-    if (!Number.isSafeInteger(numericAmount) || numericAmount < 1) {
-      setError("Enter a valid amount in KES.");
+    if (!Number.isSafeInteger(numericAmount) || numericAmount < 500) {
+      setError("Minimum deposit amount is KES 500.");
       return;
     }
 
@@ -730,8 +730,8 @@ function WithdrawPanel({ availableUsdt, isEligible, onOpenReferrals }) {
   async function handleSubmit(event) {
     event.preventDefault();
     const numericAmount = Number(amount);
-    if (!Number.isFinite(numericAmount) || numericAmount <= 0) {
-      setError("Enter a valid amount.");
+    if (!Number.isSafeInteger(numericAmount) || numericAmount < 5) {
+      setError("Minimum withdrawal amount is 5 USDT.");
       return;
     }
     if (numericAmount > Number(availableUsdt || 0)) {
