@@ -58,6 +58,7 @@ export async function POST(request) {
     // Build updated prefs
     const updatedPrefs = {
       ...currentPrefs,
+      botProfitAccrualAt: new Date().toISOString(),
     };
 
     if (Number.isFinite(balanceKes)) {
