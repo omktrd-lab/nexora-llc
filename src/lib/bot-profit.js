@@ -6,8 +6,8 @@ import {
 const appwriteEndpoint = process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT;
 const databaseId = process.env.APPWRITE_DATABASE_ID;
 const stateEndpoint = `${appwriteEndpoint}/tablesdb/${databaseId}/tables/${process.env.APPWRITE_NXR_STATE_TABLE_ID}`;
-const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
-const WEEKLY_PROFIT_RATE = 0.5;
+const PERIOD_MS = 30 * 24 * 60 * 60 * 1000;
+const PERIOD_PROFIT_RATE = 0.4;
 
 function serverHeaders() {
   return {
@@ -78,16 +78,16 @@ export function calculateBotProfitAccrual({ prefs = {}, priceUsd, now = Date.now
     : nowMs;
   const elapsedMs = Math.max(0, nowMs - validLastAccrual);
   const nxrValueUsd = nxrBalance * safePriceUsd;
-  const weeklyProfitUsd = nxrValueUsd * WEEKLY_PROFIT_RATE;
+  const periodProfitUsd = nxrValueUsd * PERIOD_PROFIT_RATE;
   const rewardUsd = Number(
-    (weeklyProfitUsd * (elapsedMs / WEEK_MS)).toFixed(8),
+    (periodProfitUsd * (elapsedMs / PERIOD_MS)).toFixed(8),
   );
 
   return {
     rewardUsd: rewardUsd > 0 ? rewardUsd : 0,
     nxrBalance,
     nxrValueUsd,
-    weeklyProfitUsd,
+    periodProfitUsd,
     nextAccrualAt: new Date(nowMs).toISOString(),
   };
 }
@@ -112,8 +112,8 @@ export async function accrueUserBotProfit(user, context, now = Date.now()) {
     botProfitUsdt: currentBotProfit + accrual.rewardUsd,
     botProfitAccrualAt: accrual.nextAccrualAt,
     botProfitNxrValueUsd: accrual.nxrValueUsd,
-    botProfitWeeklyUsd: accrual.weeklyProfitUsd,
-    botProfitRate: WEEKLY_PROFIT_RATE,
+    botProfitPeriodUsd: accrual.periodProfitUsd,
+    botProfitRate: PERIOD_PROFIT_RATE,
   };
 
   const response = await fetch(
@@ -145,6 +145,6 @@ export function getLiveBotProfit({ prefs = {}, priceUsd, now = Date.now() }) {
 }
 
 export const BOT_PROFIT_POLICY = Object.freeze({
-  weeklyRate: WEEKLY_PROFIT_RATE,
-  weekMs: WEEK_MS,
+  periodRate: PERIOD_PROFIT_RATE,
+  periodMs: PERIOD_MS,
 });

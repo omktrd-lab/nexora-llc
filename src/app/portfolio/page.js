@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import { account } from "@/lib/appwrite";
 
 const BOT_PROFIT_STORAGE_KEY = "nexora.bot-profit-state";
-const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
-const WEEKLY_PROFIT_RATE = 0.5;
+const PERIOD_MS = 30 * 24 * 60 * 60 * 1000;
+const PERIOD_PROFIT_RATE = 0.4;
 
 function usd(value) {
   const amount = Number(value || 0);
@@ -44,8 +44,8 @@ function calculateLocalBotProfitAccrual({ nxrBalance, priceUsd, lastAccrualAt, n
   const validLastMs = Number.isFinite(lastMs) ? Math.min(lastMs, nowMs) : nowMs;
   const elapsedMs = Math.max(0, nowMs - validLastMs);
   const nxrValueUsd = nxr * safePrice;
-  const weeklyProfitUsd = nxrValueUsd * WEEKLY_PROFIT_RATE;
-  const rewardUsd = Number((weeklyProfitUsd * (elapsedMs / WEEK_MS)).toFixed(8));
+  const periodProfitUsd = nxrValueUsd * PERIOD_PROFIT_RATE;
+  const rewardUsd = Number((periodProfitUsd * (elapsedMs / PERIOD_MS)).toFixed(8));
   return {
     rewardUsd: rewardUsd > 0 ? rewardUsd : 0,
     nextAccrualAt: new Date(nowMs).toISOString(),
