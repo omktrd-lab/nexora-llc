@@ -111,6 +111,7 @@ function FundPageContent() {
     if (isSigningOut) return;
     setIsSigningOut(true);
     await account.deleteSession("current");
+    window.localStorage.removeItem("nexora.bot-profit-state");
     router.replace("/auth");
   }
 
