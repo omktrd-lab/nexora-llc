@@ -78,6 +78,17 @@ export default function LandingPage() {
         >
           Privacy Policy
         </a>
+
+        {/* WhatsApp Support Link */}
+        <a
+          href="https://wa.me/254738722495"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-3 flex items-center justify-center gap-2 text-xs text-zinc-500 hover:text-zinc-400"
+        >
+          <span>Need help?</span>
+          <span className="font-medium">Chat on WhatsApp</span>
+        </a>
       </div>
     </main>
   );
