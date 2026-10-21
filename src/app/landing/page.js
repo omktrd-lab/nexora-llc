@@ -6,8 +6,8 @@ export default function LandingPage() {
   const router = useRouter();
 
   return (
-    <main className="flex h-screen w-full flex-col items-center justify-center bg-[#090a0c] px-6">
-      <div className="max-w-2xl">
+    <main className="flex h-screen w-full flex-col items-center justify-center overflow-hidden bg-[#090a0c] px-6">
+      <div className="max-w-2xl w-full">
         {/* App Name */}
         <p className="mb-4 text-xs font-semibold tracking-widest text-zinc-500 uppercase">
           Nexora
@@ -84,10 +84,9 @@ export default function LandingPage() {
           href="https://wa.me/254738722495"
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-3 flex items-center justify-center gap-2 text-xs text-zinc-500 hover:text-zinc-400"
+          className="mt-3 block text-xs text-zinc-500 hover:text-zinc-400"
         >
-          <span>Need help?</span>
-          <span className="font-medium">Chat on WhatsApp</span>
+          Need help? Click to chat on WhatsApp
         </a>
       </div>
     </main>
