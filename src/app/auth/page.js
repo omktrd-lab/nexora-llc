@@ -1,6 +1,5 @@
 "use client";
 
-import { OAuthProvider } from "appwrite";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { account } from "@/lib/appwrite";
@@ -13,12 +12,20 @@ export default function AuthPage() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    if (params.get("error") === "oauth") {
-      setError("Google sign-in was not completed. Please try again.");
-    } else if (params.get("error") === "session") {
-      setError(
-        "Google accepted the sign-in, but this browser did not keep the session. Please try again.",
-      );
+    const rawError = params.get("error");
+    if (rawError) {
+      try {
+        const parsed = JSON.parse(rawError);
+        setError(parsed.message || "Google sign-in was not completed. Please try again.");
+      } catch {
+        if (rawError === "session") {
+          setError(
+            "Google accepted the sign-in, but this browser did not keep the session. Please try again.",
+          );
+        } else {
+          setError("Google sign-in was not completed. Please try again.");
+        }
+      }
     }
 
     account
@@ -37,23 +44,10 @@ export default function AuthPage() {
     // Get ref from URL params (server-driven, no localStorage)
     const urlParams = new URLSearchParams(window.location.search);
     const refCode = urlParams.get("ref");
-    const successUrl = refCode 
-      ? `${window.location.origin}/auth/callback?ref=${refCode}`
-      : `${window.location.origin}/auth/callback`;
-
-    console.log("=== OAUTH INITIATION ===");
-    console.log("Current URL:", window.location.href);
-    console.log("Ref code from URL:", refCode);
-    console.log("OAuth success URL:", successUrl);
-
-    // Token flow returns userId and secret to this app, then the callback
-    // creates the session here. createOAuth2Session only sets a cookie on
-    // fra.cloud.appwrite.io, which browsers now drop as a third-party cookie.
-    account.createOAuth2Token(
-      OAuthProvider.Google,
-      successUrl,
-      `${window.location.origin}/auth?error=oauth`,
-    );
+    const startUrl = refCode
+      ? `/api/auth/google?ref=${encodeURIComponent(refCode)}`
+      : "/api/auth/google";
+    window.location.assign(startUrl);
   }
 
   if (checkingSession) {
