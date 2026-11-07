@@ -1,30 +1,70 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { account, databases, ID } from "@/lib/appwrite";
 
 const REFERRALS_COLLECTION_ID = process.env.NEXT_PUBLIC_REFERRALS_COLLECTION_ID || "referrals";
 const DATABASE_ID = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID;
 
+function isSessionLimitError(error) {
+  const type = error?.type || "";
+  const message = String(error?.message || "").toLowerCase();
+  return (
+    type === "user_session_already_exists" ||
+    message.includes("maximum number of sessions") ||
+    message.includes("session limit")
+  );
+}
+
+async function establishSession(userId, secret) {
+  try {
+    await account.createSession(userId, secret);
+  } catch (error) {
+    if (!isSessionLimitError(error)) throw error;
+
+    const response = await fetch("/api/auth/clear-sessions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId, secret }),
+    });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(result.message || "Could not free an old sign-in session.");
+    }
+    if (result.cookieFallback) {
+      window.localStorage.setItem("cookieFallback", result.cookieFallback);
+      return;
+    }
+    await account.createSession(userId, secret);
+  }
+}
+
 function AuthCallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [processing, setProcessing] = useState(true);
+  const started = useRef(false);
 
   useEffect(() => {
+    if (started.current) return;
+    started.current = true;
+
     const processCallback = async () => {
+      const userId = searchParams.get("userId");
+      const secret = searchParams.get("secret");
+      const referrerId = searchParams.get("ref");
+
       try {
         console.log("=== AUTH CALLBACK START ===");
-        
-        // Get the current user session
+
+        if (userId && secret) {
+          await establishSession(userId, secret);
+          window.history.replaceState({}, "", "/auth/callback");
+        }
+
         const currentUser = await account.get();
         console.log("Current user ID:", currentUser.$id);
-        console.log("Current user email:", currentUser.email);
-
-        // Get referral ID from URL params
-        const referrerId = searchParams.get("ref");
-        console.log("Referrer ID from URL:", referrerId);
 
         // Create referral record if ref exists and not self-referral
         if (referrerId) {
@@ -67,7 +107,7 @@ function AuthCallbackContent() {
         console.error("Auth callback error:", error);
         console.error("Error details:", JSON.stringify(error, null, 2));
         // If no session, redirect to auth
-        router.replace("/auth");
+        router.replace("/auth?error=session");
       } finally {
         setProcessing(false);
       }

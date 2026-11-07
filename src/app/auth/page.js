@@ -12,8 +12,13 @@ export default function AuthPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (window.location.search.includes("error=oauth")) {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("error") === "oauth") {
       setError("Google sign-in was not completed. Please try again.");
+    } else if (params.get("error") === "session") {
+      setError(
+        "Google accepted the sign-in, but this browser did not keep the session. Please try again.",
+      );
     }
 
     account
@@ -41,7 +46,10 @@ export default function AuthPage() {
     console.log("Ref code from URL:", refCode);
     console.log("OAuth success URL:", successUrl);
 
-    account.createOAuth2Session(
+    // Token flow returns userId and secret to this app, then the callback
+    // creates the session here. createOAuth2Session only sets a cookie on
+    // fra.cloud.appwrite.io, which browsers now drop as a third-party cookie.
+    account.createOAuth2Token(
       OAuthProvider.Google,
       successUrl,
       `${window.location.origin}/auth?error=oauth`,
